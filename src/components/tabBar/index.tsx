@@ -1,50 +1,79 @@
+"use client";
+import { Route } from "@/constants/route";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 const TabBar = () => {
+  const pathname = usePathname();
+
   return (
     <div className="min-h-full">
       <nav className="bg-white border-b-[1px] border-b-slate-200">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <img
-                  className="h-[24px] w-[146px]"
-                  src={"/assets/image/Logo.svg"}
-                  alt="Your Company"
-                />
-              </div>
+              <Link href={"/"}>
+                <div className="flex-shrink-0">
+                  <img
+                    className="h-[24px] w-[146px]"
+                    src={"/assets/image/Logo.svg"}
+                    alt="Your Company"
+                  />
+                </div>
+              </Link>
               <div className="hidden md:block">
                 <div className="ml-10 flex items-baseline space-x-4">
-                  <a
-                    href="#"
-                    className="hover:bg-gray-700 hover:text-white text-gray-900 rounded-md px-3 py-2 text-sm font-medium"
+                  <Link
+                    href={Route.BROWSE_ALL}
+                    className={`hover:bg-indigo-600 hover:text-white text-gray-900 rounded-md px-3 py-2 text-sm font-medium ${
+                      pathname === Route.BROWSE_ALL
+                        ? "text-indigo-600 decoration-solid underline"
+                        : ""
+                    }`}
                     aria-current="page"
                   >
-                    Browse all
-                  </a>
-                  <a
-                    href="#"
-                    className="text-gray-900 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                    Browse All
+                  </Link>
+                  <Link
+                    href={Route.CODED_TEMPLATE}
+                    className={`hover:bg-indigo-600 hover:text-white text-gray-900 rounded-md px-3 py-2 text-sm font-medium ${
+                      pathname === Route.CODED_TEMPLATE
+                        ? "text-indigo-600 decoration-solid underline"
+                        : ""
+                    }`}
+                  >
+                    Coded Template
+                  </Link>
+                  <Link
+                    href={Route.BRANDING}
+                    className={`hover:bg-indigo-600 hover:text-white text-gray-900 rounded-md px-3 py-2 text-sm font-medium ${
+                      pathname === Route.BRANDING
+                        ? "text-indigo-600 decoration-solid underline"
+                        : ""
+                    }`}
+                  >
+                    Branding
+                  </Link>
+                  <Link
+                    href={Route.PRESENTATION}
+                    className={`hover:bg-indigo-600 hover:text-white text-gray-900 rounded-md px-3 py-2 text-sm font-medium ${
+                      pathname === Route.PRESENTATION
+                        ? "text-indigo-600 decoration-solid underline"
+                        : ""
+                    }`}
+                  >
+                    Presentation
+                  </Link>
+                  <Link
+                    href={Route.UI_KIT}
+                    className={`hover:bg-indigo-600 hover:text-white text-gray-900 rounded-md px-3 py-2 text-sm font-medium ${
+                      pathname === Route.UI_KIT
+                        ? "text-indigo-600 decoration-solid underline"
+                        : ""
+                    }`}
                   >
                     UI Kit
-                  </a>
-                  <a
-                    href="#"
-                    className="text-gray-900 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                  >
-                    Template
-                  </a>
-                  <a
-                    href="#"
-                    className="text-gray-900 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                  >
-                    Wireframe kit
-                  </a>
-                  <a
-                    href="#"
-                    className="text-gray-900 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                  >
-                    3D
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
