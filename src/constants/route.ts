@@ -5,4 +5,5 @@ export enum Route {
   BRANDING = "/category-detail/branding",
   PRESENTATION = "/category-detail/presentation",
   DETAIL_THEME = "/detail/",
+  PROFILE = "/profile",
 }

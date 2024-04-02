@@ -1,10 +1,36 @@
 "use client";
 import { Route } from "@/constants/route";
+import { shortenAddress } from "@/utils/helper";
+import { PhantomWalletName } from "@solana/wallet-adapter-phantom";
+import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCallback, useState } from "react";
 
 const TabBar = () => {
   const pathname = usePathname();
+  const { connect, select, publicKey, disconnect, connected } = useWallet();
+  const [showOption, setShowOption] = useState<boolean>(false);
+
+  const handleConnectWallet = useCallback(async () => {
+    try {
+      await select(PhantomWalletName);
+      await connect();
+    } catch (error) {}
+  }, [connect, select]);
+
+  const handleProfile = useCallback(() => {
+    setShowOption(false);
+  }, []);
+
+  const handleOption = useCallback(() => {
+    setShowOption((prev) => !prev);
+  }, []);
+
+  const handleSignOut = useCallback(() => {
+    setShowOption(false);
+    disconnect();
+  }, [disconnect]);
 
   return (
     <div className="min-h-full">
@@ -120,61 +146,71 @@ const TabBar = () => {
 
                 <div className="relative ml-3">
                   <div>
-                    <button
-                      type="button"
-                      className="relative flex max-w-xs items-center rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                      id="user-menu-button"
-                      aria-expanded="false"
-                      aria-haspopup="true"
-                    >
-                      <p className="text-slate-900 text-base font-medium mr-1">
-                        Connect wallet
-                      </p>
-                      <img
-                        className="h-[20px] w-[20px] rounded-full"
-                        src={"/assets/image/wallet.svg"}
-                        alt="wallet"
-                      />
-                    </button>
+                    {connected ? (
+                      <button
+                        onClick={handleOption}
+                        className="flex items-center h-[44px] rounded-[12px] bg-indigo-50 px-3"
+                      >
+                        <img
+                          src={"/assets/image/SOL.svg"}
+                          alt="SOL"
+                          className="w-[32px]"
+                        />
+                        <p className="text-sm font-medium text-indigo-600 ml-2">
+                          {shortenAddress(publicKey?.toBase58() || "")}
+                        </p>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleConnectWallet}
+                        type="button"
+                        className="relative flex max-w-xs items-center rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                        id="user-menu-button"
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                      >
+                        <p className="text-slate-900 text-base font-medium mr-1">
+                          Connect wallet
+                        </p>
+                        <img
+                          className="h-[20px] w-[20px] rounded-full"
+                          src={"/assets/image/wallet.svg"}
+                          alt="wallet"
+                        />
+                      </button>
+                    )}
                   </div>
-
-                  {/* <div
-                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="user-menu-button"
-                    tabIndex={-1}
-                  >
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700"
-                      role="menuitem"
-                      tabIndex={-1}
-                      id="user-menu-item-0"
-                    >
-                      Your Profile
-                    </a>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700"
-                      role="menuitem"
-                      tabIndex={-1}
-                      id="user-menu-item-1"
-                    >
-                      Settings
-                    </a>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700"
-                      role="menuitem"
-                      tabIndex={-1}
-                      id="user-menu-item-2"
-                    >
-                      Sign out
-                    </a>
-                  </div> */}
                 </div>
               </div>
+              {showOption && (
+                <div
+                  className="absolute right-0 z-10 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none mt-2"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="user-menu-button"
+                  tabIndex={-1}
+                >
+                  <Link
+                    href={Route.PROFILE}
+                    onClick={handleProfile}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50"
+                    role="menuitem"
+                    tabIndex={-1}
+                    id="user-menu-item-0"
+                  >
+                    Your Profile
+                  </Link>
+                  <a
+                    onClick={handleSignOut}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50"
+                    role="menuitem"
+                    tabIndex={-1}
+                    id="user-menu-item-2"
+                  >
+                    Sign out
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>
