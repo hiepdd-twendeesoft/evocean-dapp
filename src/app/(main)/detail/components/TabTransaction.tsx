@@ -75,7 +75,7 @@ const TabTransaction = () => {
                   <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
                     46,53%
                   </td>
-                  <td className="border-t-0 px-6 py-4 align-middle text-xs whitespace-nowrap">
+                  <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
                     46,53%
                   </td>
                 </tr>

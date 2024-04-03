@@ -28,7 +28,7 @@ const Preview = () => {
   }, []);
 
   return (
-    <div>
+    <div className="z-10">
       <img
         onClick={handleViewerImage}
         src="/assets/image/theme.png"
@@ -41,9 +41,10 @@ const Preview = () => {
         pagination={{
           clickable: true,
         }}
+        className="-z-10"
       >
         {images.map((item, index) => (
-          <SwiperSlide key={index} className="cursor-pointer group">
+          <SwiperSlide key={index} className="cursor-pointer group -z-10">
             <img
               src={item}
               alt="theme"

@@ -1,11 +1,22 @@
+"use client";
+
 import ItemNft from "@/components/itemNft";
-import Category from "../../components/Category";
 import ContentTab from "../components/ContentTab";
+import ModalBuyOwnership, {
+  modalBuyOwnershipControl,
+  refModalBuyOwnership,
+} from "../components/ModalBuyOwnership";
 import Preview from "../components/Preview";
+import { useCallback } from "react";
 
 const DetailThemePage = () => {
+  const handleBuyOwner = useCallback(() => {
+    modalBuyOwnershipControl.show();
+  }, []);
+
   return (
     <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16">
+      <ModalBuyOwnership ref={refModalBuyOwnership} />
       <div className="flex items-start justify-between max-md:flex-col mb-12">
         <div className="w-[53%] max-md:w-[100%]">
           <Preview />
@@ -108,7 +119,7 @@ const DetailThemePage = () => {
             the creator?
           </p>
           <div className="flex items-center mt-2">
-            <button className="mr-3">
+            <button className="mr-3" onClick={handleBuyOwner}>
               <p className="text-sm font-medium text-indigo-600">
                 Buy Ownership
               </p>

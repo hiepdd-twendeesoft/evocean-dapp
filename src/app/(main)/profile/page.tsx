@@ -3,6 +3,7 @@
 import TabNavigation from "@/components/tabNavigation";
 import { TAB_PROFILE } from "@/constants/data";
 import { useCallback, useState, lazy } from "react";
+import ModalOrder, { refModalOrder } from "./components/ModalOrder";
 
 const TabPurchase = lazy(
   () => import("@/app/(main)/profile/components/TabPurchase")
@@ -40,6 +41,7 @@ const ProfilePage = () => {
       />
       {indexTab === 0 && <TabPurchase />}
       {indexTab === 1 && <TabOwner />}
+      <ModalOrder ref={refModalOrder} />
     </div>
   );
 };
