@@ -1,28 +1,37 @@
 "use client";
 
-import { memo } from "react";
+import { FC, memo } from "react";
 import { useRouter } from "next/navigation";
 import { Route } from "@/constants/route";
+import { ItemTheme } from "@/models/common.type";
 
-const ItemNft = () => {
+interface IProps extends Partial<ItemTheme> {
+  handleItem?: (id: number) => void;
+  image?: string;
+}
+
+const ItemNft: FC<IProps> = ({ handleItem, image, name, id }) => {
   const router = useRouter();
 
-  const handleItem = () => {
+  const _handleItem = () => {
+    if (handleItem && id) {
+      return handleItem(id);
+    }
     router.push(`${Route.DETAIL_THEME}/3637348484`);
   };
 
   return (
     <div
-      onClick={handleItem}
+      onClick={_handleItem}
       className="mb-[12px] cursor-pointer hover:-translate-y-1 duration-200"
     >
       <img
-        src={"/assets/image/theme.png"}
+        src={image || "/assets/image/theme.png"}
         alt="Theme"
-        className="w-[100%] rounded-[16px] border-gray-300 border-[1px]"
+        className="w-[100%] rounded-[16px] border-gray-300 border-[1px] h-[200px]"
       />
       <h2 className="text-base text-gray-900 font-semibold mt-[12px] line-clamp-1">
-        DataWise Framer - Multi-Layout SaaS Framer Template
+        {name || "DataWise Framer - Multi-Layout SaaS Framer Template"}
       </h2>
       <p className="text-[#565E76] text-sm font-normal">UI Kit</p>
       <div className="items-center flex border-gray-200 border-[1px] rounded-[12px] mt-[12px] h-[44px]">

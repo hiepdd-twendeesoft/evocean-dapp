@@ -4,6 +4,8 @@ import TabNavigation from "@/components/tabNavigation";
 import { TAB_PROFILE } from "@/constants/data";
 import { useCallback, useState, lazy } from "react";
 import ModalOrder, { refModalOrder } from "./components/ModalOrder";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { shortenAddress } from "@/utils/helper";
 
 const TabPurchase = lazy(
   () => import("@/app/(main)/profile/components/TabPurchase")
@@ -11,6 +13,7 @@ const TabPurchase = lazy(
 const TabOwner = lazy(() => import("@/app/(main)/profile/components/TabOwner"));
 
 const ProfilePage = () => {
+  const { publicKey } = useWallet();
   const [indexTab, setIndexTab] = useState<number>(0);
 
   const handleChangeTab = useCallback((index: number) => {
@@ -27,7 +30,7 @@ const ProfilePage = () => {
         />
         <div className="ml-5">
           <h2 className="text-2xl font-semibold text-gray-900 line-clamp-1 mb-3">
-            Whitney Francis
+            {publicKey ? shortenAddress(publicKey.toBase58()) : "Unnamed"}
           </h2>
           <p className="text-[16px] text-gray-600">
             Dreaming in digital, living in code. Coffee first, then adventures.
