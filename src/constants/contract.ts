@@ -1,0 +1,2 @@
+export const MARKET_CONTRACT_ADDRESS =
+  "ByPA9A6dVMgGmRwyZtQWKy1R2zjDMaYEs39Hr6bDq6eA";

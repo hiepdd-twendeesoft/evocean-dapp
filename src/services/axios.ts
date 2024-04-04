@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 
-const apiServerUrl = "https://vpa.com.vn";
+const apiServerUrl = "https://evocean.twendeesoft.com";
 
 const getAxiosInstance = async () => {
   // const credentials = await Keychain.getInternetCredentials(JWT_KEY);
@@ -19,7 +19,7 @@ const getAxiosInstance = async () => {
 const api = async (
   url: string,
   data?: any,
-  options: AxiosRequestConfig = {}
+  options: AxiosRequestConfig = {},
 ) => {
   try {
     const API = await getAxiosInstance();

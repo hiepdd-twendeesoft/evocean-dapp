@@ -6,7 +6,7 @@ import { useCallback, useState, lazy } from "react";
 import ModalOrder, { refModalOrder } from "./components/ModalOrder";
 
 const TabPurchase = lazy(
-  () => import("@/app/(main)/profile/components/TabPurchase")
+  () => import("@/app/(main)/profile/components/TabPurchase"),
 );
 const TabOwner = lazy(() => import("@/app/(main)/profile/components/TabOwner"));
 
