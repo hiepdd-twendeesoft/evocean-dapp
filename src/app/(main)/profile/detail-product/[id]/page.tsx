@@ -6,19 +6,24 @@ const DetailProduct = () => {
   const { back } = useRouter();
   return (
     <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16">
-      <button
-        onClick={back}
-        className="border-gray-300 border-[1px] flex items-center px-4 rounded-[12px] h-[40px] group hover:border-indigo-600"
-      >
-        <img
-          src="/assets/icon/arrow-left.svg"
-          alt="arrow"
-          className="w-[16px]"
-        />
-        <p className="text-sm text-gray-700 font-medium ml-2 group-hover:text-indigo-600">
-          Back to the list
-        </p>
-      </button>
+      <div className="flex items-center justify-between">
+        <button
+          onClick={back}
+          className="border-gray-300 border-[1px] flex items-center px-4 rounded-[12px] h-[40px] group hover:border-indigo-600"
+        >
+          <img
+            src="/assets/icon/arrow-left.svg"
+            alt="arrow"
+            className="w-[16px]"
+          />
+          <p className="text-sm text-gray-700 font-medium ml-2 group-hover:text-indigo-600">
+            Back to the list
+          </p>
+        </button>
+        <button className="h-[40px] rounded-[12px] bg-indigo-600 px-6 flex items-center justify-center">
+          <p className="text-white font-medium text-sm">Listing</p>
+        </button>
+      </div>
       <h2 className="text-4xl font-semibold text-gray-900 mt-6">
         Nimbus Framer - Multi-Layout AI-Powerd SaaS Framer Template
       </h2>

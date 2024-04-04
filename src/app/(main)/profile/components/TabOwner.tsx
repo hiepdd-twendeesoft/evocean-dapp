@@ -139,6 +139,8 @@ const TabOwner = () => {
                         name={item.name}
                         image={item.media?.previews?.[0]}
                         author_address={item.author_address}
+                        Sale={item.Sale}
+                        id={item.id}
                       />
                     ))}
                   </Fragment>

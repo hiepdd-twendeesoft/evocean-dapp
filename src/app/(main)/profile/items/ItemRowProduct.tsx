@@ -1,15 +1,37 @@
+import { Route } from "@/constants/route";
+import useConvertDollar from "@/hooks/useConvertDollar";
 import { ItemTheme } from "@/models/common.type";
 import { shortenAddress } from "@/utils/helper";
+import { web3 } from "@coral-xyz/anchor";
+import { useRouter } from "next/navigation";
 import { FC, memo } from "react";
 
 interface IProps extends Partial<ItemTheme> {
   image?: string;
 }
 
-const ItemRowProduct: FC<IProps> = ({ name, image, author_address }) => {
+const ItemRowProduct: FC<IProps> = ({
+  name,
+  image,
+  author_address,
+  Sale,
+  id,
+}) => {
+  const router = useRouter();
+  const price = Sale
+    ? (Number(Sale.price) / web3.LAMPORTS_PER_SOL).toFixed(2)
+    : 0;
+  // const priceDollar = useConvertDollar(Number(price));
+
+  const handleDetailProduct = () => {
+    router.push(`${Route.DETAIL_PRODUCT}/${id}`);
+  };
   return (
     <tr className="border-b-[1px] border-b-gray-200">
-      <th className="flex items-center border-t-0 pl-4 pr-14 py-4 align-middle text-sm font-medium whitespace-nowrap text-left text-gray-900">
+      <th
+        onClick={handleDetailProduct}
+        className="flex items-center border-t-0 pl-4 pr-14 py-4 align-middle text-sm font-medium whitespace-nowrap text-left text-gray-900 cursor-pointer"
+      >
         <img
           src={image || "/assets/image/theme.png"}
           alt="theme"
@@ -26,7 +48,7 @@ const ItemRowProduct: FC<IProps> = ({ name, image, author_address }) => {
         {shortenAddress(author_address || "")}
       </td>
       <td className="border-t-0 px-4 py-4 align-center text-[14px] text-gray-500 whitespace-nowrap">
-        340
+        {price}
       </td>
       <td className="border-t-0 px-4 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
         8

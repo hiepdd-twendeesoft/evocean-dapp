@@ -3,6 +3,7 @@ export interface FetchThemeParams {
   take: number;
   author?: string;
   owner?: string;
+  listing?: boolean;
 }
 
 export interface ListData<T> {
@@ -25,5 +26,12 @@ export interface ItemTheme {
   owner_addresses: any[];
   token_mint: string;
   author_address: string;
-  Sale: any;
+  Sale: null | {
+    theme_id: number;
+    price: string;
+  };
+  Listing: null | {
+    theme_id: number;
+    price: string;
+  };
 }

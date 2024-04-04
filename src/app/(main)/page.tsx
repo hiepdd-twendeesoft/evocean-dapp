@@ -1,13 +1,14 @@
 "use client";
 import ItemNft from "@/components/itemNft";
-import Category from "./components/Category";
 import { useFetchTheme } from "@/hooks/useFetchTheme";
-import { Fragment, useEffect } from "react";
+import { Fragment } from "react";
+import Category from "./components/Category";
 
 const HomePage = () => {
   const { data, fetchNextPage, hasNextPage } = useFetchTheme({
     page: 1,
     take: 12,
+    listing: true,
   });
 
   return (
@@ -28,6 +29,7 @@ const HomePage = () => {
                 id={item.id}
                 name={item.name}
                 image={item.media?.previews?.[0]}
+                Sale={item.Sale}
               />
             ))}
           </Fragment>

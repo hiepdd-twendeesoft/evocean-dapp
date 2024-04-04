@@ -31,6 +31,7 @@ const TabPurchase = () => {
               name={item.name}
               image={item.media?.previews?.[0]}
               handleItem={handleItem}
+              hidePrice
             />
           ))}
         </Fragment>

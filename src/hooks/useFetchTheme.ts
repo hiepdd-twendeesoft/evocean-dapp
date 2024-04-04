@@ -15,8 +15,8 @@ export const useFetchTheme = (params: FetchThemeParams, disable?: boolean) => {
     queryKey: ["fetchTheme", params],
     queryFn: ({ pageParam }) => {
       return fetchThemes({
+        ...params,
         page: pageParam.page,
-        take: params.take,
       });
     },
     getNextPageParam: (lastPage) => {
