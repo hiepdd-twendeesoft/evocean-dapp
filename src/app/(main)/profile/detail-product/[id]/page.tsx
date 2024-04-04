@@ -1,31 +1,130 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { MARKET_CONTRACT_ADDRESS } from "@/constants/contract";
+import idl from "@/idl/marketplace.json";
+import { Marketplace } from "@/idl/type";
+import { ItemTheme } from "@/models/common.type";
+import { detailTheme, listTheme } from "@/services/list-theme";
+import {
+  AnchorProvider,
+  BN,
+  Program,
+  setProvider,
+  web3,
+} from "@coral-xyz/anchor";
+import {
+  TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
+} from "@solana/spl-token";
+import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
+import { PublicKey } from "@solana/web3.js";
+import { useQuery } from "@tanstack/react-query";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { Bounce, toast } from "react-toastify";
 
 const DetailProduct = () => {
   const { back } = useRouter();
+  const { id } = useParams();
+  const { connection } = useConnection();
+  const [priceOwner, setPriceOwner] = useState<string>("");
+  const [priceSale, setPriceSale] = useState<string>("");
+
+  const { data } = useQuery<ItemTheme, Error>({
+    queryKey: ["detailTheme", { id }],
+    queryFn: () => detailTheme(Number(id)),
+    enabled: !!id,
+  });
+
+  const wallet = useAnchorWallet();
+
+  const provider = new AnchorProvider(connection, wallet!, {});
+
+  setProvider(provider);
+
+  const program = new Program(
+    idl as Marketplace,
+    new PublicKey(MARKET_CONTRACT_ADDRESS)
+  );
+
+  const handleList = async () => {
+    if (!priceOwner || !priceSale) {
+      return toast.warn("Please cannot empty this field!");
+    }
+    if (!wallet) {
+      return toast.warn("Not found wallet");
+    }
+    try {
+      const tokenMint = new web3.PublicKey(
+        "5A9KG1ceF514ALPo21RFyXTistGp2nWwErfss1oPXPYt" //token_mint
+      );
+
+      const [listingAccount] = web3.PublicKey.findProgramAddressSync(
+        [Buffer.from("listing_account_"), tokenMint.toBuffer()],
+        program.programId
+      );
+
+      const [marketTokenAccount] = web3.PublicKey.findProgramAddressSync(
+        [Buffer.from("market_token_account_"), tokenMint.toBuffer()],
+        program.programId
+      );
+
+      const tokenAccount = getAssociatedTokenAddressSync(
+        tokenMint,
+        wallet.publicKey
+      );
+
+      const instruction = await program.methods
+        .list(new BN(2 * web3.LAMPORTS_PER_SOL))
+        .accounts({
+          listingAccount,
+          marketTokenAccount,
+          seller: wallet.publicKey,
+          systemProgram: web3.SystemProgram.programId,
+          tokenMint,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          userTokenAccount: tokenAccount,
+        })
+        .instruction();
+
+      const transaction = new web3.Transaction().add(instruction);
+
+      await provider.sendAndConfirm(transaction);
+
+      await listTheme({
+        listing_price: 2 * web3.LAMPORTS_PER_SOL,
+        sale_price: 1 * web3.LAMPORTS_PER_SOL,
+        seller: wallet.publicKey.toBase58(),
+        theme_id: Number(id),
+      });
+
+      toast.success("List theme successful!");
+    } catch (error) {
+      toast.error("List theme fail!");
+      console.error("error list: ", error);
+    }
+  };
+
+  const onChangePriceOwner = (event: any) => setPriceOwner(event.target.value);
+  const onChangePriceSale = (event: any) => setPriceSale(event.target.value);
+
   return (
     <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16">
-      <div className="flex items-center justify-between">
-        <button
-          onClick={back}
-          className="border-gray-300 border-[1px] flex items-center px-4 rounded-[12px] h-[40px] group hover:border-indigo-600"
-        >
-          <img
-            src="/assets/icon/arrow-left.svg"
-            alt="arrow"
-            className="w-[16px]"
-          />
-          <p className="text-sm text-gray-700 font-medium ml-2 group-hover:text-indigo-600">
-            Back to the list
-          </p>
-        </button>
-        <button className="h-[40px] rounded-[12px] bg-indigo-600 px-6 flex items-center justify-center">
-          <p className="text-white font-medium text-sm">Listing</p>
-        </button>
-      </div>
+      <button
+        onClick={back}
+        className="border-gray-300 border-[1px] flex items-center px-4 rounded-[12px] h-[40px] group hover:border-indigo-600"
+      >
+        <img
+          src="/assets/icon/arrow-left.svg"
+          alt="arrow"
+          className="w-[16px]"
+        />
+        <p className="text-sm text-gray-700 font-medium ml-2 group-hover:text-indigo-600">
+          Back to the list
+        </p>
+      </button>
       <h2 className="text-4xl font-semibold text-gray-900 mt-6">
-        Nimbus Framer - Multi-Layout AI-Powerd SaaS Framer Template
+        {data?.name}
       </h2>
       <div className="flex items-center mt-4">
         <p className="text-base font-normal text-gray-600">Date: 23 Mar 2024</p>
@@ -33,61 +132,66 @@ const DetailProduct = () => {
           Order #4235123
         </p>
       </div>
+      {!data?.Sale && (
+        <div className="border-gray-200 border-[1px] rounded-[12px] p-6 mt-6">
+          <p className="text-base font-semibold text-gray-900 mb-2">
+            Ownership price
+          </p>
+          <input
+            placeholder="Ownership price..."
+            className="w-full bg-indigo-50 h-[40px] rounded-[12px] px-3 outline-none mb-3 text-sm text-gray-700"
+            type="number"
+            value={priceOwner}
+            onChange={onChangePriceOwner}
+          />
+          <p className="text-base font-semibold text-gray-900 mb-2 mt-2">
+            Sale price
+          </p>
+          <input
+            placeholder="Sale price..."
+            className="w-full bg-indigo-50 h-[40px] rounded-[12px] px-3 outline-none mb-3 text-sm text-gray-700"
+            type="number"
+            onChange={onChangePriceSale}
+            value={priceSale}
+          />
+          <div className="flex items-end justify-end mt-2">
+            <button
+              onClick={handleList}
+              className="h-[40px] rounded-[12px] bg-indigo-600 px-6 flex items-center justify-center hover:bg-indigo "
+            >
+              <p className="text-white font-medium text-sm">Listing</p>
+            </button>
+          </div>
+        </div>
+      )}
       <div className="flex items-start justify-between max-md:flex-col mb-12 mt-12">
         <div className="w-[43%] max-md:w-[100%]">
           <h4 className="text-xl font-semibold text-gray-900 mb-3">
             Information
           </h4>
           <p className="text-base font-normal text-gray-800">
-            Thank you for buying the product! Flexible Layout Options: We know
-            every business is unique. That is why Nimbus provides a wide range
-            of layout sections. You can pick and choose, mix and match to create
-            a website that truly represents your brand.
+            {data?.overview}
           </p>
           <h4 className="text-xl font-semibold text-gray-900 mb-3 mt-8">
             Files
           </h4>
-          <div className="flex items-center mb-6">
-            <div className="h-[52px] rounded-[12px] bg-gray-100 px-4 flex items-center justify-center mr-4">
-              <p className="text-lg font-semibold text-gray-500">.PDF</p>
-            </div>
-            <div className="flex flex-1 flex-col">
-              <h4 className="text-base font-medium text-gray-900 line-clamp-1">
-                Framer Template Nimbus
-              </h4>
-              <p className="text-gray-600 text-base text-normal">1.6 MB</p>
-            </div>
-            <button className="h-[42px] bg-indigo-600 rounded-[12px] flex items-center justify-center px-4 hover:-translate-y-1 duration-200">
-              <p className="text-base text-white font-semibold">Download</p>
-            </button>
-          </div>
+
           <div className="flex items-center mb-6">
             <div className="h-[52px] rounded-[12px] bg-gray-100 px-4 flex items-center justify-center mr-4">
               <p className="text-lg font-semibold text-gray-500">.ZIP</p>
             </div>
             <div className="flex flex-1 flex-col">
               <h4 className="text-base font-medium text-gray-900 line-clamp-1">
-                Framer Template Nimbus
+                {data?.name}
               </h4>
-              <p className="text-gray-600 text-base text-normal">1.6 MB</p>
+              <p className="text-gray-600 text-base text-normal">File zip</p>
             </div>
-            <button className="h-[42px] bg-indigo-600 rounded-[12px] flex items-center justify-center px-4 hover:-translate-y-1 duration-200">
+            <a
+              href={data?.zip_link}
+              className="h-[42px] bg-indigo-600 rounded-[12px] flex items-center justify-center px-4 hover:-translate-y-1 duration-200 cursor-pointer"
+            >
               <p className="text-base text-white font-semibold">Download</p>
-            </button>
-          </div>
-          <div className="flex items-center mb-6">
-            <div className="h-[52px] rounded-[12px] bg-gray-100 px-4 flex items-center justify-center mr-4">
-              <p className="text-lg font-semibold text-gray-500">.Fig</p>
-            </div>
-            <div className="flex flex-1 flex-col">
-              <h4 className="text-base font-medium text-gray-900 line-clamp-1">
-                Framer Template Nimbus
-              </h4>
-              <p className="text-gray-600 text-base text-normal">1.6 MB</p>
-            </div>
-            <button className="h-[42px] bg-indigo-600 rounded-[12px] flex items-center justify-center px-4 hover:-translate-y-1 duration-200">
-              <p className="text-base text-white font-semibold">Download</p>
-            </button>
+            </a>
           </div>
         </div>
         <div className="w-[53%] max-md:mt-4 max-md:w-[100%]">

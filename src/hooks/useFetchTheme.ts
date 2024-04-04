@@ -1,7 +1,6 @@
 import { FetchThemeParams, ItemTheme, ListData } from "@/models/common.type";
 import { fetchThemes } from "@/services/common.service";
 import { InfiniteData, useInfiniteQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 
 export const useFetchTheme = (params: FetchThemeParams, disable?: boolean) => {
   return useInfiniteQuery<

@@ -10,6 +10,7 @@ import { clusterApiUrl } from "@solana/web3.js";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { FC, PropsWithChildren } from "react";
 import { ToastContainer, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const client = new QueryClient();
 const Providers: FC<PropsWithChildren> = ({ children }) => {
@@ -17,7 +18,7 @@ const Providers: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <QueryClientProvider client={client}>
-      <ConnectionProvider endpoint={clusterApiUrl(WalletAdapterNetwork.Mainnet)}>
+      <ConnectionProvider endpoint={clusterApiUrl(WalletAdapterNetwork.Devnet)}>
         <WalletProvider wallets={[wallet]} autoConnect={true}>
           <ToastContainer
             position="top-right"
