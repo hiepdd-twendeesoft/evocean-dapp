@@ -1,11 +1,11 @@
 "use client";
 
-import { FC, memo } from "react";
-import { useRouter } from "next/navigation";
 import { Route } from "@/constants/route";
-import { ItemTheme } from "@/models/common.type";
-import { web3 } from "@coral-xyz/anchor";
 import useConvertDollar from "@/hooks/useConvertDollar";
+import { ItemTheme } from "@/models/common.type";
+import { lamportsToSol } from "@/utils/lamports-to-sol";
+import { useRouter } from "next/navigation";
+import { FC, memo } from "react";
 
 interface IProps extends Partial<ItemTheme> {
   handleItem?: (id: number) => void;
@@ -20,12 +20,11 @@ const ItemNft: FC<IProps> = ({
   id,
   Sale,
   hidePrice,
+  Listing,
 }) => {
   const router = useRouter();
-  const price = Sale
-    ? (Number(Sale.price) / web3.LAMPORTS_PER_SOL).toFixed(2)
-    : 0;
-  const priceDollar = useConvertDollar(Number(price));
+
+  const priceDollar = useConvertDollar(lamportsToSol(Sale?.price));
 
   const _handleItem = () => {
     if (handleItem && id) {
@@ -50,30 +49,34 @@ const ItemNft: FC<IProps> = ({
       <p className="text-[#565E76] text-sm font-normal">UI Kit</p>
       {!hidePrice && (
         <div className="items-center flex border-gray-200 border-[1px] rounded-[12px] mt-[12px] h-[44px]">
-          <div className="flex item-center w-[50%] justify-between px-[12px]">
-            <p className="font-medium text-gray-900 text-sm">${priceDollar}</p>
-            <div className="flex items-center">
+          <div className="flex item-center w-[50%] justify-center px-[12px]">
+            <div className="flex items-center mr-1">
               <img
                 src={"/assets/image/SOL.svg"}
                 alt="SOL"
                 className="w-[14px] h-[14px]"
               />
               <p className="font-medium text-gray-900 text-sm ml-[4px]">
-                {price}
+                {lamportsToSol(Sale?.price)}
               </p>
             </div>
+            <p className="font-medium text-gray-500 text-sm">
+              (${priceDollar})
+            </p>
           </div>
           <div className="bg-gray-200 w-[1px] h-[100%]" />
           <div className="flex items-center w-[50%] justify-center">
             <p className="font-medium text-gray-900 text-sm mr-[4px]">
-              Volume:
+              Ownership:
             </p>
             <img
               src={"/assets/image/SOL.svg"}
               alt="SOL"
               className="w-[14px] h-[14px]"
             />
-            <p className="font-medium text-gray-900 text-sm ml-[4px]">0,26</p>
+            <p className="font-medium text-gray-900 text-sm ml-[4px]">
+              {lamportsToSol(Listing?.price)}
+            </p>
           </div>
         </div>
       )}

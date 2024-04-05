@@ -24,6 +24,7 @@ import "../detail.style.css";
 import useConvertDollar from "@/hooks/useConvertDollar";
 import Link from "next/link";
 import { Route } from "@/constants/route";
+import { useRouter } from "next/navigation";
 
 export const refModalBuyOwnership = createRef<any>();
 
@@ -70,6 +71,7 @@ const ModalBuyOwnership = forwardRef(
     }: ModalBuyOwnershipProps,
     ref
   ) => {
+    const { push } = useRouter();
     const [showModal, setShowModal] = useState<boolean>(false);
     const [step, setStep] = useState<number>(0);
 
@@ -189,6 +191,10 @@ const ModalBuyOwnership = forwardRef(
       console.log("done buy");
     };
 
+    const handleProfileOwner = () => {
+      push(Route.PROFILE);
+    };
+
     return (
       <Modal isOpen={showModal} style={customStyles} ariaHideApp={false}>
         <div className="bg-white">
@@ -279,15 +285,14 @@ const ModalBuyOwnership = forwardRef(
                   22.344 SOL
                 </h3>
               </div>
-              <Link
-                href={`${Route.PROFILE}`}
-                // onClick={handleApproved}
+              <button
+                onClick={handleProfileOwner}
                 className="h-[50px] w-full rounded-[12px] bg-indigo-600 flex items-center justify-center mt-6"
               >
                 <p className="text-white font-semibold text-base">
                   View your ownership
                 </p>
-              </Link>
+              </button>
             </Fragment>
           )}
         </div>

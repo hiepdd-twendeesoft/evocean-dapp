@@ -6,14 +6,16 @@ import { useCallback, useState, lazy } from "react";
 import ModalOrder, { refModalOrder } from "./components/ModalOrder";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { shortenAddress } from "@/utils/helper";
+import { useRouter } from "next/navigation";
 
 const TabPurchase = lazy(
-  () => import("@/app/(main)/profile/components/TabPurchase"),
+  () => import("@/app/(main)/profile/components/TabPurchase")
 );
 const TabOwner = lazy(() => import("@/app/(main)/profile/components/TabOwner"));
 
 const ProfilePage = () => {
   const { publicKey } = useWallet();
+
   const [indexTab, setIndexTab] = useState<number>(0);
 
   const handleChangeTab = useCallback((index: number) => {
