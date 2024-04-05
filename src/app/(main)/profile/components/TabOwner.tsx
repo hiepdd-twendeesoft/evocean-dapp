@@ -9,7 +9,7 @@ const TabOwner = () => {
   const wallet = useAnchorWallet();
 
   const { data } = useFetchTheme(
-    { page: 1, take: 1, author: wallet?.publicKey?.toBase58() },
+    { page: 1, take: 60, author: wallet?.publicKey?.toBase58() },
     !wallet?.publicKey
   );
 

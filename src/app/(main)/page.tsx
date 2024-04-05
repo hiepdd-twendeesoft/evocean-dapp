@@ -32,6 +32,7 @@ const HomePage = () => {
                 name={item.name}
                 image={item.media?.previews?.[0]}
                 Sale={item.Sale}
+                Listing={item.Listing}
               />
             ))}
           </Fragment>

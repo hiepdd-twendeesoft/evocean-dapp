@@ -9,7 +9,7 @@ const TabPurchase = () => {
   const router = useRouter();
   const { publicKey } = useWallet();
   const { data } = useFetchTheme(
-    { page: 1, take: 1, owner: publicKey?.toBase58() },
+    { page: 1, take: 60, owner: publicKey?.toBase58() },
     !publicKey,
   );
 

@@ -16,7 +16,7 @@ const useConvertDollar = (price: number) => {
     if (data?.data?.solana?.usd) {
       return price * data?.data?.solana?.usd;
     }
-    return 0;
+    return 175;
   }, [data?.data?.solana?.usd, price]);
 
   return value;
