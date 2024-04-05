@@ -5,5 +5,4 @@ type PayLoad = {
   theme_id: number;
 };
 
-export const buyLicenseTheme = (payload: PayLoad) =>
-  api("/themes/license-buying", payload);
+export const buyTheme = (payload: PayLoad) => api("/themes/buying", payload);

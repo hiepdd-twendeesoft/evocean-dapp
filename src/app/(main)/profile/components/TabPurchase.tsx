@@ -10,14 +10,14 @@ const TabPurchase = () => {
   const { publicKey } = useWallet();
   const { data } = useFetchTheme(
     { page: 1, take: 1, owner: publicKey?.toBase58() },
-    !publicKey
+    !publicKey,
   );
 
   const handleItem = useCallback(
     (id: number) => {
-      router.push(`${Route.DETAIL_PRODUCT}/sfd3gdfd`);
+      router.push(`${Route.DETAIL_PRODUCT}/${id}`);
     },
-    [router]
+    [router],
   );
 
   return (

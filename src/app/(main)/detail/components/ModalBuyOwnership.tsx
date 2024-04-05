@@ -2,7 +2,7 @@
 "use client";
 
 import { useTx } from "@/hooks/useTx";
-import { buyLicenseTheme } from "@/services/buy-theme";
+import { buyLicenseTheme } from "@/services/buy-theme-license";
 import { web3 } from "@coral-xyz/anchor";
 import {
   TOKEN_PROGRAM_ID,
@@ -68,7 +68,7 @@ const ModalBuyOwnership = forwardRef(
       image,
       priceOwner,
     }: ModalBuyOwnershipProps,
-    ref
+    ref,
   ) => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [step, setStep] = useState<number>(0);
@@ -116,25 +116,25 @@ const ModalBuyOwnership = forwardRef(
 
       const [listingAccount] = web3.PublicKey.findProgramAddressSync(
         [Buffer.from("listing_account_"), tokenMint.toBuffer()],
-        program.programId
+        program.programId,
       );
 
       const [marketTokenAccount] = web3.PublicKey.findProgramAddressSync(
         [Buffer.from("market_token_account_"), tokenMint.toBuffer()],
-        program.programId
+        program.programId,
       );
 
       let userTokenAccount: PublicKey;
 
       const associatedToken = getAssociatedTokenAddressSync(
         tokenMint,
-        provider.wallet.publicKey
+        provider.wallet.publicKey,
       );
 
       try {
         const { address } = await getAccount(
           provider.connection,
-          associatedToken
+          associatedToken,
         );
 
         userTokenAccount = address;
@@ -144,15 +144,15 @@ const ModalBuyOwnership = forwardRef(
             provider.wallet.publicKey,
             associatedToken,
             provider.wallet.publicKey,
-            tokenMint
-          )
+            tokenMint,
+          ),
         );
 
         await provider.sendAndConfirm(transaction);
 
         const { address } = await getAccount(
           provider.connection,
-          associatedToken
+          associatedToken,
         );
 
         userTokenAccount = address;
@@ -293,7 +293,7 @@ const ModalBuyOwnership = forwardRef(
         </div>
       </Modal>
     );
-  }
+  },
 );
 
 export default ModalBuyOwnership;

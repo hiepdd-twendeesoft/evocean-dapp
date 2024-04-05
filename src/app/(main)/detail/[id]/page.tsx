@@ -15,16 +15,31 @@ import ModalBuyOwnership, {
 } from "../components/ModalBuyOwnership";
 import Preview from "../components/Preview";
 import { useFetchTheme } from "@/hooks/useFetchTheme";
+import { useAnchorWallet, useWallet } from "@solana/wallet-adapter-react";
+import { useTx } from "@/hooks/useTx";
+import {
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+} from "@solana/web3.js";
+import { ADMIN_WALLET } from "@/constants/contract";
+import { buyTheme } from "@/services/buy-theme";
 
 const DetailThemePage = () => {
+  const { provider } = useTx();
+
   const handleBuyOwner = useCallback(() => {
     modalBuyOwnershipControl.show();
   }, []);
+
   const { id } = useParams<{ id: string }>();
+
   const { data } = useQuery({
     queryKey: ["get-theme", id],
     queryFn: () => getTheme(Number(id)),
   });
+
   const { data: listThemes } = useFetchTheme({
     page: 1,
     take: 10,
@@ -33,6 +48,35 @@ const DetailThemePage = () => {
 
   const handleBuy = () => {
     toast.warn("This payment method is going to be supported later.");
+  };
+
+  const handleBuySol = async () => {
+    try {
+      if (!data?.Sale) {
+        toast.warn("Sale not found");
+        return;
+      }
+
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: provider.wallet.publicKey,
+          toPubkey: new PublicKey(data.author_address),
+          lamports: Number(data.Sale.price),
+        }),
+      );
+
+      await provider.sendAndConfirm(transaction);
+      await buyTheme({
+        buyer: provider.wallet.publicKey.toBase58(),
+        theme_id: data.id,
+      });
+
+      toast.success("Buy success");
+    } catch (error) {
+      console.error("error buy");
+      console.error(error);
+      toast.error("Failed to buy this theme");
+    }
   };
 
   return (
@@ -100,7 +144,10 @@ const DetailThemePage = () => {
                 </p>
               </div>
               <div className="h-[50px] flex-1 flex items-center ml-3 justify-center rounded-[12px] border-indigo-600 border-[1px] cursor-pointer hover:scale-105 duration-200">
-                <p className="text-gray-700 font-semibold text-base mr-3">
+                <p
+                  className="text-gray-700 font-semibold text-base mr-3"
+                  onClick={handleBuySol}
+                >
                   Buy for {lamportsToSol(data?.Listing?.price)} SOL
                 </p>
                 <img
@@ -143,7 +190,9 @@ const DetailThemePage = () => {
               alt="SOL"
               className="w-[20px] mx-[8px]"
             />
-            <p className="text-sm text-gray-900 font-medium">FutixLab</p>
+            <p className="text-sm text-gray-900 font-medium">
+              {data?.author_address}
+            </p>
           </div>
           <p className="text-base font-normal text-gray-600 mt-4">
             Interested in this product and eager to collaborate and earn with
@@ -151,7 +200,7 @@ const DetailThemePage = () => {
           </p>
           <div className="flex items-center mt-2">
             <button className="mr-3" onClick={handleBuyOwner}>
-              <p className="text-sm font-medium text-indigo-600">
+              <p className="text-lg font-semibold text-indigo-600">
                 Buy Ownership
               </p>
             </button>

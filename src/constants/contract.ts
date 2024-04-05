@@ -1,2 +1,4 @@
 export const MARKET_CONTRACT_ADDRESS =
   "ByPA9A6dVMgGmRwyZtQWKy1R2zjDMaYEs39Hr6bDq6eA";
+
+export const ADMIN_WALLET = "41DLkZXSbAY5EtvMnVvWZM5qZ6TDHqVjvUMzd1LWpc1m";
