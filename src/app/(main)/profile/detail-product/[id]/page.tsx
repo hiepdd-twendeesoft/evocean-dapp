@@ -5,6 +5,7 @@ import idl from "@/idl/marketplace.json";
 import { Marketplace } from "@/idl/type";
 import { ItemTheme } from "@/models/common.type";
 import { detailTheme, listTheme } from "@/services/list-theme";
+import { lamportsToSol } from "@/utils/lamports-to-sol";
 import {
   AnchorProvider,
   BN,
@@ -35,10 +36,6 @@ const DetailProduct = () => {
     queryFn: () => detailTheme(Number(id)),
     enabled: !!id,
   });
-
-  const price = data?.Sale
-    ? (Number(data.Sale.price) / web3.LAMPORTS_PER_SOL).toFixed(2)
-    : 0;
 
   const wallet = useAnchorWallet();
 
@@ -234,7 +231,7 @@ const DetailProduct = () => {
                     Subtotal
                   </p>
                   <p className="text-base font-normal text-gray-600">
-                    {price} SOL
+                    {lamportsToSol(data?.Listing?.price)} SOL
                   </p>
                 </div>
                 {/* <div className="flex items-center justify-between mb-3">
@@ -250,7 +247,7 @@ const DetailProduct = () => {
                     Total price
                   </p>
                   <p className="text-base font-medium text-gray-900">
-                    {price} SOL
+                    {lamportsToSol(data?.Listing?.price)} SOL
                   </p>
                 </div>
               </Fragment>

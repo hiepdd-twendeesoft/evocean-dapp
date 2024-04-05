@@ -12,14 +12,13 @@ import ModalBuyOwnership, {
   refModalBuyOwnership,
 } from "../components/ModalBuyOwnership";
 import Preview from "../components/Preview";
+import { web3 } from "@coral-xyz/anchor";
 
 const DetailThemePage = () => {
   const handleBuyOwner = useCallback(() => {
     modalBuyOwnershipControl.show();
   }, []);
-
   const { id } = useParams<{ id: string }>();
-
   const { data } = useQuery({
     queryKey: ["get-theme", id],
     queryFn: () => getTheme(Number(id)),
