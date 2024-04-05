@@ -1,18 +1,20 @@
 "use client";
 
 import ItemNft from "@/components/itemNft";
+import useConvertDollar from "@/hooks/useConvertDollar";
 import { getTheme } from "@/services/get-theme-detail";
 import { lamportsToSol } from "@/utils/lamports-to-sol";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { useCallback } from "react";
+import { Fragment, useCallback } from "react";
+import { toast } from "react-toastify";
 import ContentTab from "../components/ContentTab";
 import ModalBuyOwnership, {
   modalBuyOwnershipControl,
   refModalBuyOwnership,
 } from "../components/ModalBuyOwnership";
 import Preview from "../components/Preview";
-import { web3 } from "@coral-xyz/anchor";
+import { useFetchTheme } from "@/hooks/useFetchTheme";
 
 const DetailThemePage = () => {
   const handleBuyOwner = useCallback(() => {
@@ -23,6 +25,15 @@ const DetailThemePage = () => {
     queryKey: ["get-theme", id],
     queryFn: () => getTheme(Number(id)),
   });
+  const { data: listThemes } = useFetchTheme({
+    page: 1,
+    take: 10,
+    listing: true,
+  });
+
+  const handleBuy = () => {
+    toast.warn("This payment method is going to be supported later.");
+  };
 
   return (
     <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16">
@@ -34,7 +45,7 @@ const DetailThemePage = () => {
       />
       <div className="flex items-start justify-between max-md:flex-col mb-12">
         <div className="w-[53%] max-md:w-[100%]">
-          <Preview />
+          <Preview data={data?.media?.previews} />
           <div className="flex items-center mt-6">
             <button className="flex items-center justify-center h-[50px] rounded-[12px] bg-indigo-50 flex-1 mr-4 hover:bg-indigo-100">
               <p className="text-base font-semibold text-indigo-700">
@@ -70,17 +81,19 @@ const DetailThemePage = () => {
             </div>
           </div>
           <h2 className="text-4xl text-gray-900 font-semibold mb-3">
-            Nimbus - Multi-Layout AI-Powerd SaaS Template
+            {data?.name}
           </h2>
           <p className="text-gray-600 text-base font-normal">
-            Framer SaaS template with 3 unique homepage and multi-purpose
-            pre-built pages
+            {data?.overview}
           </p>
           <div className="bg-gray-100 rounded-[20px] p-[12px] mt-8">
             <div className="flex items-center">
-              <div className="h-[50px] flex flex-1 bg-indigo-600 items-center justify-center cursor-pointer rounded-[12px] hover:scale-105 duration-200">
+              <div
+                onClick={handleBuy}
+                className="h-[50px] flex flex-1 bg-indigo-600 items-center justify-center cursor-pointer rounded-[12px] hover:scale-105 duration-200"
+              >
                 <p className="text-base font-semibold text-white">
-                  Buy for {lamportsToSol(data?.Sale?.price)} SOL
+                  Buy for {useConvertDollar(lamportsToSol(data?.Sale?.price))}$
                 </p>
               </div>
               <div className="h-[50px] flex-1 flex items-center ml-3 justify-center rounded-[12px] border-indigo-600 border-[1px] cursor-pointer hover:scale-105 duration-200">
@@ -139,7 +152,9 @@ const DetailThemePage = () => {
                 Buy Ownership
               </p>
             </button>
-            <p className="text-sm font-medium text-gray-900">From $ 1200</p>
+            <p className="text-sm font-medium text-gray-900">
+              From $ {useConvertDollar(lamportsToSol(data?.Listing?.price))}
+            </p>
             <p className="text-sm font-medium text-gray-500 mx-4">or</p>
             <div className="flex items-center">
               <img
@@ -147,7 +162,9 @@ const DetailThemePage = () => {
                 alt="SOL"
                 className="w-[14px] mr-[4px]"
               />
-              <p className="text-sm font-medium text-gray-900">6.36</p>
+              <p className="text-sm font-medium text-gray-900">
+                {lamportsToSol(data?.Listing?.price)}
+              </p>
             </div>
           </div>
           <button className="flex items-center mt-6 group">
@@ -189,10 +206,19 @@ const DetailThemePage = () => {
         </button>
       </div>
       <div className="grid grid-cols-1 gap-4 md:gap-6 lg:gap-10 grid-flow-row lg:grid-cols-4 md:grid-cols-3 mb-8">
-        <ItemNft />
-        <ItemNft />
-        <ItemNft />
-        <ItemNft />
+        {listThemes?.pages?.map((page, indexPage) => (
+          <Fragment key={indexPage}>
+            {page.data.map((item, index) => (
+              <ItemNft
+                key={index}
+                id={item.id}
+                name={item.name}
+                Sale={item.Sale}
+                image={item.media?.previews?.[0]}
+              />
+            ))}
+          </Fragment>
+        ))}
       </div>
     </div>
   );

@@ -1,23 +1,17 @@
 "use client";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { memo, useCallback, useState } from "react";
+import { FC, memo, useCallback, useState } from "react";
 import "swiper/css";
 import "swiper/css/pagination";
 import ImageViewer from "react-simple-image-viewer";
 
-const images = [
-  "/assets/image/theme.png",
-  "/assets/image/theme.png",
-  "/assets/image/theme.png",
-  "/assets/image/theme.png",
-  "/assets/image/theme.png",
-  "/assets/image/theme.png",
-  "/assets/image/theme.png",
-  "/assets/image/theme.png",
-];
+interface IProps {
+  data?: string[];
+}
 
-const Preview = () => {
+const Preview: FC<IProps> = ({ data }) => {
   const [isViewerOpen, setViewerOpen] = useState<boolean>(false);
+  const [indexImage, setIndexImage] = useState<number>(0);
 
   const handleCloseViewer = useCallback(() => {
     setViewerOpen(false);
@@ -31,7 +25,7 @@ const Preview = () => {
     <div className="z-10">
       <img
         onClick={handleViewerImage}
-        src="/assets/image/theme.png"
+        src={data?.[indexImage] || "/assets/image/theme.png"}
         alt="theme"
         className="w-[100%] rounded-[20px] border-[1px] border-gray-200 cursor-pointer mb-5 drop-shadow-md"
       />
@@ -43,8 +37,12 @@ const Preview = () => {
         }}
         className="-z-10"
       >
-        {images.map((item, index) => (
-          <SwiperSlide key={index} className="cursor-pointer group -z-10">
+        {data?.map((item, index) => (
+          <SwiperSlide
+            onClick={() => setIndexImage(index)}
+            key={index}
+            className="cursor-pointer group -z-10"
+          >
             <img
               src={item}
               alt="theme"
@@ -56,8 +54,8 @@ const Preview = () => {
       </Swiper>
       {isViewerOpen && (
         <ImageViewer
-          src={images}
-          currentIndex={0}
+          src={data || []}
+          currentIndex={indexImage}
           closeOnClickOutside={true}
           onClose={handleCloseViewer}
           disableScroll={false}
