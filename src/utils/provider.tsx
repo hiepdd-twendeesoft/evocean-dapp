@@ -17,7 +17,7 @@ const Providers: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <QueryClientProvider client={client}>
-      <ConnectionProvider endpoint={clusterApiUrl(WalletAdapterNetwork.Mainnet)}>
+      <ConnectionProvider endpoint={clusterApiUrl(WalletAdapterNetwork.Devnet)}>
         <WalletProvider wallets={[wallet]} autoConnect={true}>
           <ToastContainer
             position="top-right"

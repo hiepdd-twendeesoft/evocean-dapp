@@ -1,22 +1,38 @@
 "use client";
 
 import ItemNft from "@/components/itemNft";
+import { getTheme } from "@/services/get-theme-detail";
+import { lamportsToSol } from "@/utils/lamports-to-sol";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
+import { useCallback } from "react";
 import ContentTab from "../components/ContentTab";
 import ModalBuyOwnership, {
   modalBuyOwnershipControl,
   refModalBuyOwnership,
 } from "../components/ModalBuyOwnership";
 import Preview from "../components/Preview";
-import { useCallback } from "react";
 
 const DetailThemePage = () => {
   const handleBuyOwner = useCallback(() => {
     modalBuyOwnershipControl.show();
   }, []);
 
+  const { id } = useParams<{ id: string }>();
+
+  const { data } = useQuery({
+    queryKey: ["get-theme", id],
+    queryFn: () => getTheme(Number(id)),
+  });
+
   return (
     <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16">
-      <ModalBuyOwnership ref={refModalBuyOwnership} />
+      <ModalBuyOwnership
+        ref={refModalBuyOwnership}
+        author_address={data?.author_address}
+        token_mint={data?.token_mint}
+        theme_id={data?.id}
+      />
       <div className="flex items-start justify-between max-md:flex-col mb-12">
         <div className="w-[53%] max-md:w-[100%]">
           <Preview />
@@ -65,12 +81,12 @@ const DetailThemePage = () => {
             <div className="flex items-center">
               <div className="h-[50px] flex flex-1 bg-indigo-600 items-center justify-center cursor-pointer rounded-[12px] hover:scale-105 duration-200">
                 <p className="text-base font-semibold text-white">
-                  Buy for $32
+                  Buy for {lamportsToSol(data?.Sale?.price)} SOL
                 </p>
               </div>
               <div className="h-[50px] flex-1 flex items-center ml-3 justify-center rounded-[12px] border-indigo-600 border-[1px] cursor-pointer hover:scale-105 duration-200">
                 <p className="text-gray-700 font-semibold text-base mr-3">
-                  Buy for 0.6 SOL
+                  Buy for {lamportsToSol(data?.Listing?.price)} SOL
                 </p>
                 <img
                   src={"/assets/image/SOL.svg"}

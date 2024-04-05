@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Route } from "@/constants/route";
 import { ItemTheme } from "@/models/common.type";
 import { web3 } from "@coral-xyz/anchor";
-import useBalance from "@/hooks/useBalance";
 import useConvertDollar from "@/hooks/useConvertDollar";
 
 interface IProps extends Partial<ItemTheme> {
@@ -32,7 +31,7 @@ const ItemNft: FC<IProps> = ({
     if (handleItem && id) {
       return handleItem(id);
     }
-    router.push(`${Route.DETAIL_THEME}/3637348484`);
+    router.push(`${Route.DETAIL_THEME}/${id}`);
   };
 
   return (
