@@ -27,7 +27,7 @@ const Preview: FC<IProps> = ({ data }) => {
         onClick={handleViewerImage}
         src={data?.[indexImage] || "/assets/image/theme.png"}
         alt="theme"
-        className="w-[100%] rounded-[20px] border-[1px] border-gray-200 cursor-pointer mb-5 drop-shadow-md"
+        className="w-[100%] max-h-[475px] max-sm:max-h-[225px] rounded-[20px] border-[1px] border-gray-200 cursor-pointer mb-5 drop-shadow-md"
       />
       <Swiper
         slidesPerView={5}
