@@ -20,8 +20,8 @@ import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
-import { Bounce, toast } from "react-toastify";
+import { Fragment, useState } from "react";
+import { toast } from "react-toastify";
 
 const DetailProduct = () => {
   const { back } = useRouter();
@@ -35,6 +35,10 @@ const DetailProduct = () => {
     queryFn: () => detailTheme(Number(id)),
     enabled: !!id,
   });
+
+  const price = data?.Sale
+    ? (Number(data.Sale.price) / web3.LAMPORTS_PER_SOL).toFixed(2)
+    : 0;
 
   const wallet = useAnchorWallet();
 
@@ -56,7 +60,7 @@ const DetailProduct = () => {
     }
     try {
       const tokenMint = new web3.PublicKey(
-        "5A9KG1ceF514ALPo21RFyXTistGp2nWwErfss1oPXPYt" //token_mint
+        data?.token_mint || "" //token_mint
       );
 
       const [listingAccount] = web3.PublicKey.findProgramAddressSync(
@@ -75,7 +79,7 @@ const DetailProduct = () => {
       );
 
       const instruction = await program.methods
-        .list(new BN(2 * web3.LAMPORTS_PER_SOL))
+        .list(new BN(Number(priceOwner) * web3.LAMPORTS_PER_SOL))
         .accounts({
           listingAccount,
           marketTokenAccount,
@@ -92,8 +96,8 @@ const DetailProduct = () => {
       await provider.sendAndConfirm(transaction);
 
       await listTheme({
-        listing_price: 2 * web3.LAMPORTS_PER_SOL,
-        sale_price: 1 * web3.LAMPORTS_PER_SOL,
+        listing_price: Number(priceOwner) * web3.LAMPORTS_PER_SOL,
+        sale_price: Number(priceSale) * web3.LAMPORTS_PER_SOL,
         seller: wallet.publicKey.toBase58(),
         theme_id: Number(id),
       });
@@ -197,17 +201,17 @@ const DetailProduct = () => {
         <div className="w-[53%] max-md:mt-4 max-md:w-[100%]">
           <div className="border-gray-200 border-[1px] rounded-[12px] p-4 mb-4">
             <h4 className="text-xl font-semibold text-gray-900 mb-4">
-              Order sumary
+              Order summary
             </h4>
             <div className="flex items-start mb-6">
               <img
-                src="/assets/image/theme.png"
+                src={data?.media?.previews?.[0] || "/assets/image/theme.png"}
                 alt="theme"
-                className="w-[126px] rounded-[12px] mr-4"
+                className="w-[126px] h-[88px] rounded-[12px] mr-4"
               />
               <div>
                 <h4 className="text-base font-semibold text-gray-900 mb-2">
-                  Nimbus - Multi-Layout AI-Powerd SaaS Template
+                  {data?.name}
                 </h4>
                 <div className="flex items-center flex-wrap">
                   <div className="h-[28px] bg-indigo-100 rounded-[14px] px-3 flex items-center justify-center mr-2">
@@ -223,20 +227,34 @@ const DetailProduct = () => {
                 </div>
               </div>
             </div>
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-base font-normal text-gray-600">Subtotal</p>
-              <p className="text-base font-normal text-gray-600">222.22 SOL</p>
-            </div>
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-base font-normal text-gray-600">Gas fees</p>
-              <p className="text-base font-normal text-gray-600">0.0022 SOL</p>
-            </div>
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-base font-medium text-gray-900">Total price</p>
-              <p className="text-base font-medium text-gray-900">
-                222.2203 SOL
-              </p>
-            </div>
+            {data?.Listing && (
+              <Fragment>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-base font-normal text-gray-600">
+                    Subtotal
+                  </p>
+                  <p className="text-base font-normal text-gray-600">
+                    {price} SOL
+                  </p>
+                </div>
+                {/* <div className="flex items-center justify-between mb-3">
+                  <p className="text-base font-normal text-gray-600">
+                    Gas fees
+                  </p>
+                  <p className="text-base font-normal text-gray-600">
+                    0.0022 SOL
+                  </p>
+                </div> */}
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-base font-medium text-gray-900">
+                    Total price
+                  </p>
+                  <p className="text-base font-medium text-gray-900">
+                    {price} SOL
+                  </p>
+                </div>
+              </Fragment>
+            )}
           </div>
           <div className="border-gray-200 border-[1px] rounded-[12px] p-4 mb-4">
             <h4 className="text-xl font-semibold text-gray-900 mb-4">

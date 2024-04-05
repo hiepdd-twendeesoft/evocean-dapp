@@ -1,5 +1,6 @@
-import { Connection, PublicKey } from "@solana/web3.js";
+import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import { useEffect, useState } from "react";
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 
 const useBalance = (publicKey: PublicKey | null) => {
   const [balance, setBalance] = useState<number>(0);
@@ -7,7 +8,10 @@ const useBalance = (publicKey: PublicKey | null) => {
     if (!publicKey) {
       return;
     }
-    const connection = new Connection("https://api.mainnet-beta.solana.com");
+    const connection = new Connection(
+      clusterApiUrl(WalletAdapterNetwork.Devnet) ||
+        "https://api.mainnet-beta.solana.com"
+    );
     connection
       .getBalance(publicKey)
       .then((balance) => {
