@@ -62,7 +62,7 @@ const DetailThemePage = () => {
           fromPubkey: provider.wallet.publicKey,
           toPubkey: new PublicKey(data.author_address),
           lamports: Number(data.Sale.price),
-        }),
+        })
       );
 
       await provider.sendAndConfirm(transaction);
@@ -118,14 +118,14 @@ const DetailThemePage = () => {
         </div>
         <div className="w-[43%] max-md:mt-4 max-md:w-[100%]">
           <div className="flex items-center flex-wrap mb-6">
-            <div className="h-[28px] bg-indigo-100 rounded-[12px] px-[16px] mr-[12px] flex items-center justify-center">
-              <p className="text-sm text-indigo-800 font-medium">UI Kit</p>
-            </div>
-            <div className="h-[28px] bg-indigo-100 rounded-[12px] px-[16px] mr-[12px] flex items-center justify-center">
-              <p className="text-sm text-indigo-800 font-medium">
-                Framer template
-              </p>
-            </div>
+            {data?.media?.categories?.map((item, index) => (
+              <div
+                key={index}
+                className="h-[28px] bg-indigo-100 rounded-[12px] px-[16px] mr-[12px] flex items-center justify-center"
+              >
+                <p className="text-sm text-indigo-800 font-medium">{item}</p>
+              </div>
+            ))}
           </div>
           <h2 className="text-4xl text-gray-900 font-semibold mb-3">
             {data?.name}

@@ -14,9 +14,9 @@ const useConvertDollar = (price: number) => {
 
   const value = useMemo(() => {
     if (data?.data?.solana?.usd) {
-      return price * data?.data?.solana?.usd;
+      return (price * data?.data?.solana?.usd).toFixed(1);
     }
-    return 175;
+    return (175 * price).toFixed(1);
   }, [data?.data?.solana?.usd, price]);
 
   return value;

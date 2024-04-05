@@ -13,6 +13,11 @@ const TabTransaction = lazy(
   () => import("@/app/(main)/detail/components/TabTransaction")
 );
 
+interface IProps {
+  pages?: string[];
+  hightlight?: string[];
+}
+
 const ContentTab = () => {
   const { indexTab, handleChangeTab } = useControlTab();
 

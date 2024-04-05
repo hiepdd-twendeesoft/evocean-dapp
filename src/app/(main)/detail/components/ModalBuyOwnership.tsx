@@ -25,6 +25,7 @@ import useConvertDollar from "@/hooks/useConvertDollar";
 import Link from "next/link";
 import { Route } from "@/constants/route";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export const refModalBuyOwnership = createRef<any>();
 
@@ -69,7 +70,7 @@ const ModalBuyOwnership = forwardRef(
       image,
       priceOwner,
     }: ModalBuyOwnershipProps,
-    ref,
+    ref
   ) => {
     const { push } = useRouter();
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -79,6 +80,7 @@ const ModalBuyOwnership = forwardRef(
       setShowModal(true);
     }, []);
     const close = useCallback(() => {
+      setStep(0);
       setShowModal(false);
     }, []);
 
@@ -105,12 +107,12 @@ const ModalBuyOwnership = forwardRef(
     const handleBuyLicense = async () => {
       if (!token_mint || !author_address || !theme_id) {
         console.error("missing token mint or author_address or theme_id");
-        return;
+        return toast.warn("Missing token mint or author_address or theme_id");
       }
 
       if (author_address == provider.wallet.publicKey.toBase58()) {
         console.error("can not buy your own theme");
-        return;
+        return toast.warn("Can not buy your own theme");
       }
 
       const seller = new web3.PublicKey(author_address);
@@ -118,25 +120,25 @@ const ModalBuyOwnership = forwardRef(
 
       const [listingAccount] = web3.PublicKey.findProgramAddressSync(
         [Buffer.from("listing_account_"), tokenMint.toBuffer()],
-        program.programId,
+        program.programId
       );
 
       const [marketTokenAccount] = web3.PublicKey.findProgramAddressSync(
         [Buffer.from("market_token_account_"), tokenMint.toBuffer()],
-        program.programId,
+        program.programId
       );
 
       let userTokenAccount: PublicKey;
 
       const associatedToken = getAssociatedTokenAddressSync(
         tokenMint,
-        provider.wallet.publicKey,
+        provider.wallet.publicKey
       );
 
       try {
         const { address } = await getAccount(
           provider.connection,
-          associatedToken,
+          associatedToken
         );
 
         userTokenAccount = address;
@@ -146,15 +148,15 @@ const ModalBuyOwnership = forwardRef(
             provider.wallet.publicKey,
             associatedToken,
             provider.wallet.publicKey,
-            tokenMint,
-          ),
+            tokenMint
+          )
         );
 
         await provider.sendAndConfirm(transaction);
 
         const { address } = await getAccount(
           provider.connection,
-          associatedToken,
+          associatedToken
         );
 
         userTokenAccount = address;
@@ -162,7 +164,7 @@ const ModalBuyOwnership = forwardRef(
 
       if (!userTokenAccount) {
         console.error("Can not create user token account");
-        return;
+        return toast.warn("Can not create user token account");
       }
 
       const instruction = await program.methods
@@ -188,6 +190,8 @@ const ModalBuyOwnership = forwardRef(
         theme_id,
       });
 
+      toast.success("Buy ownership successful");
+
       console.log("done buy");
     };
 
@@ -199,8 +203,12 @@ const ModalBuyOwnership = forwardRef(
       <Modal isOpen={showModal} style={customStyles} ariaHideApp={false}>
         <div className="bg-white">
           <div className="flex items-start justify-between">
-            <h3 className="text-2xl font-semibold text-gray-900">
-              Buy ownership
+            <h3
+              className={`text-2xl font-semibold ${
+                step === 2 ? "text-green-600" : "text-gray-900"
+              }`}
+            >
+              {step === 2 ? "Your purchase is complete" : "Buy ownership"}
             </h3>
             <button onClick={close}>
               <img
@@ -231,7 +239,7 @@ const ModalBuyOwnership = forwardRef(
                 </div>
               </div>
             </div>
-            <div className="flex items-end flex-col">
+            <div className="flex items-end flex-col min-w-[70px]">
               <p className="text-base font-medium text-gray-900">
                 {priceOwner} SOL
               </p>
@@ -298,7 +306,7 @@ const ModalBuyOwnership = forwardRef(
         </div>
       </Modal>
     );
-  },
+  }
 );
 
 export default ModalBuyOwnership;

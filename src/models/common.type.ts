@@ -22,6 +22,10 @@ export interface ItemTheme {
     previews: string[];
     figma_features: any[];
     template_features: any[];
+    categories: string[];
+    format: string[];
+    hightlight: string[];
+    live_preview: string;
   };
   owner_addresses: any[];
   token_mint: string;
