@@ -28,10 +28,7 @@ import { buyTheme } from "@/services/buy-theme";
 
 const DetailThemePage = () => {
   const { provider } = useTx();
-
-  const handleBuyOwner = useCallback(() => {
-    modalBuyOwnershipControl.show();
-  }, []);
+  const wallet = useAnchorWallet();
 
   const { id } = useParams<{ id: string }>();
 
@@ -39,6 +36,19 @@ const DetailThemePage = () => {
     queryKey: ["get-theme", id],
     queryFn: () => getTheme(Number(id)),
   });
+
+  const isBuy = data?.owner_addresses?.some(
+    (item) => item === wallet?.publicKey?.toBase58()
+  );
+
+  const isOwner = data?.author_address === wallet?.publicKey?.toBase58();
+
+  const handleBuyOwner = useCallback(() => {
+    if (isOwner) {
+      return toast("You already own the product");
+    }
+    modalBuyOwnershipControl.show();
+  }, [isOwner]);
 
   const { data: listThemes } = useFetchTheme({
     page: 1,
@@ -52,6 +62,13 @@ const DetailThemePage = () => {
 
   const handleBuySol = async () => {
     try {
+      if (isBuy || isOwner) {
+        return toast(
+          isOwner
+            ? "You already own the product"
+            : "You have purchased the product"
+        );
+      }
       if (!data?.Sale) {
         toast.warn("Sale not found");
         return;
@@ -127,10 +144,15 @@ const DetailThemePage = () => {
               </div>
             ))}
           </div>
-          <h2 className="text-4xl text-gray-900 font-semibold mb-3">
+          <h2 className="text-4xl text-gray-900 font-semibold mb-2">
             {data?.name}
           </h2>
-          <p className="text-gray-600 text-base font-normal">
+          {(isBuy || isOwner) && (
+            <p className="text-sm text-green-600 font-medium">
+              {isOwner ? "You are the owner" : "Purchased"}
+            </p>
+          )}
+          <p className="text-gray-600 text-base font-normal mt-1">
             {data?.overview}
           </p>
           <div className="bg-gray-100 rounded-[20px] p-[12px] mt-8">

@@ -11,6 +11,7 @@ interface IProps extends Partial<ItemTheme> {
   handleItem?: (id: number) => void;
   image?: string;
   hidePrice?: boolean;
+  categories?: string[];
 }
 
 const ItemNft: FC<IProps> = ({
@@ -21,6 +22,7 @@ const ItemNft: FC<IProps> = ({
   Sale,
   hidePrice,
   Listing,
+  categories,
 }) => {
   const router = useRouter();
 
@@ -46,7 +48,10 @@ const ItemNft: FC<IProps> = ({
       <h2 className="text-base text-gray-900 font-semibold mt-[12px] line-clamp-1">
         {name || "DataWise Framer - Multi-Layout SaaS Framer Template"}
       </h2>
-      <p className="text-[#565E76] text-sm font-normal">UI Kit</p>
+      <p className="text-[#565E76] text-sm font-normal mr-2 line-clamp-1">
+        {categories?.map((item) => `${item} `)}
+      </p>
+
       {!hidePrice && (
         <div className="items-center flex border-gray-200 border-[1px] rounded-[12px] mt-[12px] h-[44px]">
           <div className="flex item-center w-[50%] justify-center px-[12px]">

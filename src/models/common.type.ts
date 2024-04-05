@@ -28,7 +28,7 @@ export interface ItemTheme {
     live_preview: string;
     pages: string[];
   };
-  owner_addresses: any[];
+  owner_addresses: string[];
   token_mint: string;
   author_address: string;
   Sale: null | {
