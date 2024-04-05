@@ -26,6 +26,7 @@ export interface ItemTheme {
     format: string[];
     hightlight: string[];
     live_preview: string;
+    pages: string[];
   };
   owner_addresses: any[];
   token_mint: string;

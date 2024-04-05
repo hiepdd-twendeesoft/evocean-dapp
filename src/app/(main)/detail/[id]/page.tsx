@@ -148,7 +148,7 @@ const DetailThemePage = () => {
                   className="text-gray-700 font-semibold text-base mr-3"
                   onClick={handleBuySol}
                 >
-                  Buy for {lamportsToSol(data?.Listing?.price)} SOL
+                  Buy for {lamportsToSol(data?.Sale?.price)} SOL
                 </p>
                 <img
                   src={"/assets/image/SOL.svg"}
@@ -241,7 +241,14 @@ const DetailThemePage = () => {
           </button>
         </div>
       </div>
-      <ContentTab />
+      <ContentTab
+        hightlight={data?.media?.hightlight}
+        pages={data?.media?.pages}
+        format={data?.media?.format}
+        template_features={data?.media?.template_features}
+        figma_features={data?.media?.figma_features}
+        overview={data?.overview}
+      />
       <div className="flex items-center justify-between border-t-gray-200 border-t-[1px] mt-14">
         <h2 className="text-gray-900 text-1xl font-semibold mb-4 md:text-2xl mt-12">
           Other template products

@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, lazy, useState } from "react";
+import { FC, Fragment, lazy, useState } from "react";
 import InfoItem from "./InfoItem";
 import TabNavigation from "@/components/tabNavigation";
 import { TAB_DETAIL } from "@/constants/data";
@@ -16,9 +16,20 @@ const TabTransaction = lazy(
 interface IProps {
   pages?: string[];
   hightlight?: string[];
+  format?: string[];
+  template_features?: string[];
+  figma_features?: string[];
+  overview?: string;
 }
 
-const ContentTab = () => {
+const ContentTab: FC<IProps> = ({
+  pages,
+  hightlight,
+  format,
+  template_features,
+  figma_features,
+  overview,
+}) => {
   const { indexTab, handleChangeTab } = useControlTab();
 
   return (
@@ -30,7 +41,13 @@ const ContentTab = () => {
       />
       <div className="flex items-start justify-between mt-8 max-md:flex-col">
         <div className={`w-[${indexTab === 1 ? 100 : 53}%] max-md:w-[100%]`}>
-          {indexTab === 0 && <TabOverView />}
+          {indexTab === 0 && (
+            <TabOverView
+              template_features={template_features}
+              figma_features={figma_features}
+              overview={overview}
+            />
+          )}
           {indexTab === 1 && <TabTransaction />}
         </div>
         <div
@@ -40,7 +57,7 @@ const ContentTab = () => {
         >
           <h4 className="text-lg font-medium text-gray-900 mb-4">Pages</h4>
           <div className="flex items-center flex-wrap">
-            {Array.from(Array(10).keys()).map((item, index) => {
+            {pages?.map((item, index) => {
               return (
                 <div
                   key={index}
@@ -52,7 +69,7 @@ const ContentTab = () => {
                     className="w-[16px]"
                   />
                   <p className="text-sm font-medium text-gray-800 ml-1">
-                    Home {item}
+                    {item}
                   </p>
                 </div>
               );
@@ -62,21 +79,22 @@ const ContentTab = () => {
             Highlight
           </h4>
           <Fragment>
-            {Array.from(Array(7).keys()).map((item, index) => {
-              return (
-                <InfoItem
-                  key={index}
-                  title="Auto Dark Theme available"
-                  icon="check-icon"
-                />
-              );
+            {hightlight?.map((item, index) => {
+              return <InfoItem key={index} title={item} icon="check-icon" />;
             })}
           </Fragment>
           <h4 className="text-lg font-medium text-gray-900 mb-4 mt-8">
             Format
           </h4>
-          <InfoItem title="Figma" icon="Figma" />
-          <InfoItem title="Framer" icon="Framer" />
+          {format?.map((item, index) => {
+            return (
+              <InfoItem
+                key={index}
+                title={item}
+                icon={item === "Figma" ? "Figma" : "Framer"}
+              />
+            );
+          })}
           <h4 className="text-lg font-medium text-gray-900 mb-4 mt-8">
             Support
           </h4>
