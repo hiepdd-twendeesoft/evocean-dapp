@@ -25,6 +25,7 @@ import {
 } from "@solana/web3.js";
 import { ADMIN_WALLET } from "@/constants/contract";
 import { buyTheme } from "@/services/buy-theme";
+import { shortenAddress } from "@/utils/helper";
 
 const DetailThemePage = () => {
   const { provider } = useTx();
@@ -159,15 +160,15 @@ const DetailThemePage = () => {
             <div className="flex items-center">
               <div
                 onClick={handleBuy}
-                className="h-[50px] flex flex-1 bg-indigo-600 items-center justify-center cursor-pointer rounded-[12px] hover:scale-105 duration-200"
+                className="h-[50px] flex border-indigo-600 border-[1px] flex-1 items-center justify-center cursor-pointer rounded-[12px] hover:scale-105 duration-200"
               >
-                <p className="text-base font-semibold text-white">
+                <p className="text-base font-semibold text-indigo-600">
                   Buy for {useConvertDollar(lamportsToSol(data?.Sale?.price))}$
                 </p>
               </div>
-              <div className="h-[50px] flex-1 flex items-center ml-3 justify-center rounded-[12px] border-indigo-600 border-[1px] cursor-pointer hover:scale-105 duration-200">
+              <div className="h-[50px] flex-1 flex items-center ml-3 justify-center rounded-[12px]  border-[1px] cursor-pointer hover:scale-105 duration-200 bg-indigo-600">
                 <p
-                  className="text-gray-700 font-semibold text-base mr-3"
+                  className="text-white font-semibold text-base mr-3"
                   onClick={handleBuySol}
                 >
                   Buy for {lamportsToSol(data?.Sale?.price)} SOL
@@ -213,7 +214,7 @@ const DetailThemePage = () => {
               className="w-[20px] mx-[8px]"
             />
             <p className="text-sm text-gray-900 font-medium">
-              {data?.author_address}
+              {shortenAddress(data?.author_address || "")}
             </p>
           </div>
           <p className="text-base font-normal text-gray-600 mt-4">
