@@ -21,6 +21,9 @@ import {
 } from "react";
 import Modal from "react-modal";
 import "../detail.style.css";
+import useConvertDollar from "@/hooks/useConvertDollar";
+import Link from "next/link";
+import { Route } from "@/constants/route";
 
 export const refModalBuyOwnership = createRef<any>();
 
@@ -50,13 +53,25 @@ type ModalBuyOwnershipProps = {
   token_mint?: string;
   author_address?: string;
   theme_id?: number;
+  name?: string;
+  image?: string;
+  priceOwner?: number;
 };
 
 const ModalBuyOwnership = forwardRef(
-  ({ author_address, token_mint, theme_id }: ModalBuyOwnershipProps, ref) => {
+  (
+    {
+      author_address,
+      token_mint,
+      theme_id,
+      name,
+      image,
+      priceOwner,
+    }: ModalBuyOwnershipProps,
+    ref
+  ) => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [step, setStep] = useState<number>(0);
-    // const priceDollar = useConvertDollar(1);
 
     const show = useCallback(() => {
       setShowModal(true);
@@ -72,7 +87,7 @@ const ModalBuyOwnership = forwardRef(
       };
     });
 
-    const handleApproved = useCallback(async () => {
+    const handleApproved = async () => {
       try {
         setStep(1);
         await handleBuyLicense();
@@ -81,7 +96,7 @@ const ModalBuyOwnership = forwardRef(
         console.error("buy error", error);
         setStep(0);
       }
-    }, [token_mint, author_address]);
+    };
 
     const { program, provider } = useTx();
 
@@ -101,25 +116,25 @@ const ModalBuyOwnership = forwardRef(
 
       const [listingAccount] = web3.PublicKey.findProgramAddressSync(
         [Buffer.from("listing_account_"), tokenMint.toBuffer()],
-        program.programId,
+        program.programId
       );
 
       const [marketTokenAccount] = web3.PublicKey.findProgramAddressSync(
         [Buffer.from("market_token_account_"), tokenMint.toBuffer()],
-        program.programId,
+        program.programId
       );
 
       let userTokenAccount: PublicKey;
 
       const associatedToken = getAssociatedTokenAddressSync(
         tokenMint,
-        provider.wallet.publicKey,
+        provider.wallet.publicKey
       );
 
       try {
         const { address } = await getAccount(
           provider.connection,
-          associatedToken,
+          associatedToken
         );
 
         userTokenAccount = address;
@@ -129,15 +144,15 @@ const ModalBuyOwnership = forwardRef(
             provider.wallet.publicKey,
             associatedToken,
             provider.wallet.publicKey,
-            tokenMint,
-          ),
+            tokenMint
+          )
         );
 
         await provider.sendAndConfirm(transaction);
 
         const { address } = await getAccount(
           provider.connection,
-          associatedToken,
+          associatedToken
         );
 
         userTokenAccount = address;
@@ -183,7 +198,7 @@ const ModalBuyOwnership = forwardRef(
             </h3>
             <button onClick={close}>
               <img
-                src="/assets/icon/close-icon.svg"
+                src={"/assets/icon/close-icon.svg"}
                 alt="close"
                 className="w-[38px]"
               />
@@ -191,13 +206,13 @@ const ModalBuyOwnership = forwardRef(
           </div>
           <div className="flex items-start mt-6 border-b-gray-200 border-b-[1px] pb-8 mb-8">
             <img
-              src={"/assets/image/theme.png"}
+              src={image || "/assets/image/theme.png"}
               alt="theme"
               className="w-[126px] rounded-[12px]"
             />
             <div className="ml-4 w-full">
               <h3 className="text-base font-semibold text-gray-900 mb-4">
-                Nimbus - Multi-Layout AI-Powerd SaaS Template
+                {name}
               </h3>
               <div className="flex items-center flex-wrap">
                 <div className="h-[32px] rounded-[16px] bg-indigo-50 items-center justify-center flex mr-4 px-4">
@@ -211,8 +226,12 @@ const ModalBuyOwnership = forwardRef(
               </div>
             </div>
             <div className="flex items-end flex-col">
-              <p className="text-base font-medium text-gray-900">222.22</p>
-              <p className="text-sm font-medium text-gray-500">$1200</p>
+              <p className="text-base font-medium text-gray-900">
+                {priceOwner} SOL
+              </p>
+              <p className="text-sm font-medium text-gray-500">
+                ${useConvertDollar(priceOwner || 0)}
+              </p>
             </div>
           </div>
           {step === 0 && (
@@ -222,7 +241,7 @@ const ModalBuyOwnership = forwardRef(
                   Total price
                 </h3>
                 <h3 className="text-lg font-medium text-gray-900">
-                  22.344 SOL
+                  {priceOwner} SOL
                 </h3>
               </div>
               <button
@@ -260,20 +279,21 @@ const ModalBuyOwnership = forwardRef(
                   22.344 SOL
                 </h3>
               </div>
-              <button
-                onClick={handleApproved}
+              <Link
+                href={`${Route.PROFILE}`}
+                // onClick={handleApproved}
                 className="h-[50px] w-full rounded-[12px] bg-indigo-600 flex items-center justify-center mt-6"
               >
                 <p className="text-white font-semibold text-base">
                   View your ownership
                 </p>
-              </button>
+              </Link>
             </Fragment>
           )}
         </div>
       </Modal>
     );
-  },
+  }
 );
 
 export default ModalBuyOwnership;

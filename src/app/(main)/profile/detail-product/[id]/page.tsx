@@ -31,7 +31,7 @@ const DetailProduct = () => {
   const [priceOwner, setPriceOwner] = useState<string>("");
   const [priceSale, setPriceSale] = useState<string>("");
 
-  const { data } = useQuery<ItemTheme, Error>({
+  const { data, refetch } = useQuery<ItemTheme, Error>({
     queryKey: ["detailTheme", { id }],
     queryFn: () => detailTheme(Number(id)),
     enabled: !!id,
@@ -98,7 +98,7 @@ const DetailProduct = () => {
         seller: wallet.publicKey.toBase58(),
         theme_id: Number(id),
       });
-
+      refetch();
       toast.success("List theme successful!");
     } catch (error) {
       toast.error("List theme fail!");

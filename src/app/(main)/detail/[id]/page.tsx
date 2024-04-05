@@ -42,6 +42,9 @@ const DetailThemePage = () => {
         author_address={data?.author_address}
         token_mint={data?.token_mint}
         theme_id={data?.id}
+        name={data?.name}
+        image={data?.media?.previews?.[0]}
+        priceOwner={lamportsToSol(data?.Listing?.price)}
       />
       <div className="flex items-start justify-between max-md:flex-col mb-12">
         <div className="w-[53%] max-md:w-[100%]">
