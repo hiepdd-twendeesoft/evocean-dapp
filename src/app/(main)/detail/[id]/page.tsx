@@ -2,8 +2,14 @@
 
 import ItemNft from "@/components/itemNft";
 import useConvertDollar from "@/hooks/useConvertDollar";
+import { useFetchTheme } from "@/hooks/useFetchTheme";
+import { useTx } from "@/hooks/useTx";
+import { buyTheme } from "@/services/buy-theme";
 import { getTheme } from "@/services/get-theme-detail";
+import { shortenAddress } from "@/utils/helper";
 import { lamportsToSol } from "@/utils/lamports-to-sol";
+import { useAnchorWallet } from "@solana/wallet-adapter-react";
+import { PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { Fragment, useCallback } from "react";
@@ -14,18 +20,6 @@ import ModalBuyOwnership, {
   refModalBuyOwnership,
 } from "../components/ModalBuyOwnership";
 import Preview from "../components/Preview";
-import { useFetchTheme } from "@/hooks/useFetchTheme";
-import { useAnchorWallet, useWallet } from "@solana/wallet-adapter-react";
-import { useTx } from "@/hooks/useTx";
-import {
-  LAMPORTS_PER_SOL,
-  PublicKey,
-  SystemProgram,
-  Transaction,
-} from "@solana/web3.js";
-import { ADMIN_WALLET } from "@/constants/contract";
-import { buyTheme } from "@/services/buy-theme";
-import { shortenAddress } from "@/utils/helper";
 
 const DetailThemePage = () => {
   const { provider } = useTx();
@@ -44,12 +38,15 @@ const DetailThemePage = () => {
 
   const isOwner = data?.author_address === wallet?.publicKey?.toBase58();
 
-  const handleBuyOwner = useCallback(() => {
+  const handleBuyOwner = () => {
     if (isOwner) {
       return toast("You already own the product");
     }
+    if (!wallet?.publicKey) {
+      return toast.warn("Please connect your wallet before purchasing");
+    }
     modalBuyOwnershipControl.show();
-  }, [isOwner]);
+  };
 
   const { data: listThemes } = useFetchTheme({
     page: 1,
@@ -57,12 +54,15 @@ const DetailThemePage = () => {
     listing: true,
   });
 
-  const handleBuy = () => {
-    toast.warn("This payment method is going to be supported later.");
-  };
+  // const handleBuy = () => {
+  //   toast.warn("This payment method is going to be supported later.");
+  // };
 
   const handleBuySol = async () => {
     try {
+      if (!wallet?.publicKey) {
+        return toast.warn("Please connect your wallet before purchasing");
+      }
       if (isBuy || isOwner) {
         return toast(
           isOwner
@@ -115,8 +115,9 @@ const DetailThemePage = () => {
       <div className="flex items-start justify-between max-md:flex-col mb-12">
         <div className="w-[53%] max-md:w-[100%]">
           <Preview data={data?.media?.previews} />
-          <div className="flex items-center mt-6">
-            {/* <button className="flex items-center justify-center h-[50px] rounded-[12px] bg-indigo-50 flex-1 mr-4 hover:bg-indigo-100">
+          {data?.media?.live_preview && (
+            <div className="flex items-center mt-6">
+              {/* <button className="flex items-center justify-center h-[50px] rounded-[12px] bg-indigo-50 flex-1 mr-4 hover:bg-indigo-100">
               <p className="text-base font-semibold text-indigo-700">
                 Full preview
               </p>
@@ -126,20 +127,21 @@ const DetailThemePage = () => {
                 className="w-[20px] ml-2"
               />
             </button> */}
-            <button
-              onClick={handleLivePreview}
-              className="flex items-center justify-center h-[50px] rounded-[12px] bg-indigo-50 flex-1 hover:bg-indigo-100"
-            >
-              <p className="text-base font-semibold text-indigo-700">
-                Live preview
-              </p>
-              <img
-                src={"/assets/image/global.svg"}
-                alt="eye"
-                className="w-[18px] ml-2"
-              />
-            </button>
-          </div>
+              <button
+                onClick={handleLivePreview}
+                className="flex items-center justify-center h-[50px] rounded-[12px] bg-indigo-50 flex-1 hover:bg-indigo-100"
+              >
+                <p className="text-base font-semibold text-indigo-700">
+                  Live preview
+                </p>
+                <img
+                  src={"/assets/image/global.svg"}
+                  alt="eye"
+                  className="w-[18px] ml-2"
+                />
+              </button>
+            </div>
+          )}
         </div>
         <div className="w-[43%] max-md:mt-4 max-md:w-[100%]">
           <div className="flex items-center flex-wrap mb-6">
