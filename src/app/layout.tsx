@@ -7,7 +7,7 @@ import Head from "next/head";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Evocean",
+  title: "MoonKit",
   description: "NFT Digital Assets Marketplace",
   icons: [
     {
