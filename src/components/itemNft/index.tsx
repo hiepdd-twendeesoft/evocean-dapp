@@ -71,7 +71,7 @@ const ItemNft: FC<IProps> = ({
           </div>
           <div className="bg-gray-200 w-[1px] h-[100%]" />
           <div className="flex items-center w-[50%] justify-center">
-            <p className="font-medium text-gray-900 text-sm mr-[4px]">
+            <p className="font-medium text-gray-900 text-sm mr-[3px]">
               Ownership:
             </p>
             <img

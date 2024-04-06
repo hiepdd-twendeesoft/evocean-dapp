@@ -97,6 +97,10 @@ const DetailThemePage = () => {
     }
   };
 
+  const handleLivePreview = () => {
+    window.open(data?.media?.live_preview);
+  };
+
   return (
     <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16">
       <ModalBuyOwnership
@@ -112,7 +116,7 @@ const DetailThemePage = () => {
         <div className="w-[53%] max-md:w-[100%]">
           <Preview data={data?.media?.previews} />
           <div className="flex items-center mt-6">
-            <button className="flex items-center justify-center h-[50px] rounded-[12px] bg-indigo-50 flex-1 mr-4 hover:bg-indigo-100">
+            {/* <button className="flex items-center justify-center h-[50px] rounded-[12px] bg-indigo-50 flex-1 mr-4 hover:bg-indigo-100">
               <p className="text-base font-semibold text-indigo-700">
                 Full preview
               </p>
@@ -121,8 +125,11 @@ const DetailThemePage = () => {
                 alt="eye"
                 className="w-[20px] ml-2"
               />
-            </button>
-            <button className="flex items-center justify-center h-[50px] rounded-[12px] bg-indigo-50 flex-1 hover:bg-indigo-100">
+            </button> */}
+            <button
+              onClick={handleLivePreview}
+              className="flex items-center justify-center h-[50px] rounded-[12px] bg-indigo-50 flex-1 hover:bg-indigo-100"
+            >
               <p className="text-base font-semibold text-indigo-700">
                 Live preview
               </p>
@@ -158,15 +165,15 @@ const DetailThemePage = () => {
           </p>
           <div className="bg-gray-100 rounded-[20px] p-[12px] mt-8">
             <div className="flex items-center">
-              <div
+              {/* <div
                 onClick={handleBuy}
                 className="h-[50px] flex border-indigo-600 border-[1px] flex-1 items-center justify-center cursor-pointer rounded-[12px] hover:scale-105 duration-200"
               >
                 <p className="text-base font-semibold text-indigo-600">
                   Buy for {useConvertDollar(lamportsToSol(data?.Sale?.price))}$
                 </p>
-              </div>
-              <div className="h-[50px] flex-1 flex items-center ml-3 justify-center rounded-[12px]  border-[1px] cursor-pointer hover:scale-105 duration-200 bg-indigo-600">
+              </div> */}
+              <div className="h-[50px] flex-1 flex items-center justify-center rounded-[12px]  border-[1px] cursor-pointer hover:bg-indigo-800 duration-200 bg-indigo-600">
                 <p
                   className="text-white font-semibold text-base mr-3"
                   onClick={handleBuySol}
@@ -297,6 +304,7 @@ const DetailThemePage = () => {
                 name={item.name}
                 Sale={item.Sale}
                 image={item.media?.previews?.[0]}
+                Listing={item.Listing}
               />
             ))}
           </Fragment>
