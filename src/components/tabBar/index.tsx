@@ -1,17 +1,20 @@
 "use client";
 import { Route } from "@/constants/route";
+import useBalance from "@/hooks/useBalance";
 import { shortenAddress } from "@/utils/helper";
 import { PhantomWalletName } from "@solana/wallet-adapter-phantom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import { Connection, PublicKey } from "@solana/web3.js";
+import { useCallback, useState } from "react";
 
 const TabBar = () => {
   const pathname = usePathname();
   const { connect, select, publicKey, disconnect, connected } = useWallet();
   const [showOption, setShowOption] = useState<boolean>(false);
+  const balance = useBalance(publicKey);
+
+  console.log("balance>>", balance);
 
   const handleConnectWallet = useCallback(async () => {
     try {
@@ -126,19 +129,31 @@ const TabBar = () => {
                 <div className="relative ml-3">
                   <div>
                     {connected ? (
-                      <button
-                        onClick={handleOption}
-                        className="flex items-center h-[44px] rounded-[12px] bg-indigo-50 px-3"
-                      >
-                        <img
-                          src={"/assets/image/SOL.svg"}
-                          alt="SOL"
-                          className="w-[32px]"
-                        />
-                        <p className="text-sm font-medium text-indigo-600 ml-2">
-                          {shortenAddress(publicKey?.toBase58() || "")}
-                        </p>
-                      </button>
+                      <div className="flex items-center">
+                        <div className="flex items-center h-[44px] rounded-[12px] bg-indigo-50 px-3 mr-2">
+                          <img
+                            src={"/assets/icon/wallet.svg"}
+                            alt="wallet"
+                            className="w-[20px] mr-2"
+                          />
+                          <p className="text-sm font-medium text-indigo-600">
+                            {balance} SOL
+                          </p>
+                        </div>
+                        <button
+                          onClick={handleOption}
+                          className="flex items-center h-[44px] rounded-[12px] bg-indigo-50 px-3"
+                        >
+                          <img
+                            src={"/assets/image/SOL.svg"}
+                            alt="SOL"
+                            className="w-[32px]"
+                          />
+                          <p className="text-sm font-medium text-indigo-600 ml-2">
+                            {shortenAddress(publicKey?.toBase58() || "")}
+                          </p>
+                        </button>
+                      </div>
                     ) : (
                       <button
                         onClick={handleConnectWallet}

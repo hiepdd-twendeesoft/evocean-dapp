@@ -56,6 +56,7 @@ const TabOwner = () => {
                         author_address={item.author_address}
                         Sale={item.Sale}
                         id={item.id}
+                        token_mint={item.token_mint}
                       />
                     ))}
                   </Fragment>

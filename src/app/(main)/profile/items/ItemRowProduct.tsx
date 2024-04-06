@@ -16,6 +16,7 @@ const ItemRowProduct: FC<IProps> = ({
   author_address,
   Sale,
   id,
+  token_mint,
 }) => {
   const router = useRouter();
   const price = Sale
@@ -26,6 +27,12 @@ const ItemRowProduct: FC<IProps> = ({
   const handleDetailProduct = () => {
     router.push(`${Route.DETAIL_PRODUCT}/${id}`);
   };
+
+  const handleHistory = () =>
+    window.open(
+      `https://explorer.solana.com/address/${token_mint}?cluster=devnet`
+    );
+
   return (
     <tr className="border-b-[1px] border-b-gray-200">
       <th
@@ -55,6 +62,14 @@ const ItemRowProduct: FC<IProps> = ({
       </td>
       <td className="border-t-0 px-4 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
         $5655
+      </td>
+      <td className="border-t-0 px-4 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
+        <button
+          onClick={handleHistory}
+          className="bg-indigo-600 h-[38px] px-2 rounded-[12px] hover:-translate-y-1 duration-200"
+        >
+          <p className="text-sm text-white font-medium">View History</p>
+        </button>
       </td>
     </tr>
   );

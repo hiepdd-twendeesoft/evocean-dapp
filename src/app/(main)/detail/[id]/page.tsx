@@ -11,7 +11,7 @@ import { lamportsToSol } from "@/utils/lamports-to-sol";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Fragment, useCallback } from "react";
 import { toast } from "react-toastify";
 import ContentTab from "../components/ContentTab";
@@ -20,10 +20,12 @@ import ModalBuyOwnership, {
   refModalBuyOwnership,
 } from "../components/ModalBuyOwnership";
 import Preview from "../components/Preview";
+import { Route } from "@/constants/route";
 
 const DetailThemePage = () => {
   const { provider } = useTx();
   const wallet = useAnchorWallet();
+  const { push } = useRouter();
 
   const { id } = useParams<{ id: string }>();
 
@@ -83,13 +85,17 @@ const DetailThemePage = () => {
         })
       );
 
-      await provider.sendAndConfirm(transaction);
+      const signal = await provider.sendAndConfirm(transaction);
+
+      console.log("signal>>", signal);
+
       await buyTheme({
         buyer: provider.wallet.publicKey.toBase58(),
         theme_id: data.id,
       });
 
       toast.success("Buy success");
+      push(Route.PROFILE);
     } catch (error) {
       console.error("error buy");
       console.error(error);

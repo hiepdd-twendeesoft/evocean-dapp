@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 
 const useBalance = (publicKey: PublicKey | null) => {
-  const [balance, setBalance] = useState<number>(0);
+  const [balance, setBalance] = useState<string>("0");
+
   useEffect(() => {
     if (!publicKey) {
       return;
     }
+
     const connection = new Connection(
       clusterApiUrl(WalletAdapterNetwork.Devnet) ||
         "https://api.mainnet-beta.solana.com"
@@ -15,7 +17,7 @@ const useBalance = (publicKey: PublicKey | null) => {
     connection
       .getBalance(publicKey)
       .then((balance) => {
-        setBalance(balance / 10 ** 9);
+        setBalance((balance / 10 ** 9).toFixed(2));
         console.log(balance / 10 ** 9); // Convert lamports to SOL
       })
       .catch((error) => {
