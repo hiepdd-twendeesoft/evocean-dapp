@@ -14,8 +14,6 @@ const TabBar = () => {
   const [showOption, setShowOption] = useState<boolean>(false);
   const balance = useBalance(publicKey);
 
-  console.log("balance>>", balance);
-
   const handleConnectWallet = useCallback(async () => {
     try {
       await select(PhantomWalletName);

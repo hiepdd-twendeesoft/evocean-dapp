@@ -4,6 +4,7 @@ import { Route } from "@/constants/route";
 import useConvertDollar from "@/hooks/useConvertDollar";
 import { ItemTheme } from "@/models/common.type";
 import { lamportsToSol } from "@/utils/lamports-to-sol";
+import { toFormatPrice } from "@/utils/utils";
 import { useRouter } from "next/navigation";
 import { FC, memo } from "react";
 
@@ -66,7 +67,7 @@ const ItemNft: FC<IProps> = ({
               </p>
             </div>
             <p className="font-medium text-gray-500 text-sm">
-              (${priceDollar})
+              (${toFormatPrice(priceDollar)})
             </p>
           </div>
           <div className="bg-gray-200 w-[1px] h-[100%]" />

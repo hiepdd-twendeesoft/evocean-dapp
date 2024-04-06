@@ -12,3 +12,10 @@ export function getCategoryName(name: string) {
       "";
   }
 }
+
+export const toFormatPrice = (price: string) => {
+  if (!price) {
+    return "0";
+  }
+  return price.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+};
