@@ -168,7 +168,7 @@ const DetailThemePage = () => {
               {isOwner ? "You are the owner" : "Purchased"}
             </p>
           )}
-          <p className="text-gray-600 text-base font-normal mt-1">
+          <p className="text-gray-600 text-base font-normal mt-1 line-clamp-2">
             {data?.overview}
           </p>
           <div className="bg-gray-100 rounded-[20px] p-[12px] mt-8">
