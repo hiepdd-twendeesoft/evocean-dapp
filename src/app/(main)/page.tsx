@@ -13,7 +13,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <h2 className="text-3xl font-semibold text-slate-800 my-12 max-w-[70%] lg:text-6xl md:text-4xl">
+      <h2 className="text-2xl font-semibold text-slate-800 mt-12 mb-12 max-sm:mb-2 max-w-[70%] max-sm:max-w-[100%] lg:text-6xl md:text-4xl">
         Design resouces to optimize for creative work flow
       </h2>
       <Category />
