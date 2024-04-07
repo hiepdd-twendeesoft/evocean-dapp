@@ -1,4 +1,5 @@
 import { ItemTheme } from "@/models/common.type";
+import { detailTheme } from "@/services/list-theme";
 import { Metadata } from "next";
 
 export async function generateMetadata({
@@ -10,9 +11,7 @@ export async function generateMetadata({
   const id = params.id;
   const url = `https://evocean-dapp-jet.vercel.app/detail/${id}`;
   // fetch data
-  const event: ItemTheme = await fetch(
-    `https://evocean.twendeesoft.com/themes/${id}`
-  ).then((res) => res.json());
+  const event: ItemTheme = await detailTheme(Number(id));
 
   return {
     title: event.name,
