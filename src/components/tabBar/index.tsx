@@ -161,7 +161,7 @@ const TabBar = () => {
                         aria-expanded="false"
                         aria-haspopup="true"
                       >
-                        <p className="text-slate-900 text-base font-medium mr-1">
+                        <p className="text-slate-900 text-[11px] md:text-base font-medium mr-1">
                           Connect wallet
                         </p>
                         <img
