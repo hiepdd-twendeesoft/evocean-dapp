@@ -49,4 +49,5 @@ export type TransactionTheme = {
   price: string;
   seller: string;
   theme_id: number;
+  date: string;
 };

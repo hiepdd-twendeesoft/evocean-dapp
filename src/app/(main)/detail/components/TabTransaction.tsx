@@ -1,6 +1,7 @@
 import { TransactionTheme } from "@/models/common.type";
 import { shortenAddress } from "@/utils/helper";
 import { lamportsToSol } from "@/utils/lamports-to-sol";
+import moment from "moment";
 import { FC, Fragment } from "react";
 
 interface IProps {
@@ -36,12 +37,12 @@ const TabTransaction: FC<IProps> = ({ Transactions }) => {
                   <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
                     Type
                   </th>
+                  <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 uppercase whitespace-nowrap text-left">
+                    Time
+                  </th>
                   <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
                     Theme ID
                   </th>
-                  {/* <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 uppercase whitespace-nowrap text-left">
-                    Account
-                  </th> */}
                 </tr>
               </thead>
 
@@ -61,11 +62,11 @@ const TabTransaction: FC<IProps> = ({ Transactions }) => {
                       {item.kind}
                     </td>
                     <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
+                      {moment(item.date).fromNow()}
+                    </td>
+                    <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
                       {item.theme_id}
                     </td>
-                    {/* <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
-                      46,53%
-                    </td> */}
                   </tr>
                 ))}
               </tbody>

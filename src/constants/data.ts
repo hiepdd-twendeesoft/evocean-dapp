@@ -4,4 +4,4 @@ export const TAB_PROFILE = [
   "Your activities",
 ];
 
-export const TAB_DETAIL = ["Overview", "Transparency", "Owner biding"];
+export const TAB_DETAIL = ["Overview", "Transparency"];
