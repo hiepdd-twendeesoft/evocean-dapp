@@ -105,7 +105,7 @@ const TabBar = () => {
                 </div>
               </div>
             </div>
-            <div className="hidden md:block relative">
+            <div className="md:block relative">
               <div className="ml-4 flex items-center md:ml-6">
                 {/* <button
                   type="button"
@@ -128,26 +128,26 @@ const TabBar = () => {
                   <div>
                     {connected ? (
                       <div className="flex items-center">
-                        <div className="flex items-center h-[44px] rounded-[12px] bg-indigo-50 px-3 mr-2">
+                        <div className="flex items-center h-[32px] md:h-[44px] rounded-[12px] bg-indigo-50 px-3 mr-2">
                           <img
                             src={"/assets/icon/wallet.svg"}
                             alt="wallet"
-                            className="w-[20px] mr-2"
+                            className="w-[20px] mr-2 md:block hidden"
                           />
-                          <p className="text-sm font-medium text-indigo-600">
+                          <p className="text-[12px] md:text-sm font-medium text-indigo-600">
                             {balance} SOL
                           </p>
                         </div>
                         <button
                           onClick={handleOption}
-                          className="flex items-center h-[44px] rounded-[12px] bg-indigo-50 px-3"
+                          className="flex items-center h-[32px] md:h-[44px] px-2 rounded-[12px] bg-indigo-50 md:px-3"
                         >
                           <img
                             src={"/assets/image/SOL.svg"}
                             alt="SOL"
-                            className="w-[32px]"
+                            className="md:w-[32px] w-[20px]"
                           />
-                          <p className="text-sm font-medium text-indigo-600 ml-2">
+                          <p className="text-sm font-medium text-indigo-600 ml-2 hidden md:block">
                             {shortenAddress(publicKey?.toBase58() || "")}
                           </p>
                         </button>
