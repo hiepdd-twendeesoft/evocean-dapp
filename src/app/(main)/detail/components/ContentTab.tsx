@@ -5,6 +5,7 @@ import InfoItem from "./InfoItem";
 import TabNavigation from "@/components/tabNavigation";
 import { TAB_DETAIL } from "@/constants/data";
 import { useControlTab } from "@/hooks/useControlTab";
+import { TransactionTheme } from "@/models/common.type";
 
 const TabOverView = lazy(
   () => import("@/app/(main)/detail/components/TabOverview")
@@ -20,6 +21,7 @@ interface IProps {
   template_features?: string[];
   figma_features?: string[];
   overview?: string;
+  Transactions?: TransactionTheme[];
 }
 
 const ContentTab: FC<IProps> = ({
@@ -29,6 +31,7 @@ const ContentTab: FC<IProps> = ({
   template_features,
   figma_features,
   overview,
+  Transactions,
 }) => {
   const { indexTab, handleChangeTab } = useControlTab();
 
@@ -48,7 +51,7 @@ const ContentTab: FC<IProps> = ({
               overview={overview}
             />
           )}
-          {indexTab === 1 && <TabTransaction />}
+          {indexTab === 1 && <TabTransaction Transactions={Transactions} />}
         </div>
         <div
           className={`w-[43%] max-md:w-[100%] ${

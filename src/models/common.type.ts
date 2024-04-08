@@ -39,4 +39,14 @@ export interface ItemTheme {
     theme_id: number;
     price: string;
   };
+  Transactions: TransactionTheme[];
 }
+
+export type TransactionTheme = {
+  buyer: string;
+  id: number;
+  kind: string;
+  price: string;
+  seller: string;
+  theme_id: number;
+};

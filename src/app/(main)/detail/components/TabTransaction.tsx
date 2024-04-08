@@ -1,6 +1,13 @@
-import { Fragment } from "react";
+import { TransactionTheme } from "@/models/common.type";
+import { shortenAddress } from "@/utils/helper";
+import { lamportsToSol } from "@/utils/lamports-to-sol";
+import { FC, Fragment } from "react";
 
-const TabTransaction = () => {
+interface IProps {
+  Transactions?: TransactionTheme[];
+}
+
+const TabTransaction: FC<IProps> = ({ Transactions }) => {
   return (
     <Fragment>
       <h3 className="text-lg font-medium text-gray-900">
@@ -18,67 +25,49 @@ const TabTransaction = () => {
               <thead>
                 <tr className="border-b-[1px] border-b-gray-200">
                   <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
-                    Signature
+                    Buyer
                   </th>
                   <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
-                    Time
+                    Seller
+                  </th>
+                  <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
+                    Price
                   </th>
                   <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
                     Type
                   </th>
                   <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
-                    From
+                    Theme ID
                   </th>
-                  <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
-                    To
-                  </th>
-                  <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 uppercase whitespace-nowrap text-left">
+                  {/* <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 uppercase whitespace-nowrap text-left">
                     Account
-                  </th>
+                  </th> */}
                 </tr>
               </thead>
 
               <tbody>
-                <tr className="border-b-[1px] border-b-gray-200">
-                  <th className="border-t-0 px-6 py-4 align-middle text-sm font-medium whitespace-nowrap text-left text-gray-900">
-                    3boaqwaFiqymrXbcxG
-                  </th>
-                  <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap ">
-                    4,569
-                  </td>
-                  <td className="border-t-0 px-6 py-4 align-center text-[14px] text-gray-500 whitespace-nowrap">
-                    340
-                  </td>
-                  <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
-                    46,53%
-                  </td>
-                  <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
-                    46,53%
-                  </td>
-                  <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
-                    46,53%
-                  </td>
-                </tr>
-                <tr className="border-b-[1px] border-b-gray-200">
-                  <th className="border-t-0 px-6 py-4 align-middle text-sm font-medium whitespace-nowrap text-left text-gray-900">
-                    3boaqwaFiqymrXbcxG
-                  </th>
-                  <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap ">
-                    4,569
-                  </td>
-                  <td className="border-t-0 px-6 py-4 align-center text-[14px] text-gray-500 whitespace-nowrap">
-                    340
-                  </td>
-                  <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
-                    46,53%
-                  </td>
-                  <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
-                    46,53%
-                  </td>
-                  <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
-                    46,53%
-                  </td>
-                </tr>
+                {Transactions?.map((item, index) => (
+                  <tr key={index} className="border-b-[1px] border-b-gray-200">
+                    <th className="border-t-0 px-6 py-4 align-middle text-sm font-medium whitespace-nowrap text-left text-gray-900">
+                      {shortenAddress(item.buyer)}
+                    </th>
+                    <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap ">
+                      {shortenAddress(item.seller)}
+                    </td>
+                    <td className="border-t-0 px-6 py-4 align-center text-[14px] text-gray-500 whitespace-nowrap">
+                      {lamportsToSol(item.price)} SOL
+                    </td>
+                    <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
+                      {item.kind}
+                    </td>
+                    <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
+                      {item.theme_id}
+                    </td>
+                    {/* <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
+                      46,53%
+                    </td> */}
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

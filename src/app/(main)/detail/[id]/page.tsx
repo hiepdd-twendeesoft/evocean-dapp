@@ -286,6 +286,7 @@ const DetailThemePage = () => {
         template_features={data?.media?.template_features}
         figma_features={data?.media?.figma_features}
         overview={data?.overview}
+        Transactions={data?.Transactions}
       />
       <div className="flex items-center justify-between border-t-gray-200 border-t-[1px] mt-14">
         <h2 className="text-gray-900 text-1xl font-semibold mb-4 md:text-2xl mt-12">
