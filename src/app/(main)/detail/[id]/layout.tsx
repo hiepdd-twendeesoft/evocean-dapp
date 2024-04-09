@@ -9,7 +9,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   // read route params
   const id = params.id;
-  const url = `${window.location.hostname}/detail/${id}`;
+  const url = `https://evocean-dapp-jet.vercel.app/detail/${id}`;
   // fetch data
   const event: ItemTheme = await detailTheme(Number(id));
 
