@@ -29,7 +29,7 @@ const DetailThemePage = () => {
 
   const { id } = useParams<{ id: string }>();
 
-  const { data } = useQuery({
+  const { data, refetch } = useQuery({
     queryKey: ["get-theme", id],
     queryFn: () => getTheme(Number(id)),
   });
@@ -93,7 +93,7 @@ const DetailThemePage = () => {
         buyer: provider.wallet.publicKey.toBase58(),
         theme_id: data.id,
       });
-
+      refetch();
       toast.success("Buy success");
       push(Route.PROFILE);
     } catch (error) {
@@ -117,6 +117,7 @@ const DetailThemePage = () => {
         name={data?.name}
         image={data?.media?.previews?.[0]}
         priceOwner={lamportsToSol(data?.Listing?.price)}
+        refetch={refetch}
       />
       <div className="flex items-start justify-between max-md:flex-col mb-12">
         <div className="w-[53%] max-md:w-[100%]">

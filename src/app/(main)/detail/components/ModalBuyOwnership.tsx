@@ -58,6 +58,7 @@ type ModalBuyOwnershipProps = {
   name?: string;
   image?: string;
   priceOwner?: number;
+  refetch?: () => void;
 };
 
 const ModalBuyOwnership = forwardRef(
@@ -69,6 +70,7 @@ const ModalBuyOwnership = forwardRef(
       name,
       image,
       priceOwner,
+      refetch,
     }: ModalBuyOwnershipProps,
     ref
   ) => {
@@ -189,7 +191,7 @@ const ModalBuyOwnership = forwardRef(
         buyer: provider.wallet.publicKey.toBase58(),
         theme_id,
       });
-
+      refetch?.();
       toast.success("Buy ownership successful");
 
       console.log("done buy");
