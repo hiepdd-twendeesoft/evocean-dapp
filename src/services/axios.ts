@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 
-const apiServerUrl = "https://evocean.twendeesoft.com";
+const apiServerUrl = "https://moonkit.twendeesoft.com";
 
 const getAxiosInstance = async () => {
   // const credentials = await Keychain.getInternetCredentials(JWT_KEY);
