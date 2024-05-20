@@ -21,11 +21,16 @@ import ModalBuyOwnership, {
 } from "../components/ModalBuyOwnership";
 import Preview from "../components/Preview";
 import { Route } from "@/constants/route";
+import { RootState } from "@/store/slices";
+import { useSelector } from "react-redux";
 
 const DetailThemePage = () => {
   const { provider } = useTx();
   const wallet = useAnchorWallet();
   const { push } = useRouter();
+  const { isLogin, accountInfo } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   const { id } = useParams<{ id: string }>();
 
@@ -174,27 +179,29 @@ const DetailThemePage = () => {
           </p>
           <div className="bg-gray-100 rounded-[20px] p-[12px] mt-8">
             <div className="flex items-center">
-              {/* <div
-                onClick={handleBuy}
-                className="h-[50px] flex border-indigo-600 border-[1px] flex-1 items-center justify-center cursor-pointer rounded-[12px] hover:scale-105 duration-200"
+              <div
+                // onClick={handleBuy}
+                className="h-[50px] flex-1 flex items-center justify-center rounded-[12px]  border-[1px] cursor-pointer hover:bg-indigo-800 duration-200 bg-indigo-600"
               >
-                <p className="text-base font-semibold text-indigo-600">
+                <p className="text-white font-semibold text-base mr-3">
                   Buy for {useConvertDollar(lamportsToSol(data?.Sale?.price))}$
                 </p>
-              </div> */}
-              <div className="h-[50px] flex-1 flex items-center justify-center rounded-[12px]  border-[1px] cursor-pointer hover:bg-indigo-800 duration-200 bg-indigo-600">
-                <p
-                  className="text-white font-semibold text-base mr-3"
-                  onClick={handleBuySol}
-                >
-                  Buy for {lamportsToSol(data?.Sale?.price)} SOL
-                </p>
-                <img
-                  src={"/assets/image/SOL.svg"}
-                  alt="SOL"
-                  className="w-[20px]"
-                />
               </div>
+              {isLogin && (
+                <div className="h-[50px] flex border-indigo-600 border-[1px] flex-1 items-center justify-center cursor-pointer rounded-[12px] hover:scale-105 duration-200">
+                  <p
+                    className="text-base font-semibold text-indigo-600"
+                    onClick={handleBuySol}
+                  >
+                    Buy for {lamportsToSol(data?.Sale?.price)} SOL
+                  </p>
+                  <img
+                    src={"/assets/image/SOL.svg"}
+                    alt="SOL"
+                    className="w-[20px]"
+                  />
+                </div>
+              )}
             </div>
             <div className="flex items-center mt-6 mb-4">
               <div className="flex flex-1 items-center justify-center">

@@ -1,17 +1,23 @@
 "use client";
 import { Route } from "@/constants/route";
 import useBalance from "@/hooks/useBalance";
+import { RootState } from "@/store/slices";
 import { shortenAddress } from "@/utils/helper";
 import { PhantomWalletName } from "@solana/wallet-adapter-phantom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
+import { useSelector } from "react-redux";
 
 const TabBar = () => {
   const pathname = usePathname();
   const { connect, select, publicKey, disconnect, connected } = useWallet();
+  const { isLogin, accountInfo } = useSelector(
+    (state: RootState) => state.auth
+  );
   const [showOption, setShowOption] = useState<boolean>(false);
+  const [showSetting, setShowSetting] = useState<boolean>(false);
   const balance = useBalance(publicKey);
 
   const handleConnectWallet = useCallback(async () => {
@@ -107,22 +113,111 @@ const TabBar = () => {
             </div>
             <div className="md:block relative">
               <div className="ml-4 flex items-center md:ml-6">
-                {/* <button
-                  type="button"
-                  className="relative mr-3 flex max-w-xs items-center rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                  id="user-menu-button"
-                  aria-expanded="false"
-                  aria-haspopup="true"
-                >
-                  <p className="text-slate-900 text-base font-medium mr-1">
-                    Login
-                  </p>
-                  <img
-                    className="h-[20px] w-[20px] rounded-full"
-                    src={"/assets/image/Google.svg"}
-                    alt="Google"
-                  />
-                </button> */}
+                {isLogin ? (
+                  <div className="cursor-pointer flex items-center justify-center gap-2">
+                    <div className="relative">
+                      <div
+                        onClick={() => setShowSetting(!showSetting)}
+                        className="cursor-pointer flex items-center justify-center py-2 px-4 border-[#E2E8F0] rounded-[12px] border-b border-solid border-[1px]"
+                      >
+                        <h4>Account</h4>
+                        <div>
+                          <img
+                            src={"/assets/image/drop-down.svg"}
+                            alt="sale"
+                            className="w-5 h-5"
+                          />
+                        </div>
+                      </div>
+                      {showSetting && (
+                        <div
+                          className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                          role="menu"
+                          aria-orientation="vertical"
+                          aria-labelledby="menu-button"
+                        >
+                          <div className="py-1" role="none">
+                            <p
+                              className="text-gray-700 block px-4 py-2 text-sm"
+                              role="menuitem"
+                              id="menu-item-0"
+                            >
+                              Signed in as {accountInfo?.email}
+                            </p>
+                          </div>
+                          <div className="py-1" role="none">
+                            <Link
+                              href="#"
+                              className="text-gray-700 block px-4 py-2 text-sm"
+                            >
+                              Your profile
+                            </Link>
+                            <Link
+                              href="#"
+                              className="text-gray-700 block px-4 py-2 text-sm"
+                            >
+                              Purchased
+                            </Link>
+                            <Link
+                              href="#"
+                              className="text-gray-700 block px-4 py-2 text-sm"
+                            >
+                              Owned
+                            </Link>
+                          </div>
+                          <div className="py-1" role="none">
+                            <Link
+                              href="#"
+                              className="text-gray-700 block px-4 py-2 text-sm"
+                            >
+                              Seller dashboard
+                            </Link>
+                            <Link
+                              href="#"
+                              className="text-gray-700 block px-4 py-2 text-sm"
+                            >
+                              Investor dashboard
+                            </Link>
+                          </div>
+                          <div className="py-1" role="none">
+                            <Link
+                              href="#"
+                              className="text-gray-700 block px-4 py-2 text-sm"
+                            >
+                              Logout
+                            </Link>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <img
+                        src={
+                          "https://pbs.twimg.com/media/FoUoGo3XsAMEPFr?format=jpg&name=4096x4096"
+                        }
+                        alt="avatar"
+                        className="w-[36px] h-[36px] object-cover rounded-[50%]"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="relative mr-3 flex max-w-xs items-center rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                    id="user-menu-button"
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                  >
+                    <p className="text-slate-900 text-base font-medium mr-1">
+                      Login
+                    </p>
+                    <img
+                      className="h-[20px] w-[20px] rounded-full"
+                      src={"/assets/image/Google.svg"}
+                      alt="Google"
+                    />
+                  </button>
+                )}
 
                 <div className="relative ml-3">
                   <div>
