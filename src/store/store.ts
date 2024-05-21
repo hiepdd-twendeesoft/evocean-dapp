@@ -1,6 +1,11 @@
 import thunk, { ThunkAction } from 'redux-thunk'
 import { configureStore } from '@reduxjs/toolkit'
-import { persistStore, persistReducer } from 'redux-persist'
+import { persistStore, persistReducer,   FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER, } from 'redux-persist'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import sessionStorage from 'redux-persist/es/storage/session'
 
@@ -17,6 +22,12 @@ const persistedReducer = persistReducer(persistConfig, reducer)
 
 const store = configureStore({
   reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+  getDefaultMiddleware({
+    serializableCheck: {
+      ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+    },
+  }),
   // middleware: (getDefaultMiddleware) =>
   //   getDefaultMiddleware({
   //     serializableCheck: false,

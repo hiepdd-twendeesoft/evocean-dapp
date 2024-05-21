@@ -488,6 +488,11 @@
   resolved "https://registry.yarnpkg.com/@mobily/ts-belt/-/ts-belt-3.13.1.tgz#8f8ce2a2eca41d88c2ca70c84d0f47d0f7f5cd5f"
   integrity sha512-K5KqIhPI/EoCTbA6CGbrenM9s41OouyK8A03fGJJcla/zKucsgLbz8HNbeseoLarRPgyWJsUyCYqFhI7t3Ra9Q==
 
+"@moonpay/moonpay-react@^1.6.1":
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/@moonpay/moonpay-react/-/moonpay-react-1.6.1.tgz#8ee311f113a54ce1d9684816d081bc534d69620a"
+  integrity sha512-v2cx7W1ESrvzBf8Wj1If+poTiTX7OwZYUY0PLfDMuiCnu+di++GyI+R6VeAWUaH20KAQGiD54pFaoE7naNZrew==
+
 "@next/env@14.1.4":
   version "14.1.4"
   resolved "https://registry.yarnpkg.com/@next/env/-/env-14.1.4.tgz#432e80651733fbd67230bf262aee28be65252674"
