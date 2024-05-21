@@ -1,14 +1,13 @@
 "use client";
 import { Route } from "@/constants/route";
 import useBalance from "@/hooks/useBalance";
-import { googleLogoutAction } from "@/store/actions/auth";
 import { RootState, authActions } from "@/store/slices";
 import { useAppDispatch } from "@/store/store";
 import { shortenAddress } from "@/utils/helper";
 import { PhantomWalletName } from "@solana/wallet-adapter-phantom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
-import { redirect, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -20,7 +19,6 @@ const TabBar = () => {
   const { isLogin, accountInfo } = useSelector(
     (state: RootState) => state.auth
   );
-    console.log('isLogin', isLogin)
   const [domLoaded, setDomLoaded] = useState(false);
   const [showOption, setShowOption] = useState<boolean>(false);
   const [showSetting, setShowSetting] = useState<boolean>(false);
