@@ -1,6 +1,8 @@
 import axios, { AxiosRequestConfig } from "axios";
 
-const apiServerUrl = "https://moonkit.twendeesoft.com";
+const apiServerUrl = process.env.NEXT_PUBLIC_API_URL || "https://moonkit.twendeesoft.com";
+// const apiServerUrl = "https://22c0-222-252-11-28.ngrok-free.app";
+// const apiServerUrl = "http://localhost:8000";
 
 const getAxiosInstance = async () => {
   // const credentials = await Keychain.getInternetCredentials(JWT_KEY);

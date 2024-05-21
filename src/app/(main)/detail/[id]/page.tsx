@@ -11,8 +11,8 @@ import { lamportsToSol } from "@/utils/lamports-to-sol";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, useRouter } from "next/navigation";
-import { Fragment, useCallback } from "react";
+import { redirect, useParams, useRouter } from "next/navigation";
+import { Fragment, useCallback, useState } from "react";
 import { toast } from "react-toastify";
 import ContentTab from "../components/ContentTab";
 import ModalBuyOwnership, {
@@ -21,11 +21,31 @@ import ModalBuyOwnership, {
 } from "../components/ModalBuyOwnership";
 import Preview from "../components/Preview";
 import { Route } from "@/constants/route";
+import { RootState } from "@/store/slices";
+import { useSelector } from "react-redux";
+import dynamic from "next/dynamic";
 
 const DetailThemePage = () => {
+  const router = useRouter();
   const { provider } = useTx();
   const wallet = useAnchorWallet();
   const { push } = useRouter();
+  const { isLogin, accountInfo } = useSelector(
+    (state: RootState) => state.auth
+  );
+  const [visible, setVisible] = useState(false);
+  const themeData = {
+    theme_id: 1,
+  };
+  const MoonPayProvider = dynamic(
+    () => import("@moonpay/moonpay-react").then((mod) => mod.MoonPayProvider),
+    { ssr: false }
+  );
+
+  const MoonPayBuyWidget = dynamic(
+    () => import("@moonpay/moonpay-react").then((mod) => mod.MoonPayBuyWidget),
+    { ssr: false }
+  );
 
   const { id } = useParams<{ id: string }>();
 
@@ -56,9 +76,12 @@ const DetailThemePage = () => {
     listing: true,
   });
 
-  // const handleBuy = () => {
-  //   toast.warn("This payment method is going to be supported later.");
-  // };
+  const handleBuy = () => {
+    redirect(`https://buy-sandbox.moonpay.com?apiKey=${process.env.NEXT_PUBLIC_PUBLIC_KEY_MOONPAY}&currencyCode=eth&walletAddress=0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae`);
+
+    // toast.warn("This payment method is going to be supported later.");
+
+  };
 
   const handleBuySol = async () => {
     try {
@@ -107,8 +130,35 @@ const DetailThemePage = () => {
     window.open(data?.media?.live_preview);
   };
 
+  const handleGetSignature = async (url: string): Promise<string> => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/themes/payment?url=${url}`);
+    console.log('response', response.url);
+    return response.url as string;
+  }
+  
   return (
     <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16">
+      {/* <MoonPayProvider
+        apiKey={process.env.NEXT_PUBLIC_PUBLIC_KEY_MOONPAY ?? ""}
+        debug
+      >
+        <div className="App">
+          <MoonPayBuyWidget
+            variant="embedded"
+            baseCurrencyCode="usd"
+            baseCurrencyAmount="50"
+            defaultCurrencyCode="eth"
+            walletAddress="0xde55e70d3BFB65F20908358179715fdAF8c7dA6d"
+            // visible={visible}
+            visible
+            onUrlSignatureRequested={'handleGetSignature'}
+            theme="dark"
+            externalCustomerId="70"
+            externalTransactionId={JSON.stringify(themeData)}
+          />
+          <button onClick={() => setVisible(!visible)}>Toggle widget</button>
+        </div>
+      </MoonPayProvider> */}
       <ModalBuyOwnership
         ref={refModalBuyOwnership}
         author_address={data?.author_address}
@@ -174,27 +224,29 @@ const DetailThemePage = () => {
           </p>
           <div className="bg-gray-100 rounded-[20px] p-[12px] mt-8">
             <div className="flex items-center">
-              {/* <div
+              <div
                 onClick={handleBuy}
-                className="h-[50px] flex border-indigo-600 border-[1px] flex-1 items-center justify-center cursor-pointer rounded-[12px] hover:scale-105 duration-200"
+                className="h-[50px] flex-1 flex items-center justify-center rounded-[12px]  border-[1px] cursor-pointer hover:bg-indigo-800 duration-200 bg-indigo-600"
               >
-                <p className="text-base font-semibold text-indigo-600">
+                <p className="text-white font-semibold text-base mr-3">
                   Buy for {useConvertDollar(lamportsToSol(data?.Sale?.price))}$
                 </p>
-              </div> */}
-              <div className="h-[50px] flex-1 flex items-center justify-center rounded-[12px]  border-[1px] cursor-pointer hover:bg-indigo-800 duration-200 bg-indigo-600">
-                <p
-                  className="text-white font-semibold text-base mr-3"
-                  onClick={handleBuySol}
-                >
-                  Buy for {lamportsToSol(data?.Sale?.price)} SOL
-                </p>
-                <img
-                  src={"/assets/image/SOL.svg"}
-                  alt="SOL"
-                  className="w-[20px]"
-                />
               </div>
+              {isLogin && (
+                <div className="h-[50px] flex border-indigo-600 border-[1px] flex-1 items-center justify-center cursor-pointer rounded-[12px] hover:scale-105 duration-200">
+                  <p
+                    className="text-base font-semibold text-indigo-600"
+                    onClick={handleBuySol}
+                  >
+                    Buy for {lamportsToSol(data?.Sale?.price)} SOL
+                  </p>
+                  <img
+                    src={"/assets/image/SOL.svg"}
+                    alt="SOL"
+                    className="w-[20px]"
+                  />
+                </div>
+              )}
             </div>
             <div className="flex items-center mt-6 mb-4">
               <div className="flex flex-1 items-center justify-center">
