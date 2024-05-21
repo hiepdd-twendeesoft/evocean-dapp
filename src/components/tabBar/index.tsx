@@ -181,7 +181,7 @@ const TabBar = () => {
                             onClick={() => setShowSetting(!showSetting)}
                             className="cursor-pointer flex items-center justify-center py-2 px-4 border-[#E2E8F0] rounded-[12px] border-b border-solid border-[1px]"
                           >
-                            <h4>Account</h4>
+                            <h4 className="text-[#000]">Account</h4>
                             <div>
                               <img
                                 src={"/assets/image/drop-down.svg"}
