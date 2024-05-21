@@ -1,13 +1,13 @@
 "use client";
 import { Route } from "@/constants/route";
 import useBalance from "@/hooks/useBalance";
-import { googleLogoutAction } from "@/store/actions/auth";
-import { RootState } from "@/store/slices";
+import { RootState, authActions } from "@/store/slices";
+import { useAppDispatch } from "@/store/store";
 import { shortenAddress } from "@/utils/helper";
 import { PhantomWalletName } from "@solana/wallet-adapter-phantom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
-import { redirect, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -15,6 +15,7 @@ const TabBar = () => {
   const pathname = usePathname();
   const { connect, select, publicKey, disconnect, connected } = useWallet();
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const { isLogin, accountInfo } = useSelector(
     (state: RootState) => state.auth
   );
@@ -44,6 +45,7 @@ const TabBar = () => {
 
   const handleSignOut = useCallback(() => {
     disconnect();
+    dispatch(authActions.logout())
     router.push("/login", { scroll: false });
     setShowSetting(false)
   }, [disconnect]);
@@ -123,6 +125,55 @@ const TabBar = () => {
                 </div>
                 <div className="md:block relative">
                   <div className="ml-4 flex items-center md:ml-6">
+                    <div className="relative mr-3">
+                      <div>
+                        {connected ? (
+                          <div className="flex items-center">
+                            <div className="flex items-center h-[32px] md:h-[44px] rounded-[12px] bg-indigo-50 px-3 mr-2">
+                              <img
+                                src={"/assets/icon/wallet.svg"}
+                                alt="wallet"
+                                className="w-[20px] mr-2 md:block hidden"
+                              />
+                              <p className="text-[12px] md:text-sm font-medium text-indigo-600">
+                                {balance} SOL
+                              </p>
+                            </div>
+                            <button
+                              onClick={handleOption}
+                              className="flex items-center h-[32px] md:h-[44px] px-2 rounded-[12px] bg-indigo-50 md:px-3"
+                            >
+                              <img
+                                src={"/assets/image/SOL.svg"}
+                                alt="SOL"
+                                className="md:w-[32px] w-[20px]"
+                              />
+                              <p className="text-sm font-medium text-indigo-600 ml-2 hidden md:block">
+                                {shortenAddress(publicKey?.toBase58() || "")}
+                              </p>
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={handleConnectWallet}
+                            type="button"
+                            className="relative flex max-w-xs items-center rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                            id="user-menu-button"
+                            aria-expanded="false"
+                            aria-haspopup="true"
+                          >
+                            <p className="text-slate-900 text-[11px] md:text-base font-medium mr-1">
+                              Connect wallet
+                            </p>
+                            <img
+                              className="h-[20px] w-[20px] rounded-full"
+                              src={"/assets/image/wallet.svg"}
+                              alt="wallet"
+                            />
+                          </button>
+                        )}
+                      </div>
+                    </div>
                     {isLogin ? (
                       <div className="cursor-pointer flex items-center justify-center gap-2">
                         <div className="relative">
@@ -236,55 +287,6 @@ const TabBar = () => {
                       </button>
                     )}
 
-                    <div className="relative ml-3">
-                      <div>
-                        {connected ? (
-                          <div className="flex items-center">
-                            <div className="flex items-center h-[32px] md:h-[44px] rounded-[12px] bg-indigo-50 px-3 mr-2">
-                              <img
-                                src={"/assets/icon/wallet.svg"}
-                                alt="wallet"
-                                className="w-[20px] mr-2 md:block hidden"
-                              />
-                              <p className="text-[12px] md:text-sm font-medium text-indigo-600">
-                                {balance} SOL
-                              </p>
-                            </div>
-                            <button
-                              onClick={handleOption}
-                              className="flex items-center h-[32px] md:h-[44px] px-2 rounded-[12px] bg-indigo-50 md:px-3"
-                            >
-                              <img
-                                src={"/assets/image/SOL.svg"}
-                                alt="SOL"
-                                className="md:w-[32px] w-[20px]"
-                              />
-                              <p className="text-sm font-medium text-indigo-600 ml-2 hidden md:block">
-                                {shortenAddress(publicKey?.toBase58() || "")}
-                              </p>
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={handleConnectWallet}
-                            type="button"
-                            className="relative flex max-w-xs items-center rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                            id="user-menu-button"
-                            aria-expanded="false"
-                            aria-haspopup="true"
-                          >
-                            <p className="text-slate-900 text-[11px] md:text-base font-medium mr-1">
-                              Connect wallet
-                            </p>
-                            <img
-                              className="h-[20px] w-[20px] rounded-full"
-                              src={"/assets/image/wallet.svg"}
-                              alt="wallet"
-                            />
-                          </button>
-                        )}
-                      </div>
-                    </div>
                   </div>
                   {/* {showOption && (
                     <div
