@@ -14,13 +14,13 @@ const ItemRowProduct: FC<IProps> = ({
   name,
   image,
   author_address,
-  Sale,
+  sale,
   id,
   token_mint,
 }) => {
   const router = useRouter();
-  const price = Sale
-    ? (Number(Sale.price) / web3.LAMPORTS_PER_SOL).toFixed(2)
+  const price = sale
+    ? (Number(sale.price) / web3.LAMPORTS_PER_SOL).toFixed(2)
     : 0;
   // const priceDollar = useConvertDollar(Number(price));
 

@@ -25,7 +25,7 @@ const BrowseAllPage = () => {
                 key={index}
                 id={item.id}
                 name={item.name}
-                Sale={item.Sale}
+                sale={item.sale}
                 image={item.media?.previews?.[0]}
               />
             ))}
@@ -41,7 +41,7 @@ const BrowseAllPage = () => {
                 key={index}
                 id={item.id}
                 name={item.name}
-                Sale={item.Sale}
+                sale={item.sale}
                 image={item.media?.previews?.[0]}
               />
             ))}
@@ -60,7 +60,7 @@ const BrowseAllPage = () => {
                 key={index}
                 id={item.id}
                 name={item.name}
-                Sale={item.Sale}
+                sale={item.sale}
                 image={item.media?.previews?.[0]}
               />
             ))}
@@ -76,7 +76,7 @@ const BrowseAllPage = () => {
                 key={index}
                 id={item.id}
                 name={item.name}
-                Sale={item.Sale}
+                sale={item.sale}
                 image={item.media?.previews?.[0]}
               />
             ))}
