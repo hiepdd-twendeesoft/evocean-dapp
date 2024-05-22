@@ -31,8 +31,8 @@ const HomePage = () => {
                 id={item.id}
                 name={item.name}
                 image={item.media?.previews?.[0]}
-                Sale={item.Sale}
-                Listing={item.Listing}
+                sale={item.sale}
+                listing={item.listing}
                 categories={item?.media?.categories}
               />
             ))}

@@ -1,18 +1,22 @@
 "use client";
 
 import ItemNft from "@/components/itemNft";
+import { Route } from "@/constants/route";
 import useConvertDollar from "@/hooks/useConvertDollar";
 import { useFetchTheme } from "@/hooks/useFetchTheme";
 import { useTx } from "@/hooks/useTx";
 import { buyTheme } from "@/services/buy-theme";
 import { getTheme } from "@/services/get-theme-detail";
+import { RootState } from "@/store/slices";
 import { shortenAddress } from "@/utils/helper";
 import { lamportsToSol } from "@/utils/lamports-to-sol";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { useQuery } from "@tanstack/react-query";
-import { redirect, useParams, useRouter } from "next/navigation";
-import { Fragment, useCallback, useState } from "react";
+import dynamic from "next/dynamic";
+import { useParams, useRouter } from "next/navigation";
+import { Fragment, useState } from "react";
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import ContentTab from "../components/ContentTab";
 import ModalBuyOwnership, {
@@ -20,10 +24,6 @@ import ModalBuyOwnership, {
   refModalBuyOwnership,
 } from "../components/ModalBuyOwnership";
 import Preview from "../components/Preview";
-import { Route } from "@/constants/route";
-import { RootState } from "@/store/slices";
-import { useSelector } from "react-redux";
-import dynamic from "next/dynamic";
 
 const DetailThemePage = () => {
   const router = useRouter();
@@ -33,10 +33,7 @@ const DetailThemePage = () => {
   const { isLogin, accountInfo } = useSelector(
     (state: RootState) => state.auth
   );
-  const [visible, setVisible] = useState(false);
-  const themeData = {
-    theme_id: 1,
-  };
+
   const MoonPayProvider = dynamic(
     () => import("@moonpay/moonpay-react").then((mod) => mod.MoonPayProvider),
     { ssr: false }
@@ -76,8 +73,22 @@ const DetailThemePage = () => {
     listing: true,
   });
 
+  const usdAmount = useConvertDollar(lamportsToSol(data?.sale?.price));
+
   const handleBuy = () => {
-    router.push(`https://buy-sandbox.moonpay.com?apiKey=${process.env.NEXT_PUBLIC_PUBLIC_KEY_MOONPAY}&currencyCode=eth&walletAddress=0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae`, { scroll: false });
+    if (!data?.sale || !data.author_address) {
+      toast.warn("sale not found");
+      return;
+    }
+    // check if the buyer has been added to the owner_address array
+    if (data.owner_addresses.includes(id)) {
+      toast.warn("You have already bought this theme");
+      return;
+    }
+    router.push(
+      `/detail/${id}/payment/eth/${data?.author_address}/${usdAmount}`,
+      { scroll: false }
+    );
   };
 
   const handleBuySol = async () => {
@@ -92,8 +103,8 @@ const DetailThemePage = () => {
             : "You have purchased the product"
         );
       }
-      if (!data?.Sale) {
-        toast.warn("Sale not found");
+      if (!data?.sale) {
+        toast.warn("sale not found");
         return;
       }
 
@@ -101,7 +112,7 @@ const DetailThemePage = () => {
         SystemProgram.transfer({
           fromPubkey: provider.wallet.publicKey,
           toPubkey: new PublicKey(data.author_address),
-          lamports: Number(data.Sale.price),
+          lamports: Number(data.sale.price),
         })
       );
 
@@ -128,34 +139,15 @@ const DetailThemePage = () => {
   };
 
   const handleGetSignature = async (url: string): Promise<string> => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/themes/payment?url=${url}`);
-    console.log('response', response.url);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/themes/payment?url=${url}`
+    );
+    console.log("response", response.url);
     return response.url as string;
-  }
-  
+  };
+
   return (
     <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16">
-      {/* <MoonPayProvider
-        apiKey={process.env.NEXT_PUBLIC_PUBLIC_KEY_MOONPAY ?? ""}
-        debug
-      >
-        <div className="App">
-          <MoonPayBuyWidget
-            variant="embedded"
-            baseCurrencyCode="usd"
-            baseCurrencyAmount="50"
-            defaultCurrencyCode="eth"
-            walletAddress="0xde55e70d3BFB65F20908358179715fdAF8c7dA6d"
-            // visible={visible}
-            visible
-            onUrlSignatureRequested={'handleGetSignature'}
-            theme="dark"
-            externalCustomerId="70"
-            externalTransactionId={JSON.stringify(themeData)}
-          />
-          <button onClick={() => setVisible(!visible)}>Toggle widget</button>
-        </div>
-      </MoonPayProvider> */}
       <ModalBuyOwnership
         ref={refModalBuyOwnership}
         author_address={data?.author_address}
@@ -163,7 +155,7 @@ const DetailThemePage = () => {
         theme_id={data?.id}
         name={data?.name}
         image={data?.media?.previews?.[0]}
-        priceOwner={lamportsToSol(data?.Listing?.price)}
+        priceOwner={lamportsToSol(data?.listing?.price)}
         refetch={refetch}
       />
       <div className="flex items-start justify-between max-md:flex-col mb-12">
@@ -226,7 +218,7 @@ const DetailThemePage = () => {
                 className="h-[50px] flex-1 flex items-center justify-center rounded-[12px]  border-[1px] cursor-pointer hover:bg-indigo-800 duration-200 bg-indigo-600"
               >
                 <p className="text-white font-semibold text-base mr-3">
-                  Buy for {useConvertDollar(lamportsToSol(data?.Sale?.price))}$
+                  Buy for {useConvertDollar(lamportsToSol(data?.sale?.price))}$
                 </p>
               </div>
               {isLogin && (
@@ -235,7 +227,7 @@ const DetailThemePage = () => {
                     className="text-base font-semibold text-indigo-600"
                     onClick={handleBuySol}
                   >
-                    Buy for {lamportsToSol(data?.Sale?.price)} SOL
+                    Buy for {lamportsToSol(data?.sale?.price)} SOL
                   </p>
                   <img
                     src={"/assets/image/SOL.svg"}
@@ -247,7 +239,7 @@ const DetailThemePage = () => {
             </div>
             <div className="flex items-center mt-6 mb-4">
               <div className="flex flex-1 items-center justify-center">
-                <p className="text-sm font-medium text-gray-900">Sale</p>
+                <p className="text-sm font-medium text-gray-900">sale</p>
                 <img
                   src={"/assets/image/sale.svg"}
                   alt="sale"
@@ -293,7 +285,7 @@ const DetailThemePage = () => {
               </p>
             </button>
             <p className="text-sm font-medium text-gray-900">
-              From $ {useConvertDollar(lamportsToSol(data?.Listing?.price))}
+              From $ {useConvertDollar(lamportsToSol(data?.listing?.price))}
             </p>
             <p className="text-sm font-medium text-gray-500 mx-4">or</p>
             <div className="flex items-center">
@@ -303,7 +295,7 @@ const DetailThemePage = () => {
                 className="w-[14px] mr-[4px]"
               />
               <p className="text-sm font-medium text-gray-900">
-                {lamportsToSol(data?.Listing?.price)}
+                {lamportsToSol(data?.listing?.price)}
               </p>
             </div>
           </div>
@@ -361,9 +353,9 @@ const DetailThemePage = () => {
                 key={index}
                 id={item.id}
                 name={item.name}
-                Sale={item.Sale}
+                sale={item.sale}
                 image={item.media?.previews?.[0]}
-                Listing={item.Listing}
+                listing={item.listing}
               />
             ))}
           </Fragment>

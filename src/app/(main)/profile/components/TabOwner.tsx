@@ -38,7 +38,7 @@ const TabOwner = () => {
                     Price
                   </th>
                   <th className="px-4 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
-                    Sales
+                    sales
                   </th>
                   <th className="px-4 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
                     Earning
@@ -54,7 +54,7 @@ const TabOwner = () => {
                         name={item.name}
                         image={item.media?.previews?.[0]}
                         author_address={item.author_address}
-                        Sale={item.Sale}
+                        sale={item.sale}
                         id={item.id}
                         token_mint={item.token_mint}
                       />

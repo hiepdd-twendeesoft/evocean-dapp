@@ -133,7 +133,7 @@ const DetailProduct = () => {
           Order #4235123
         </p>
       </div>
-      {!data?.Sale && (
+      {!data?.sale && (
         <div className="border-gray-200 border-[1px] rounded-[12px] p-6 mt-6">
           <p className="text-base font-semibold text-gray-900 mb-2">
             Ownership price
@@ -224,14 +224,14 @@ const DetailProduct = () => {
                 </div>
               </div>
             </div>
-            {data?.Listing && (
+            {data?.listing && (
               <Fragment>
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-base font-normal text-gray-600">
                     Subtotal
                   </p>
                   <p className="text-base font-normal text-gray-600">
-                    {lamportsToSol(data?.Listing?.price)} SOL
+                    {lamportsToSol(data?.listing?.price)} SOL
                   </p>
                 </div>
                 {/* <div className="flex items-center justify-between mb-3">
@@ -247,7 +247,7 @@ const DetailProduct = () => {
                     Total price
                   </p>
                   <p className="text-base font-medium text-gray-900">
-                    {lamportsToSol(data?.Listing?.price)} SOL
+                    {lamportsToSol(data?.listing?.price)} SOL
                   </p>
                 </div>
               </Fragment>

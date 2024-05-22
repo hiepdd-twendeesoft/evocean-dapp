@@ -31,11 +31,11 @@ export interface ItemTheme {
   owner_addresses: string[];
   token_mint: string;
   author_address: string;
-  Sale: null | {
+  sale: null | {
     theme_id: number;
     price: string;
   };
-  Listing: null | {
+  listing: null | {
     theme_id: number;
     price: string;
   };
