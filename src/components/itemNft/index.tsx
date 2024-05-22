@@ -20,14 +20,14 @@ const ItemNft: FC<IProps> = ({
   image,
   name,
   id,
-  Sale,
+  sale,
   hidePrice,
-  Listing,
+  listing,
   categories,
 }) => {
   const router = useRouter();
 
-  const priceDollar = useConvertDollar(lamportsToSol(Sale?.price));
+  const priceDollar = useConvertDollar(lamportsToSol(sale?.price));
 
   const _handleItem = () => {
     if (handleItem && id) {
@@ -63,7 +63,7 @@ const ItemNft: FC<IProps> = ({
                 className="w-[14px] h-[14px]"
               />
               <p className="font-medium text-gray-900 text-sm ml-[4px]">
-                {lamportsToSol(Sale?.price)}
+                {lamportsToSol(sale?.price)}
               </p>
             </div>
             <p className="font-medium text-gray-500 text-sm">
@@ -81,7 +81,7 @@ const ItemNft: FC<IProps> = ({
               className="w-[14px] h-[14px]"
             />
             <p className="font-medium text-gray-900 text-sm ml-[4px]">
-              {lamportsToSol(Listing?.price)}
+              {lamportsToSol(listing?.price)}
             </p>
           </div>
         </div>
