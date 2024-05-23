@@ -13,6 +13,7 @@ const DetailThemePagePayment = () => {
 
   const themeData = {
     theme_id: +id,
+    currency: 'usd'
   };
 
   const MoonPayProvider = dynamic(
