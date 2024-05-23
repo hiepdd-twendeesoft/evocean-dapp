@@ -24,6 +24,8 @@ const TabBar = () => {
   const [showSetting, setShowSetting] = useState<boolean>(false);
   const balance = useBalance(publicKey);
 
+  console.log('domLoaded', domLoaded)
+
   useEffect(() => {
     setDomLoaded(true);
   }, []);
