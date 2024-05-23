@@ -208,7 +208,8 @@ const TabBar = () => {
                               </div>
                               <div className="py-1" role="none">
                                 <Link
-                                  href="#"
+                                  href={Route.PROFILE}
+                                  onClick={handleProfile}
                                   className="text-gray-700 block px-4 py-2 text-sm"
                                 >
                                   Your profile
