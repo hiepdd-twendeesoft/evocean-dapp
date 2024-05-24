@@ -1,3 +1,4 @@
+
 import { getCryptoPrice } from "@/services/get-crypto-price";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -12,10 +13,11 @@ const useConvertDollar = (price: number) => {
   //     );
   //   },
   // });
-
+  
   const { data } = useQuery({
     queryKey: ["get-scrypto-price"],
     queryFn: () => getCryptoPrice('solana'),
+    enabled: !!price
   });
 
   const value = useMemo(() => {
@@ -23,7 +25,7 @@ const useConvertDollar = (price: number) => {
       return (price * Number(data?.price_usd)).toFixed(1);
     }
     return (175 * price).toFixed(1);
-  }, [Number(data?.price_usd), price]);
+  }, [(data?.price_usd), price]);
 
   return value;
 };

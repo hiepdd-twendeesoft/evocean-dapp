@@ -1,3 +1,4 @@
+import { Strorages } from "@/models/storage.enum";
 import axios, { AxiosRequestConfig } from "axios";
 
 const apiServerUrl = process.env.NEXT_PUBLIC_API_URL || "https://moonkit.twendeesoft.com";
@@ -10,8 +11,16 @@ const getAxiosInstance = async () => {
   //   axios.defaults.headers.common.Authorization = `Bearer ${credentials.password}`;
   // }
 
+  const accessToken = localStorage
+  .getItem(Strorages.AccessToken)
+  ?.replace(/^"(.*)"$/, '$1');
+
   const axiosInstance = axios.create({
     baseURL: apiServerUrl,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
     timeout: 15000,
   });
 
