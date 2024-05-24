@@ -1,8 +1,10 @@
 "use client";
 
 import { PaymentParams } from "@/models/scrypto-price.type";
+import { RootState } from "@/store/slices";
 import dynamic from "next/dynamic";
 import { useParams, useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 
 const type = {};
 
@@ -10,10 +12,11 @@ const DetailThemePagePayment = () => {
   const router = useRouter();
   const { id, currencyCode, walletAddress, amount } =
     useParams<PaymentParams>();
+  const { accountInfo } = useSelector((state: RootState) => state.auth);
 
   const themeData = {
     theme_id: +id,
-    currency: 'usd'
+    currency: "usd",
   };
 
   const MoonPayProvider = dynamic(
@@ -59,7 +62,7 @@ const DetailThemePagePayment = () => {
             visible
             // onUrlSignatureRequested={handleGetSignature}
             theme="dark"
-            externalCustomerId="70"
+            externalCustomerId={accountInfo?.id.toString()}
             externalTransactionId={JSON.stringify(themeData)}
             redirectURL={`/detail/${id}`}
           />
