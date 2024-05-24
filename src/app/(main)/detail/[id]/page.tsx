@@ -1,4 +1,8 @@
+// eslint-disable-next-line react-hooks/exhaustive-deps
 "use client";
+
+
+
 
 import ItemNft from "@/components/itemNft";
 import { Route } from "@/constants/route";
@@ -34,22 +38,16 @@ const DetailThemePage = () => {
     (state: RootState) => state.auth
   );
 
-  const MoonPayProvider = dynamic(
-    () => import("@moonpay/moonpay-react").then((mod) => mod.MoonPayProvider),
-    { ssr: false }
-  );
-
-  const MoonPayBuyWidget = dynamic(
-    () => import("@moonpay/moonpay-react").then((mod) => mod.MoonPayBuyWidget),
-    { ssr: false }
-  );
-
   const { id } = useParams<{ id: string }>();
+
+  console.log('id', id)
 
   const { data, refetch } = useQuery({
     queryKey: ["get-theme", id],
     queryFn: () => getTheme(Number(id)),
   });
+
+  const usdAmount = useConvertDollar(lamportsToSol(data?.sale?.price));
 
   const isBuy = data?.owner_addresses?.some(
     (item) => item === wallet?.publicKey?.toBase58()
@@ -72,8 +70,6 @@ const DetailThemePage = () => {
     take: 10,
     listing: true,
   });
-
-  const usdAmount = useConvertDollar(lamportsToSol(data?.sale?.price));
 
   const handleBuy = () => {
     if (!data?.sale || !data.author_address) {
@@ -117,8 +113,6 @@ const DetailThemePage = () => {
       );
 
       const signal = await provider.sendAndConfirm(transaction);
-
-      console.log("signal>>", signal);
 
       await buyTheme({
         buyer: provider.wallet.publicKey.toBase58(),
@@ -213,29 +207,32 @@ const DetailThemePage = () => {
           </p>
           <div className="bg-gray-100 rounded-[20px] p-[12px] mt-8">
             <div className="flex items-center">
-              <div
-                onClick={handleBuy}
-                className="h-[50px] flex-1 flex items-center justify-center rounded-[12px]  border-[1px] cursor-pointer hover:bg-indigo-800 duration-200 bg-indigo-600"
-              >
-                <p className="text-white font-semibold text-base mr-3">
-                  Buy for {useConvertDollar(lamportsToSol(data?.sale?.price))}$
-                </p>
-              </div>
               {isLogin && (
-                <div className="h-[50px] flex border-indigo-600 border-[1px] flex-1 items-center justify-center cursor-pointer rounded-[12px] hover:scale-105 duration-200">
-                  <p
-                    className="text-base font-semibold text-indigo-600"
-                    onClick={handleBuySol}
-                  >
-                    Buy for {lamportsToSol(data?.sale?.price)} SOL
+                <div
+                  onClick={() => {
+                    handleBuy()
+                  }}
+                  className="h-[50px] flex-1 flex items-center justify-center rounded-[12px]  border-[1px] cursor-pointer hover:bg-indigo-800 duration-200 bg-indigo-600"
+                >
+                  <p className="text-white font-semibold text-base mr-3">
+                    Buy for {usdAmount}
+                    $
                   </p>
-                  <img
-                    src={"/assets/image/SOL.svg"}
-                    alt="SOL"
-                    className="w-[20px]"
-                  />
                 </div>
               )}
+              <div className="h-[50px] flex border-indigo-600 border-[1px] flex-1 items-center justify-center cursor-pointer rounded-[12px] hover:scale-105 duration-200">
+                <p
+                  className="text-base font-semibold text-indigo-600"
+                  onClick={handleBuySol}
+                >
+                  Buy for {lamportsToSol(data?.sale?.price)} SOL
+                </p>
+                <img
+                  src={"/assets/image/SOL.svg"}
+                  alt="SOL"
+                  className="w-[20px]"
+                />
+              </div>
             </div>
             <div className="flex items-center mt-6 mb-4">
               <div className="flex flex-1 items-center justify-center">
