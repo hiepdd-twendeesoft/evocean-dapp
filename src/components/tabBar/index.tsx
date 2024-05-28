@@ -24,7 +24,7 @@ const TabBar = () => {
   const [showSetting, setShowSetting] = useState<boolean>(false);
   const balance = useBalance(publicKey);
 
-  console.log('domLoaded', domLoaded)
+  console.log("domLoaded", domLoaded);
 
   useEffect(() => {
     setDomLoaded(true);
@@ -47,9 +47,9 @@ const TabBar = () => {
 
   const handleSignOut = useCallback(() => {
     disconnect();
-    dispatch(authActions.logout())
+    dispatch(authActions.logout());
     router.push("/login", { scroll: false });
-    setShowSetting(false)
+    setShowSetting(false);
   }, [disconnect]);
 
   return (
@@ -231,13 +231,13 @@ const TabBar = () => {
                               </div>
                               <div className="py-1" role="none">
                                 <Link
-                                  href="#"
+                                  href="/admin/dashboard"
                                   className="text-gray-700 block px-4 py-2 text-sm"
                                 >
                                   Seller dashboard
                                 </Link>
                                 <Link
-                                  href="#"
+                                  href="/admin/dashboard"
                                   className="text-gray-700 block px-4 py-2 text-sm"
                                 >
                                   Investor dashboard
@@ -249,7 +249,7 @@ const TabBar = () => {
                                   className="text-gray-700 block px-4 py-2 text-sm"
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    handleSignOut()
+                                    handleSignOut();
                                   }}
                                 >
                                   Logout
@@ -289,7 +289,6 @@ const TabBar = () => {
                         />
                       </button>
                     )}
-
                   </div>
                   {/* {showOption && (
                     <div

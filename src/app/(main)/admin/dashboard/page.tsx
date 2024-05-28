@@ -22,26 +22,33 @@ function DashboardPage() {
 
   console.log("statistic", statistic);
 
+  const selling = statistic?.data?.getSellingByYear?.map((item: any) => item.total_price) || [] 
+  const owned = statistic?.data?.getOwnedByYear?.map((item: any) => item.total_price) || [] 
+
+  const total = selling.map((item: number, index: number) => {
+    return item + owned[index]
+  }) 
+
   const data = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     datasets: [
       {
         label: "Total",
-        data: [33, 53, 85, 41, 44, 65],
+        data: total,
         fill: false,
         backgroundColor: "rgb(67, 56, 202, 0.2)",
         borderColor: "rgb(67, 56, 202, 1)",
       },
       {
         label: "Selling",
-        data: [33, 25, 35, 51, 54, 76],
+        data: selling,
         fill: false,
         backgroundColor: "rgb(132, 204, 22, 0.2)",
         borderColor: "rgb(132, 204, 22, 1)",
       },
       {
         label: "Owned",
-        data: [65, 45, 12, 43, 14, 86],
+        data: owned,
         fill: false,
         backgroundColor: "rgb(20, 184, 166, 0.2)",
         borderColor: "rgb(20, 184, 166, 1)",
@@ -78,7 +85,7 @@ function DashboardPage() {
           </div>
           <div className="mt-[32px] flex items-center justify-between">
             <div className="w-[60%] text-[#4B5563]">
-              You selled total 3,123 items started from 20 May 2024.
+              You selled total {statistic?.data?.sellingNumber} items started from 20 May 2024.
             </div>
             <button className="w-[34%] flex justify-center items-center px-[17px] py-[9px] border-r border-solid border-[1px] rounded-[12px]">
               View sales
@@ -109,7 +116,7 @@ function DashboardPage() {
           </div>
           <div className="mt-[32px] flex items-center justify-between rounded-[24px]">
             <div className="w-[60%] text-[#4B5563]">
-              Your 20 owned product has produced 5,423 sales.
+              Your {statistic?.data?.sellingOwnerProductNumber} owned product has produced {statistic?.data?.sellingOwnerProduct} sales.
             </div>
             <button className="w-[34%] flex justify-center items-center px-[17px] py-[9px] border-r border-solid border-[1px] rounded-[12px]">
               View owned
