@@ -9,7 +9,7 @@ const AppLayout: FC<PropsWithChildren> = ({ children }) => {
       <div className="w-[16%]">
         <Aside />
       </div>
-      <div className="w-[78%] p-5">{children}</div>
+      <div className="w-[78%] p-[32px]">{children}</div>
     </div>
   );
 };
