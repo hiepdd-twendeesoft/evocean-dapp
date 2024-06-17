@@ -9,5 +9,5 @@ export enum Route {
   DETAIL_PRODUCT = "/profile/detail-product",
   DASHBOARD_OVERVIEW = "/admin/dashboard",
   DASHBOARD_SALES = "/admin/sales",
-  DASHBOARD_PAYOUT = "/admin/payout",
+  DASHBOARD_PAYOUT = "/admin/payouts",
 }
