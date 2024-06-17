@@ -1,42 +1,64 @@
 import ItemNft from "@/components/itemNft";
 import { Route } from "@/constants/route";
 import { useFetchTheme } from "@/hooks/useFetchTheme";
+import { fetchThemes } from "@/services/common.service";
+import { getPurchasedThemes } from "@/services/get-purchased-themes";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { Fragment, useCallback } from "react";
 
 const TabPurchase = () => {
   const router = useRouter();
   const { publicKey } = useWallet();
-  const { data } = useFetchTheme(
-    { page: 1, take: 60, owner: publicKey?.toBase58() },
-    !publicKey,
-  );
+  // const { data } = useFetchTheme(
+  //   { page: 1, take: 60, owner: publicKey?.toBase58() },
+  //   !publicKey
+  // );
+
+  const { data } = useQuery({
+    queryKey: ["get-purchased-theme"],
+    queryFn: () => getPurchasedThemes(),
+  });
 
   const handleItem = useCallback(
     (id: number) => {
       router.push(`${Route.DETAIL_PRODUCT}/${id}`);
     },
-    [router],
+    [router]
   );
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:gap-6 lg:gap-10 grid-flow-row lg:grid-cols-4 md:grid-cols-3 mb-8 mt-10">
-      {data?.pages?.map((page, indexPage) => (
-        <Fragment key={indexPage}>
-          {page.data.map((item, index) => (
-            <ItemNft
-              key={index}
-              id={item.id}
-              name={item.name}
-              image={item.media?.previews?.[0]}
-              handleItem={handleItem}
-              hidePrice
-            />
-          ))}
-        </Fragment>
-      ))}
+    <div className="grid grid-cols-1 gap-4 md:gap-6 lg:gap-10 grid-flow-row lg:grid-cols-3 md:grid-cols-2 mt-10">
+      <Fragment>
+        {data?.data.map((item, index) => (
+          <ItemNft
+            key={index}
+            id={item.id}
+            name={item.name}
+            image={item.media?.previews?.[0]}
+            hidePrice
+          />
+        ))}
+      </Fragment>
     </div>
+
+    // <div className="grid grid-cols-1 gap-4 md:gap-6 lg:gap-10 grid-flow-row lg:grid-cols-4 md:grid-cols-3 mb-8 mt-10">
+    //   {data?.pages?.map((page, indexPage) => (
+    //     <Fragment key={indexPage}>
+    //       {page.data.map((item, index) => (
+    //         <ItemNft
+    //           key={index}
+    //           id={item.id}
+    //           name={item.name}
+    //           image={item.media?.previews?.[0]}
+    //           handleItem={handleItem}
+    //           hidePrice
+    //         />
+    //       ))}
+    //     </Fragment>
+    //   ))}
+    // </div>
   );
 };
 
