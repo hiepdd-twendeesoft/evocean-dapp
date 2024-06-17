@@ -20,15 +20,3 @@ export const googleLoginAction = createAsyncThunk(
     return rejectWithValue(res);
   }
 )
-
-export const googleLogoutAction = createAsyncThunk(
-  'auth/logoutAction',
-  async (
-    {},
-    { fulfillWithValue, rejectWithValue }
-  ) => {
-        secureStorage.removeItem(Strorages.AccessToken);
-        secureStorage.removeItem(Strorages.RefreshToken);
-      return fulfillWithValue(false)
-  }
-)

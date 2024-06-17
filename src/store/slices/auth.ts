@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-import { RootState } from '.'
-import { googleLoginAction, googleLogoutAction } from '../actions/auth'
 import { IAccountInfo } from '@/models/user.type'
+import { RootState } from '.'
+import { googleLoginAction } from '../actions/auth'
 
 
 interface IAuth {
@@ -41,16 +41,16 @@ const authSlice = createSlice({
     builder.addCase(googleLoginAction.rejected, (state) => {
       state.accessToken = ''
     })
-    builder.addCase(googleLogoutAction.pending, (state) => {
-    })
-    builder.addCase(googleLogoutAction.fulfilled, (state, action) => {
-      state.accessToken = '';
-      state.accountInfo = null;
-      state.isLogin = false;
-    })
-    builder.addCase(googleLogoutAction.rejected, (state) => {
-      state.accessToken = ''
-    })
+    // builder.addCase(googleLogoutAction.pending, (state) => {
+    // })
+    // builder.addCase(googleLogoutAction.fulfilled, (state, action) => {
+    //   state.accessToken = '';
+    //   state.accountInfo = null;
+    //   state.isLogin = false;
+    // })
+    // builder.addCase(googleLogoutAction.rejected, (state) => {
+    //   state.accessToken = ''
+    // })
   }
 })
 

@@ -25,7 +25,7 @@ const HomePage = () => {
       <div className="grid grid-cols-1 gap-4 md:gap-6 lg:gap-10 grid-flow-row lg:grid-cols-3 md:grid-cols-2">
         {data?.pages?.map((page, indexPage) => (
           <Fragment key={indexPage}>
-            {page.data.map((item, index) => (
+            {page.data?.map((item, index) => (
               <ItemNft
                 key={index}
                 id={item.id}

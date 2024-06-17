@@ -5,7 +5,7 @@ const apiServerUrl = process.env.NEXT_PUBLIC_API_URL || "https://moonkit.twendee
 // const apiServerUrl = "https://22c0-222-252-11-28.ngrok-free.app";
 // const apiServerUrl = "http://localhost:8000";
 
-const getAxiosInstance = async () => {
+export const getAxiosInstance = async () => {
   // const credentials = await Keychain.getInternetCredentials(JWT_KEY);
   // if (credentials && credentials.password) {
   //   axios.defaults.headers.common.Authorization = `Bearer ${credentials.password}`;
