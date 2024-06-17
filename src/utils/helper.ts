@@ -1,3 +1,5 @@
+import { DateTime } from "luxon";
+
 export function shortenAddress(fullAddress: string) {
   if (fullAddress.length >= 13) {
     return (
@@ -8,4 +10,8 @@ export function shortenAddress(fullAddress: string) {
   } else {
     return fullAddress;
   }
+}
+
+export function parseDate(date: string) {
+  return DateTime.fromISO(date).toFormat("dd MMM yyyy");
 }
