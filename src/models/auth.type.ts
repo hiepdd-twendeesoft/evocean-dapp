@@ -4,6 +4,6 @@ export interface AuthResponse {
   }
 
   export interface OAuthLoginDto {
-    accessToken: string;
+    access_token: string;
   }
   

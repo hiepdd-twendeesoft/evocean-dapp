@@ -36,7 +36,7 @@ const LoginPage = (props: Props) => {
       try {
         await dispatch(
           googleLoginAction({
-            accessToken: access_token,
+            access_token: access_token,
           })
         );
         router.push("/", { scroll: false });
