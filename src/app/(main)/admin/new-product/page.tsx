@@ -30,7 +30,7 @@ function AddProductPage() {
   });
   const [theme, setTheme] = useState<File>();
   const [previews, setPreviews] = useState<File[]>();
-  const [thumbnail, setThumbnail] = useState<File[]>();
+  const [thumbnail, setThumbnail] = useState<File>();
   const [tab, setTab] = useState<number>(0);
   const [status, setStatus] = useState<EThemeStatus>(EThemeStatus.DRAFT);
   const router = useRouter();
@@ -67,6 +67,7 @@ function AddProductPage() {
       ...data,
       theme,
       previews,
+      thumbnail,
       template_features,
       figma_features,
       status,
