@@ -43,6 +43,7 @@ export type TCreateTheme = {
     selling_price: number,
     owner_price: number,
     previews?: File[];
+    thumbnail: File,
     template_features: string[];
     figma_features: string[];
     status: EThemeStatus
