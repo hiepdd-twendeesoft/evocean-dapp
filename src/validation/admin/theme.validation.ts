@@ -9,9 +9,11 @@ export const createThemeSchema = Yup.object()
     selling_price: Yup.number()
     .required('Selling price is required'),
     owner_price: Yup.number()
-    .required('owner price is required'),
-    // previews: Yup.string()
-    // .required('owner price is required'),
+    .required('Owner price is required'),
+    template_features: Yup.string()
+    .required('Template features is required'),
+    figma_features: Yup.string()
+    .required('Figma feature is required'),
   })
   .required();
 

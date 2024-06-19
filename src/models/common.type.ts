@@ -5,7 +5,6 @@ export interface FetchThemeParams {
   owner?: string;
   listing?: boolean;
 }
-
 export interface ListData<T> {
   total: number;
   page: number;

@@ -24,8 +24,6 @@ const TabBar = () => {
   const [showSetting, setShowSetting] = useState<boolean>(false);
   const balance = useBalance(publicKey);
 
-  console.log("domLoaded", domLoaded);
-
   useEffect(() => {
     setDomLoaded(true);
   }, []);
@@ -50,7 +48,12 @@ const TabBar = () => {
     dispatch(authActions.logout());
     router.push("/login", { scroll: false });
     setShowSetting(false);
-  }, [disconnect]);
+  }, [disconnect, dispatch, router]);
+
+  const clickSetting = (route: string) => {
+    router.push(route, { scroll: false });
+    setShowSetting(false);
+  };
 
   return (
     <Fragment>
@@ -233,12 +236,20 @@ const TabBar = () => {
                                 <Link
                                   href="/admin/dashboard"
                                   className="text-gray-700 block px-4 py-2 text-sm"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    clickSetting(Route.DASHBOARD_OVERVIEW);
+                                  }}
                                 >
                                   Seller dashboard
                                 </Link>
                                 <Link
                                   href="/admin/dashboard"
                                   className="text-gray-700 block px-4 py-2 text-sm"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    clickSetting(Route.DASHBOARD_OVERVIEW);
+                                  }}
                                 >
                                   Investor dashboard
                                 </Link>

@@ -1,26 +1,38 @@
-import { TCreateTheme } from "@/models/theme.type";
+import { ITheme, IThemeItem, TCreateTheme } from "@/models/theme.type";
 import api, { getAxiosInstance } from "./axios";
+import { FetchThemeParams, ItemTheme, ListData } from "@/models/common.type";
+import { ApiThemes } from "./route";
 
 
 export async function createTheme(body: TCreateTheme | any): Promise<any> {
   const axios = await getAxiosInstance()
-    // return api(`/theme/creating`, body, { method: "POST" }).then((res) => res);
-
     const formData = new FormData();
     for (const property in body) {
       if(body?.[property]) {
-        if(property === 'previews') {
-          for(const file of body[property]) {
-            formData.append(property, file);
+        console.log(property, body[property])
+        if(property === 'previews' || property === 'figma_features' || property === 'template_features') {
+          for(const item of body[property]) {
+            formData.append(property, item);
           }
         } else {
           formData.append(property, body[property]);
         }
       }
     }
-    return axios.post('/themes/creating', formData, {
+    return axios.post(ApiThemes.createProducts, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     });
+}
+
+export async function fetchThemes(
+  params: FetchThemeParams
+): Promise<ListData<IThemeItem>> {
+  return api(ApiThemes.fetchProducts, null, {
+    method: "GET",
+    params,
+  })
+    .then((res) => res.data)
+    .catch((err) => err);
 }
