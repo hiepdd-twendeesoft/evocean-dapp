@@ -71,7 +71,7 @@ function ProductPage() {
                 </thead>
                 <tbody>
                   {themes &&
-                    themes.map((item) => <ProductItem product={item} />)}
+                    themes.map((item, index) => <ProductItem key={index} product={item} />)}
                 </tbody>
               </table>
               <div className="flex justify-center mt-3">

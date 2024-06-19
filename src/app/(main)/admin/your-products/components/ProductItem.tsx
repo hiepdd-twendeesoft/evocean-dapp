@@ -1,17 +1,18 @@
 import useConvertDollar from "@/hooks/useConvertDollar";
-import { ITheme, IThemeItem } from "@/models/theme.type";
+import { IThemeItem } from "@/models/theme.type";
 import { lamportsToSol } from "@/utils/lamports-to-sol";
 import Link from "next/link";
 
 export type ProductItemProps = {
   product: IThemeItem;
+  key: number;
 };
 
-export const ProductItem = ({ product }: ProductItemProps) => {
+export const ProductItem = ({ product, key }: ProductItemProps) => {
   const dollarPrice = useConvertDollar(lamportsToSol(product.price));
   const dollarEarning = useConvertDollar(lamportsToSol(product.earning));
   return (
-    <tr className="border-b border-neutral-200">
+    <tr key={key} className="border-b border-neutral-200">
       <td className="whitespace-nowrap px-6 py-4 font-medium flex items-center cursor-pointer justify-between">
         <div className="flex gap-4">
           <img className="w-[90px]" src={product.thumbnail} />

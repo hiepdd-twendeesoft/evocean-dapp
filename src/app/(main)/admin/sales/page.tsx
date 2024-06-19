@@ -1,14 +1,14 @@
 "use client";
 
-import { getCryptoPrice } from "@/services/get-crypto-price";
-import { getDashboardSales } from "@/services/get-dashboard-sales";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { lamportsToSol } from "@/utils/lamports-to-sol";
-import React, { useEffect, useState } from "react";
-import { parseDate } from "@/utils/helper";
 import { INITIAL_PAGE, INITIAL_TAKE } from "@/constants/base";
 import { ISaleItem } from "@/models/sale.type";
+import { getCryptoPrice } from "@/services/get-crypto-price";
+import { getDashboardSales } from "@/services/get-dashboard-sales";
+import { parseDate } from "@/utils/helper";
+import { lamportsToSol } from "@/utils/lamports-to-sol";
+import { useQueryClient } from "@tanstack/react-query";
 import { Pagination } from "antd";
+import { useEffect, useState } from "react";
 
 function SalesPage() {
   const [page, setPage] = useState(INITIAL_PAGE);

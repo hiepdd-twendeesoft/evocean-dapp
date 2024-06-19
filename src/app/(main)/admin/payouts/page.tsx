@@ -5,9 +5,9 @@ import { IPayoutItem } from "@/models/payout.type";
 import { getDashboardPayout } from "@/services/get-dashboard-payout";
 import { parseDate } from "@/utils/helper";
 import { lamportsToSol } from "@/utils/lamports-to-sol";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Pagination } from "antd";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 function PayoutPage() {
   const [page, setPage] = useState(INITIAL_PAGE);
