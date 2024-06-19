@@ -3,7 +3,6 @@
 import { INITIAL_PAGE, INITIAL_TAKE } from "@/constants/base";
 import { IThemeItem } from "@/models/theme.type";
 import { fetchThemes } from "@/services/theme";
-import { useAppDispatch } from "@/store/store";
 import { useQueryClient } from "@tanstack/react-query";
 import { Pagination } from "antd";
 import Link from "next/link";
@@ -12,26 +11,24 @@ import { ProductItem } from "./components/ProductItem";
 
 function ProductPage() {
   const [themes, setThemes] = useState<IThemeItem[]>();
-  const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
-
-
   const [page, setPage] = useState(INITIAL_PAGE);
-  const loadData = async () => {
-    const result = await queryClient.fetchQuery({
-      queryFn: () =>
-        fetchThemes({
-          page: page,
-          take: INITIAL_TAKE,
-        }),
-      queryKey: [],
-    });
-    setThemes(result.data);
-  };
 
   useEffect(() => {
+    const loadData = async () => {
+      const result = await queryClient.fetchQuery({
+        queryFn: () =>
+          fetchThemes({
+            page: page,
+            take: INITIAL_TAKE,
+          }),
+        queryKey: [],
+      });
+      setThemes(result.data);
+    };
+
     loadData();
-  }, [page]);
+  }, [page, queryClient]);
 
   return (
     <div>

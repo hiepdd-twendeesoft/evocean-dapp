@@ -48,7 +48,7 @@ const TabBar = () => {
     dispatch(authActions.logout());
     router.push("/login", { scroll: false });
     setShowSetting(false);
-  }, [disconnect]);
+  }, [disconnect, dispatch, router]);
 
   const clickSetting = (route: string) => {
     router.push(route, { scroll: false });

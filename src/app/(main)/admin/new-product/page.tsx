@@ -141,6 +141,7 @@ function AddProductPage() {
       <ul className="flex items-center font-medium mt-[32px] gap-10">
         {navLinks.map((item, index) => (
           <li
+            key={index}
             onClick={() => setTab(index)}
             className="flex items-center gap-4 cursor-pointer"
           >

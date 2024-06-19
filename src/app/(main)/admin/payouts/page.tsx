@@ -14,6 +14,7 @@ function PayoutPage() {
   const [payouts, setPayouts] = useState<IPayoutItem[]>();
   const queryClient = useQueryClient();
 
+  useEffect(() => {
   const loadData = async () => {
     const result = await queryClient.fetchQuery({
       queryKey: ["get-dashboard-payout"],
@@ -26,9 +27,8 @@ function PayoutPage() {
     setPayouts(result.data);
   };
 
-  useEffect(() => {
     loadData();
-  }, [page]);
+  }, [page, queryClient]);
 
   return (
     <div>

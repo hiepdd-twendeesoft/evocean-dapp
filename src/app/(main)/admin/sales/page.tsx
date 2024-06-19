@@ -16,27 +16,27 @@ function SalesPage() {
   const [dataPrice, setDataPrice] = useState<any>();
   const queryClient = useQueryClient();
 
-  const loadData = async () => {
-    const result = await queryClient.fetchQuery({
-      queryKey: ["get-dashboard-sales"],
-      queryFn: () =>
-        getDashboardSales({
-          page: page,
-          take: INITIAL_TAKE,
-        }),
-    });
-    console.log("result", result.data);
-    let dataPrice = await queryClient.fetchQuery({
-      queryKey: ["get-scrypto-price"],
-      queryFn: () => getCryptoPrice("solana"),
-    });
-    setDataPrice(dataPrice);
-    setSales(result.data);
-  };
-
   useEffect(() => {
+    const loadData = async () => {
+      const result = await queryClient.fetchQuery({
+        queryKey: ["get-dashboard-sales"],
+        queryFn: () =>
+          getDashboardSales({
+            page: page,
+            take: INITIAL_TAKE,
+          }),
+      });
+      console.log("result", result.data);
+      let dataPrice = await queryClient.fetchQuery({
+        queryKey: ["get-scrypto-price"],
+        queryFn: () => getCryptoPrice("solana"),
+      });
+      setDataPrice(dataPrice);
+      setSales(result.data);
+    };
+
     loadData();
-  }, [page]);
+  }, [page, queryClient]);
 
   console.log("sales", sales);
   console.log("dataPrice", dataPrice);
