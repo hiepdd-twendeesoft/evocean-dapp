@@ -12,7 +12,7 @@ import { ChangeEvent, useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
-function ProductPage() {
+function AddProductPage() {
   const dispatch = useAppDispatch();
   const {
     register,
@@ -364,4 +364,4 @@ function ProductPage() {
   );
 }
 
-export default ProductPage;
+export default AddProductPage;

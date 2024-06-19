@@ -1,17 +1,15 @@
+import { ListData } from "@/models/common.type";
 import api from "./axios";
+import { ApiSales } from "./route";
+import { FetchSalesParams, ISaleItem } from "@/models/sale.type";
 
-type Sale = {
-  date: string;
-  status: string;
-  product_name: string;
-  price: number;
-  earn: number;
-};
-
-type getDashboardSalesRes = {
-  data: Sale[];
-};
-
-export async function getDashboardSales(): Promise<getDashboardSalesRes> {
-  return api(`/dashboard/sales`, {}, { method: "GET" }).then((res) => res);
+export async function getDashboardSales(
+  params: FetchSalesParams
+): Promise<ListData<ISaleItem>> {
+  return api(ApiSales.fetchSales, null, {
+    method: "GET",
+    params,
+  })
+    .then((res) => res.data)
+    .catch((err) => err);
 }

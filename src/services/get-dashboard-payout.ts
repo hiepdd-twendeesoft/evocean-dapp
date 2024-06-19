@@ -1,18 +1,15 @@
+import { ListData } from "@/models/common.type";
 import api from "./axios";
+import { FetchPayoutsParams, IPayoutItem } from "@/models/payout.type";
+import { ApiPayouts, ApiThemes } from "./route";
 
-type Payout = {
-  date: string;
-  status: string;
-  method: string;
-  product_name: string;
-  note: string;
-  amount: number;
-};
-
-type getDashboardPayoutRes = {
-  data: Payout[];
-};
-
-export async function getDashboardPayout(): Promise<getDashboardPayoutRes> {
-  return api(`/dashboard/payout`, {}, { method: "GET" }).then((res) => res);
+export async function getDashboardPayout(
+  params: FetchPayoutsParams
+): Promise<ListData<IPayoutItem>> {
+  return api(ApiPayouts.fetchPayouts, null, {
+    method: "GET",
+    params,
+  })
+    .then((res) => res.data)
+    .catch((err) => err);
 }

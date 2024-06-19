@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export const Aside = () => {
   const router = useRouter();
+  const pathName = usePathname();
+
+  console.log('pathName', pathName)
 
   const adminAside = [
     {
@@ -55,7 +58,8 @@ export const Aside = () => {
             <li key={index}>
               <Link
                 href={item.url}
-                className="flex items-center p-[8px] text-[#4B5563] text-ellipsis text-base not-italic font-medium leading-6 hover:text-[#111827] hover:bg-[#F3F4F6]"
+                className={`flex items-center p-[8px] text-[#4B5563] text-ellipsis text-base not-italic font-medium leading-6 hover:text-[#111827] hover:bg-[#F3F4F6] ${pathName === item.url ? 'bg-[#F3F4F6]' : 'bg-[#fff]'} `}
+                // className={`flex items-center p-[8px] text-[#4B5563] text-ellipsis text-base not-italic font-medium leading-6 hover:text-[#111827] hover:bg-[#F3F4F6] ${pathName === item.url ? 'bg-[#F3F4F6]' : 'bg-[#fff]'} `}
               >
                 <img src={item.icon} alt="eye" className="w-[18px] ml-2" />
                 <span className="ms-3">{item.title}</span>
