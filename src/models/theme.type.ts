@@ -43,4 +43,22 @@ export type TCreateTheme = {
     selling_price: number,
     owner_price: number,
     previews?: File[];
+    template_features: string[];
+    figma_features: string[];
+    status: EThemeStatus
+}
+
+export type TCreateThemeSchema = {
+  name: string;
+  overview: string,
+  selling_price: number,
+  owner_price: number,
+  template_features:  string;
+  figma_features:  string;
+}
+
+export enum EThemeStatus {
+  DRAFT = 'DRAFT',
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
 }

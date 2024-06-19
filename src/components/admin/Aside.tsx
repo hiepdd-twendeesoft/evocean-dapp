@@ -52,7 +52,7 @@ export const Aside = () => {
       className="mt-[65px] fixed top-0 left-0 z-40 w-[16%] h-screen transition-transform -translate-x-full sm:translate-x-0"
       aria-label="Sidebar"
     >
-      <div className="relative h-full px-4 py-5 overflow-y-auto dark:bg-gray-800 border-r border-solid border-[1px]">
+      <div className="relative h-full px-4 py-5 overflow-y-auto border-r border-solid border-[1px]">
         <ul className="space-y-2">
           {adminAside.map((item, index) => (
             <li key={index}>

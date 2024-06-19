@@ -9,9 +9,10 @@ export async function createTheme(body: TCreateTheme | any): Promise<any> {
     const formData = new FormData();
     for (const property in body) {
       if(body?.[property]) {
-        if(property === 'previews') {
-          for(const file of body[property]) {
-            formData.append(property, file);
+        console.log(property, body[property])
+        if(property === 'previews' || property === 'figma_features' || property === 'template_features') {
+          for(const item of body[property]) {
+            formData.append(property, item);
           }
         } else {
           formData.append(property, body[property]);
