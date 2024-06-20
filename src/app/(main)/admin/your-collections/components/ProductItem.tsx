@@ -21,7 +21,7 @@ export const ProductItem = ({ product, key }: ProductItemProps) => {
             <p className="text-[#6B7280]">Owned: 20/05/2024</p>
           </div>
         </div>
-        <Link className="flex items-center gap-2" href={`/admin/your-products/${product.id}`}>
+        <Link className="flex items-center gap-2" href={`/your-products/${product.id}`}>
           <h2 className="text-[#4F46E5] text-[14px]">Edit</h2>
           <img src={"/assets/image/admin/edit.svg"} alt="edit" />
         </Link>
