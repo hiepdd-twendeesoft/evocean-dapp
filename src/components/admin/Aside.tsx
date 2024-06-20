@@ -7,13 +7,16 @@ export const Aside = () => {
   const router = useRouter();
   const pathName = usePathname();
 
-  console.log('pathName', pathName)
-
   const adminAside = [
     {
       title: "Dashboard",
       icon: "/assets/image/admin/dashboard.svg",
       url: "/admin/dashboard",
+    },
+    {
+      title: "Your Collections",
+      icon: "/assets/image/admin/your-products.svg",
+      url: "/admin/your-collections",
     },
     {
       title: "Your products",

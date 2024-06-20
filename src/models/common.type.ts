@@ -4,6 +4,7 @@ export interface FetchThemeParams {
   author?: string;
   owner?: string;
   listing?: boolean;
+  search?: string;
 }
 export interface ListData<T> {
   total: number;
