@@ -14,6 +14,18 @@ export async function createCollection(
     .catch((err) => err);
 }
 
+
+export async function updateCollection(
+  id: number,
+  body: TCreateCollection
+): Promise<ICollection> {
+  return api(`${ApiCollections.updateCollection}/${id}`, body, {
+    method: "PUT",
+  })
+    .then((res) => res.data)
+    .catch((err) => err);
+}
+
 export async function fetchCollections(
   params: FetchCollectionParams
 ): Promise<ListData<ICollection>> {
@@ -24,3 +36,7 @@ export async function fetchCollections(
     .then((res) => res.data)
     .catch((err) => err);
 }
+
+
+export const fetchCollection = (collectionId: number): Promise<ICollection> =>
+  api(`${ApiCollections.updateCollection}/${collectionId}`, null, { method: "GET" }).then((res) => res.data);

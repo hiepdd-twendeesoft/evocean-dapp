@@ -1,14 +1,12 @@
 "use client";
 
 import { INITIAL_PAGE, INITIAL_TAKE } from "@/constants/base";
-import { fetchThemes } from "@/services/theme";
+import { ICollection } from "@/models/collection.type";
+import { fetchCollections } from "@/services/collection";
 import { useQueryClient } from "@tanstack/react-query";
 import { Pagination } from "antd";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ProductItem } from "./components/ProductItem";
-import { fetchCollections } from "@/services/collection";
-import { ICollection } from "@/models/collection.type";
 
 function ProductPage() {
   const [themes, setThemes] = useState<ICollection[]>();
@@ -63,7 +61,17 @@ function ProductPage() {
                     themes.map((item, index) => (
                       <tr key={index} className="border-b border-neutral-200">
                         <td className="whitespace-nowrap px-6 py-4 font-medium flex items-center cursor-pointer justify-between">
-                          <h2>{item.collection_name}</h2>
+                          <h2>{item.name}</h2>
+                          <Link
+                            className="flex items-center gap-2"
+                            href={`/admin/your-collections/${item.id}`}
+                          >
+                            <h2 className="text-[#4F46E5] text-[14px]">Edit</h2>
+                            <img
+                              src={"/assets/image/admin/edit.svg"}
+                              alt="edit"
+                            />
+                          </Link>
                         </td>
                       </tr>
                     ))}

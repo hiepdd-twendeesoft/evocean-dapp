@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 
 import { TCreateCollection } from '@/models/collection.type'
-import { createCollection } from '@/services/collection'
+import { createCollection, updateCollection } from '@/services/collection'
 
 export const createCollectionAction = createAsyncThunk(
   'collections/createCollection',
@@ -11,6 +11,21 @@ export const createCollectionAction = createAsyncThunk(
   ) => {
     const res = await createCollection(payload)
     return fulfillWithValue(res)
+    // return rejectWithValue(res);
+  }
+)
+
+export const updateCollectionAction = createAsyncThunk(
+  'collections/updateCollection',
+  async (
+    payload: TCreateCollection,
+    { fulfillWithValue, rejectWithValue }
+  ) => {
+    const {id, ...data} = payload; 
+    if(id) {
+      const res = await updateCollection(id, data)
+      return fulfillWithValue(res)
+    }
     // return rejectWithValue(res);
   }
 )
