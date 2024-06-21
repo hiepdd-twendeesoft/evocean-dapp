@@ -1,6 +1,10 @@
+import { IThemeItem } from "./theme.type";
+
 export interface ICollection {
   id: number;
-  collection_name: string;
+  name: string;
+  theme_ids: number[];
+  themes: IThemeItem[];
 }
 
 export type TCreateCollectionSChema = {
@@ -9,8 +13,9 @@ export type TCreateCollectionSChema = {
 
 
 export type TCreateCollection = {
-    collection_name: string;
-    theme_ids: number[];
+  id?: number;
+  collection_name: string;
+  theme_ids: number[];
 }
 
 export interface FetchCollectionParams {

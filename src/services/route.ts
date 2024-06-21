@@ -7,6 +7,7 @@ export enum ApiThemes {
 
 export enum ApiCollections {
   createCollection = "/themes/collections",
+  updateCollection = "/themes/collections",
   fetchCollections = "/themes/collections",
 }
 

@@ -2,19 +2,21 @@
 
 import { INITIAL_PAGE } from "@/constants/base";
 import {
+  ICollection,
   TCreateCollection,
   TCreateCollectionSChema,
 } from "@/models/collection.type";
 import { FetchThemeParams } from "@/models/common.type";
 import { IThemeItem } from "@/models/theme.type";
+import { fetchCollection } from "@/services/collection";
 import { fetchThemes } from "@/services/theme";
-import { createCollectionAction } from "@/store/actions/collection";
+import { createCollectionAction, updateCollectionAction } from "@/store/actions/collection";
 import { useAppDispatch } from "@/store/store";
 import { createCollectionSchema } from "@/validation/admin/collection.validation";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useQueryClient } from "@tanstack/react-query";
 import { Dropdown, Input, Select, SelectProps, message } from "antd";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
@@ -27,15 +29,21 @@ function AddProductPage() {
     formState: { errors },
     getValues,
     control,
+    setValue
   } = useForm<TCreateCollectionSChema>({
     resolver: yupResolver(createCollectionSchema),
   });
   const router = useRouter();
   const [themes, setThemes] = useState<IThemeItem[]>();
-  const [themeIds, setThemeIds] = useState<number[]>([]);
   const [search, setSearch] = useState<string>("");
+  const [collection, setCollection] = useState<ICollection>();
+  const [selectedValue, setSelectedValue]= useState<any[]>([]);
   const queryClient = useQueryClient();
   const [page, setPage] = useState(INITIAL_PAGE);
+  const { id } = useParams<{ id: string }>();
+  const handleBack = () => {
+    router.back();
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -52,23 +60,45 @@ function AddProductPage() {
         queryKey: [],
       });
       console.log("result", result);
+
       setThemes(result.data);
+      const collection = await queryClient.fetchQuery({
+        queryKey: ["get-theme", id],
+        queryFn: () => fetchCollection(Number(id)),
+      });
+      setCollection(collection);
+      const collectionNames = collection?.themes?.map(item => {
+        return {
+          value: item.id,
+          label: item.name
+        }
+      });
+      
+      setSelectedValue(collectionNames)
     };
 
     loadData();
   }, [page, queryClient, search]);
 
+  useEffect(() => {
+    if (collection) {
+      // setTheme(collection.)
+      setValue('collection_name', collection.name);
+    }
+  }, [collection]);
+
   const onSubmit: SubmitHandler<TCreateCollectionSChema> = async (data) => {
     const createCollectionDto: TCreateCollection = {
       ...data,
-      theme_ids: themeIds,
+      theme_ids: selectedValue.map(item => Number(item.value)),
+      id: Number(id)
     };
 
     try {
       const result = await dispatch(
-        createCollectionAction(createCollectionDto)
+        updateCollectionAction(createCollectionDto)
       ).unwrap();
-      message.success("Create collection successfully");
+      message.success("Update collection successfully");
       router.push("/admin/your-collections", { scroll: false });
     } catch (error: any) {
       message.error(error.message);
@@ -89,20 +119,30 @@ function AddProductPage() {
     };
   });
 
-  const handleChange = (value: string[]) => {
+  const handleChange = (value: string[], object: any) => {
     // const checkThemeId = theme.
     // setThemeIds
-    setThemeIds(value.map((item) => Number(item)));
-    // console.log(`selected ${value}`);
+    // setSelectedValue()
+    console.log(object);
+    setSelectedValue(object)
   };
+
+  console.log('selectedValue', selectedValue)
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onError)}>
       <div className="flex justify-between">
         <h1 className="text-[#111827] text-3xl not-italic font-bold leading-9">
-          Add new collection
+          Update collection
         </h1>
         <div className="text-base not-italic font-semibold leading-6">
+          <button
+            onClick={handleBack}
+            type="button"
+            className="bg-[#888] text-white px-[17px] py-[9px] rounded-[14px] ml-4"
+          >
+            Back
+          </button>
           <button className="bg-[#4F46E5] text-white px-[17px] py-[9px] rounded-[14px] ml-4">
             Submit
           </button>
@@ -126,7 +166,7 @@ function AddProductPage() {
           />
         </li>
         <li className="w-full mt-2">
-          <h2>Themes</h2>
+          <h2>Theme</h2>
           <Select
             mode="multiple"
             allowClear
@@ -136,7 +176,8 @@ function AddProductPage() {
             onSearch={(value) => {
               setSearch(value);
             }}
-            // defaultValue={["a10", "c12"]}
+            // defaultValue={collection?.themes?.map(item => item.name.toString())}
+            value={selectedValue}
             onChange={handleChange}
             options={themeOptions}
             className="h-[50px] border-[#D1D5DB]"

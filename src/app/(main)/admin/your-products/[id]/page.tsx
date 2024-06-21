@@ -86,9 +86,9 @@ function AddProductPage() {
 
     const createThemeDto: TCreateTheme = {
       ...data,
-      // theme,
-      // previews,
-      // thumbnail,
+      theme,
+      previews,
+      thumbnail,
       template_features,
       figma_features,
       status,
