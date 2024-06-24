@@ -51,3 +51,15 @@ export type TransactionTheme = {
   theme_id: number;
   date: string;
 };
+
+export type TUploadTheme = {
+  zip_file?: File;
+  thumbnail?: File;
+  previews?: File[];
+};
+
+export type IUploadThemeRes = {
+  zip_file?: string;
+  thumbnail?: string;
+  previews?: string[];
+};

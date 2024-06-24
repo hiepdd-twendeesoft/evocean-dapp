@@ -5,6 +5,7 @@ export interface ITheme {
     overview: string;
     media: {
       previews: string[];
+      thumbnail: string;
       figma_features: any[];
       template_features: any[];
       categories: string[];
@@ -38,13 +39,13 @@ export interface ITheme {
 
 export type TCreateTheme = {
   id?: number;
-  theme?: File;
+  zip_link?: string;
   name: string;
   overview: string,
   selling_price: number,
   owner_price: number,
-  previews?: File[];
-  thumbnail?: File,
+  previews_links?: string[];
+  thumbnail_link?: string,
   template_features: string[];
   figma_features: string[];
   status?: EThemeStatus

@@ -13,20 +13,19 @@ function ProductPage() {
   const [themes, setThemes] = useState<IThemeItem[]>();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(INITIAL_PAGE);
+  const loadData = async () => {
+    const result = await queryClient.fetchQuery({
+      queryFn: () =>
+        fetchThemes({
+          page: page,
+          take: INITIAL_TAKE,
+        }),
+      queryKey: [],
+    });
+    setThemes(result.data);
+  };
 
   useEffect(() => {
-    const loadData = async () => {
-      const result = await queryClient.fetchQuery({
-        queryFn: () =>
-          fetchThemes({
-            page: page,
-            take: INITIAL_TAKE,
-          }),
-        queryKey: [],
-      });
-      setThemes(result.data);
-    };
-
     loadData();
   }, [page, queryClient]);
 
@@ -68,7 +67,7 @@ function ProductPage() {
                 </thead>
                 <tbody>
                   {themes &&
-                    themes.map((item, index) => <ProductItem key={index} product={item} />)}
+                    themes.map((item, index) => <ProductItem key={index} product={item} loadData={loadData} />)}
                 </tbody>
               </table>
               <div className="flex justify-center mt-3">
