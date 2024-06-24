@@ -40,3 +40,6 @@ export async function fetchCollections(
 
 export const fetchCollection = (collectionId: number): Promise<ICollection> =>
   api(`${ApiCollections.updateCollection}/${collectionId}`, null, { method: "GET" }).then((res) => res.data);
+
+export const deleteCollection = (collectionId: number): Promise<ICollection> =>
+  api(`${ApiCollections.deleteCollection}/${collectionId}`, null, { method: "DELETE" }).then((res) => res.data);

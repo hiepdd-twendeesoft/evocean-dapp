@@ -6,7 +6,7 @@ import {
   TCreateThemeSchema,
 } from "@/models/theme.type";
 import { getTheme } from "@/services/get-theme-detail";
-import { fetchTheme } from "@/services/theme";
+import { fetchTheme, uploadTheme } from "@/services/theme";
 import { createThemeAction, updateThemeAction } from "@/store/actions/theme";
 import { useAppDispatch } from "@/store/store";
 import { createThemeSchema } from "@/validation/admin/theme.validation";
@@ -31,9 +31,10 @@ function AddProductPage() {
   } = useForm<TCreateThemeSchema>({
     resolver: yupResolver(createThemeSchema),
   });
-  const [theme, setTheme] = useState<File>();
-  const [previews, setPreviews] = useState<File[]>();
-  const [thumbnail, setThumbnail] = useState<File>();
+  const [theme, setTheme] = useState<string>();
+  const [themeFile, setThemeFile] = useState<File>();
+  const [previews, setPreviews] = useState<string[]>();
+  const [thumbnail, setThumbnail] = useState<string>();
   const [tab, setTab] = useState<number>(0);
   const [status, setStatus] = useState<EThemeStatus>(EThemeStatus.DRAFT);
   const router = useRouter();
@@ -46,12 +47,15 @@ function AddProductPage() {
   useEffect(() => {
     if (data) {
       // setTheme(data.)
-      setValue('name', data.name);
-      setValue('overview', data.overview);
-      setValue('selling_price', Number(data.sale?.price));
-      setValue('owner_price', Number(data.listing?.price));
-      setValue('template_features', data.media?.template_features?.join(', '));
-      setValue('figma_features', data.media?.figma_features?.join(', '));
+      setValue("name", data.name);
+      setValue("overview", data.overview);
+      setValue("selling_price", Number(data.sale?.price));
+      setValue("owner_price", Number(data.listing?.price));
+      setValue("template_features", data.media?.template_features?.join(", "));
+      setValue("figma_features", data.media?.figma_features?.join(", "));
+      setTheme(data.zip_link)
+      setThumbnail(data.media.thumbnail)
+      setPreviews(data.media.previews)
     }
   }, [data]);
 
@@ -86,20 +90,20 @@ function AddProductPage() {
 
     const createThemeDto: TCreateTheme = {
       ...data,
-      theme,
-      previews,
-      thumbnail,
+      zip_link: theme,
+      previews_links: previews,
+      thumbnail_link: thumbnail,
       template_features,
       figma_features,
       status,
-      id: Number(id)
+      id: Number(id),
     };
 
     try {
       console.log("updateThemeDto", createThemeDto);
       const result = await dispatch(updateThemeAction(createThemeDto)).unwrap();
       message.success("Update theme successfully");
-      // router.push("/admin/your-products", { scroll: false });
+      router.push("/admin/your-products", { scroll: false });
     } catch (error: any) {
       message.error(error.message);
     }
@@ -113,16 +117,32 @@ function AddProductPage() {
   };
 
   const thumbnailTypes = ["JPG", "PNG", "GIF"];
-  const handleChangeThumbnail = (file: any) => {
-    setThumbnail(file);
+  const handleChangeThumbnail = async (file: any) => {
+    try {
+      const result = await uploadTheme({
+        thumbnail: file,
+      });
+      setThumbnail(result.data.thumbnail);
+      message.success("Update thumbnail successfully");
+    } catch (err) {
+      message.error("Update thumbnail failed");
+    }
   };
 
   const previewsTypes = ["JPG", "PNG", "GIF"];
-  const handleChangePreviews = (file: any) => {
-    setPreviews(file);
+  const handleChangePreviews = async (file: any) => {
+    try {
+      const result = await uploadTheme({
+        previews: file,
+      });
+      setPreviews(result.data.previews);
+      message.success("Update previews successfully");
+    } catch (err) {
+      message.error("Update previews failed");
+    }
   };
 
-  const handleChangeThemeZip = (
+  const handleChangeThemeZip = async (
     e: ChangeEvent<HTMLInputElement>,
     allowFileTypes: string[]
   ) => {
@@ -141,7 +161,16 @@ function AddProductPage() {
       message.error(`You can only upload ${allowedInputType}file!`);
       return;
     }
-    setTheme(e.target.files[0]);
+    try {
+      const result = await uploadTheme({
+        zip_file: e.target.files[0],
+      });
+      setThemeFile(e.target.files[0]);
+      setTheme(result.data.zip_file);
+      message.success("Update theme zip successfully");
+    } catch (err) {
+      message.error("Update theme zip failed");
+    }
   };
 
   const navLinks = [
@@ -194,7 +223,7 @@ function AddProductPage() {
     <form onSubmit={handleSubmit(onSubmit, onError)}>
       <div className="flex justify-between">
         <h1 className="text-[#111827] text-3xl not-italic font-bold leading-9">
-          Add new product
+          Update product
         </h1>
         <div className="text-base not-italic font-semibold leading-6">
           <button
@@ -231,8 +260,8 @@ function AddProductPage() {
                     <div>
                       <h3 className="font-medium">Single product</h3>
                       <p className="mt-1">
-                        {theme
-                          ? `${theme.name} (${theme.size}MB)`
+                        {theme 
+                          ? themeFile ? `${themeFile.name} (${themeFile.size}MB)` : theme.split(RegExp('%2..*%2F(.*?)\?alt'))?.[1]?.split(".")[0]
                           : `
                           Any set of files to download that contain a single type of category
                           
@@ -389,12 +418,15 @@ function AddProductPage() {
               <h1 className="my-6 text-[#111827] text-xl font-medium">
                 Thumbnail
               </h1>
-              <ul className="flex gap-4">
+              <ul className="flex gap-4 flex-col">
                 <FileUploader
                   handleChange={handleChangeThumbnail}
                   name="file"
                   types={thumbnailTypes}
                 />
+                {thumbnail && (
+                  <img className="w-[80%] h-full" src={thumbnail} />
+                )}
                 {/* <li></li> */}
               </ul>
             </div>
@@ -496,7 +528,7 @@ function AddProductPage() {
       {tab === 2 && (
         <div className="">
           <h1 className="my-6 text-[#111827] text-xl font-medium">Previews</h1>
-          <ul className="flex gap-4">
+          <ul className="flex gap-4 flex-col">
             <FileUploader
               handleChange={handleChangePreviews}
               name="file"
@@ -505,7 +537,11 @@ function AddProductPage() {
               multiple
               classes={"h-[700px] w-[50%]"}
             />
-            {/* <li></li> */}
+            <div className="flex flex-wrap gap-2">
+              {previews && previews.map((item, index) => (
+                <img key={index} className="w-[24%] h-[250px] object-cover" src={item} />
+              ))}
+            </div>
           </ul>
         </div>
       )}

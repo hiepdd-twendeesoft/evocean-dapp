@@ -5,6 +5,7 @@ import {
   TCreateTheme,
   TCreateThemeSchema,
 } from "@/models/theme.type";
+import { uploadTheme } from "@/services/theme";
 import { createThemeAction } from "@/store/actions/theme";
 import { useAppDispatch } from "@/store/store";
 import { createThemeSchema } from "@/validation/admin/theme.validation";
@@ -28,9 +29,10 @@ function AddProductPage() {
   } = useForm<TCreateThemeSchema>({
     resolver: yupResolver(createThemeSchema),
   });
-  const [theme, setTheme] = useState<File>();
-  const [previews, setPreviews] = useState<File[]>();
-  const [thumbnail, setThumbnail] = useState<File>();
+  const [theme, setTheme] = useState<string>();
+  const [themeFile, setThemeFile] = useState<File>();
+  const [previews, setPreviews] = useState<string[]>();
+  const [thumbnail, setThumbnail] = useState<string>();
   const [tab, setTab] = useState<number>(0);
   const [status, setStatus] = useState<EThemeStatus>(EThemeStatus.DRAFT);
   const router = useRouter();
@@ -65,16 +67,15 @@ function AddProductPage() {
 
     const createThemeDto: TCreateTheme = {
       ...data,
-      theme,
-      previews,
-      thumbnail,
+      zip_link: theme,
+      previews_links: previews,
+      thumbnail_link: thumbnail,
       template_features,
       figma_features,
       status,
     };
 
     try {
-      console.log("createThemeDto", createThemeDto);
       const result = await dispatch(createThemeAction(createThemeDto)).unwrap();
       message.success("Create theme successfully");
       router.push("/admin/dashboard", { scroll: false });
@@ -91,16 +92,32 @@ function AddProductPage() {
   };
 
   const thumbnailTypes = ["JPG", "PNG", "GIF"];
-  const handleChangeThumbnail = (file: any) => {
-    setThumbnail(file);
+  const handleChangeThumbnail = async (file: any) => {
+    try {
+      const result = await uploadTheme({
+        thumbnail: file,
+      });
+      setThumbnail(result.data.thumbnail);
+      message.success("Update thumbnail successfully");
+    } catch (err) {
+      message.error("Update thumbnail failed");
+    }
   };
 
   const previewsTypes = ["JPG", "PNG", "GIF"];
-  const handleChangePreviews = (file: any) => {
-    setPreviews(file);
+  const handleChangePreviews = async (file: any) => {
+    try {
+      const result = await uploadTheme({
+        previews: file,
+      });
+      setPreviews(result.data.previews);
+      message.success("Update previews successfully");
+    } catch (err) {
+      message.error("Update previews failed");
+    }
   };
 
-  const handleChangeThemeZip = (
+  const handleChangeThemeZip = async (
     e: ChangeEvent<HTMLInputElement>,
     allowFileTypes: string[]
   ) => {
@@ -119,7 +136,16 @@ function AddProductPage() {
       message.error(`You can only upload ${allowedInputType}file!`);
       return;
     }
-    setTheme(e.target.files[0]);
+    try {
+      const result = await uploadTheme({
+        zip_file: e.target.files[0],
+      });
+      setThemeFile(e.target.files[0]);
+      setTheme(result.data.zip_file);
+      message.success("Update theme zip successfully");
+    } catch (err) {
+      message.error("Update theme zip failed");
+    }
   };
 
   const navLinks = [
@@ -209,8 +235,8 @@ function AddProductPage() {
                     <div>
                       <h3 className="font-medium">Single product</h3>
                       <p className="mt-1">
-                        {theme
-                          ? `${theme.name} (${theme.size}MB)`
+                        {theme && themeFile
+                          ? `${themeFile.name} (${themeFile.size}MB)`
                           : `
                           Any set of files to download that contain a single type of category
                           
@@ -367,12 +393,15 @@ function AddProductPage() {
               <h1 className="my-6 text-[#111827] text-xl font-medium">
                 Thumbnail
               </h1>
-              <ul className="flex gap-4">
+              <ul className="flex gap-4 flex-col">
                 <FileUploader
                   handleChange={handleChangeThumbnail}
                   name="file"
                   types={thumbnailTypes}
                 />
+                {thumbnail && (
+                  <img className="w-[80%] h-full" src={thumbnail} />
+                )}
                 {/* <li></li> */}
               </ul>
             </div>
@@ -474,7 +503,7 @@ function AddProductPage() {
       {tab === 2 && (
         <div className="">
           <h1 className="my-6 text-[#111827] text-xl font-medium">Previews</h1>
-          <ul className="flex gap-4">
+          <ul className="flex gap-4 flex-col">
             <FileUploader
               handleChange={handleChangePreviews}
               name="file"
@@ -483,6 +512,11 @@ function AddProductPage() {
               multiple
               classes={"h-[700px] w-[50%]"}
             />
+            <div className="flex flex-wrap gap-2">
+              {previews && previews.map((item, index) => (
+                <img key={index} className="w-[24%] h-[250px] object-cover" src={item} />
+              ))}
+            </div>
             {/* <li></li> */}
           </ul>
         </div>

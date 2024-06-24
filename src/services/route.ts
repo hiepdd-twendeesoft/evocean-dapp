@@ -3,11 +3,14 @@ export enum ApiThemes {
   fetchProducts = "/dashboard/products",
   createProducts = "/themes/creating",
   updateProduct = "/themes/updating",  
+  deleteProduct = "/themes/deleting",  
+  uploadTheme = "/themes/upload",  
 }
 
 export enum ApiCollections {
   createCollection = "/themes/collections",
   updateCollection = "/themes/collections",
+  deleteCollection = "/themes/collections",
   fetchCollections = "/themes/collections",
 }
 
