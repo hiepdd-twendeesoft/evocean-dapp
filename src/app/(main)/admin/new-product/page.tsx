@@ -1,5 +1,7 @@
 "use client";
 
+import { SelectFeature } from "@/components/admin/SelectFeature";
+import { Uploader } from "@/components/admin/Uploader";
 import {
   EThemeStatus,
   TCreateTheme,
@@ -33,6 +35,21 @@ function AddProductPage() {
   const [themeFile, setThemeFile] = useState<File>();
   const [previews, setPreviews] = useState<string[]>();
   const [thumbnail, setThumbnail] = useState<string>();
+  const [features, setFeatures] = useState<any>([
+    {
+      name: "Auto Dark Theme available220+ ",
+    },
+    {
+      name: "Fully responsive ",
+    },
+    {
+      name: "Detailed inveractive component",
+    },
+    {
+      name: "Many homepage layout",
+    },
+  ]);
+  const [creators, setCreators] = useState<any>([]);
   const [tab, setTab] = useState<number>(0);
   const [status, setStatus] = useState<EThemeStatus>(EThemeStatus.DRAFT);
   const router = useRouter();
@@ -165,17 +182,19 @@ function AddProductPage() {
 
   const NavLinkComponent = () => {
     return (
-      <ul className="flex items-center font-medium mt-[32px] gap-10">
+      <ul className="flex items-center justify-between font-medium mt-[32px] gap-10">
         {navLinks.map((item, index) => (
           <li
             key={index}
             onClick={() => setTab(index)}
-            className="flex items-center gap-4 cursor-pointer"
+            className={`flex flex-1 p-[16px] items-center gap-4 cursor-pointer ${
+              index === tab ? "bg-[#F8FAFC]" : "bg-[#fff]"
+            }`}
           >
             <span
               className={`w-[40px] flex items-center justify-center h-[40px] border border-1 rounded-[50%] ${
                 index === tab
-                  ? "border-[#4F46E5] text-[#4F46E5]"
+                  ? "border-[#4F46E5] text-[#4F46E5] "
                   : "border-[#6B7280] text-[#6B7280]"
               }`}
             >
@@ -224,7 +243,7 @@ function AddProductPage() {
                 Product type
               </h1>
               <ul className="flex gap-4">
-                <li className="flex w-[50%] cursor-pointer justify-start p-[20px] bg-[#EEF2FF] border border-[#4F46E5] border-2 rounded-[8px]">
+                <li className="flex w-full cursor-pointer justify-start p-[20px] bg-[#EEF2FF] border border-[#4F46E5] border-2 rounded-[8px]">
                   <label
                     className="flex gap-2 cursor-pointer"
                     htmlFor="single-theme"
@@ -254,7 +273,7 @@ function AddProductPage() {
                   />
                   {/* <Input id="single-theme" type="file" className="hidden"/> */}
                 </li>
-                <li className="flex w-[50%] cursor-pointer gap-2 justify-start p-[20px] border border-[#D1D5DB] border-2 rounded-[8px]">
+                {/* <li className="flex w-[50%] cursor-pointer gap-2 justify-start p-[20px] border border-[#D1D5DB] border-2 rounded-[8px]">
                   <label
                     className="flex gap-2 cursor-pointer"
                     htmlFor="multiple-theme"
@@ -276,8 +295,7 @@ function AddProductPage() {
                     className="hidden"
                     multiple
                   />
-                  {/* <Input id="multiple-theme" type="file" className="hidden" multiple/> */}
-                </li>
+                </li> */}
               </ul>
             </div>
             <div className="">
@@ -398,6 +416,7 @@ function AddProductPage() {
                   handleChange={handleChangeThumbnail}
                   name="file"
                   types={thumbnailTypes}
+                  children={<Uploader />}
                 />
                 {thumbnail && (
                   <img className="w-[80%] h-full" src={thumbnail} />
@@ -465,59 +484,280 @@ function AddProductPage() {
         </div>
       )}
       {tab === 1 && (
-        <ul className="flex flex-col gap-4 mt-4">
-          <li className="w-full">
-            <h2>Template features</h2>
-            <Controller
-              name="template_features"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  className="w-[100%] px-[13px] py-[9px] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
-                  type="text"
-                  {...field}
-                  status={errors.template_features?.message ? "error" : ""}
-                  placeholder={errors.template_features?.message || ""}
-                />
-              )}
+        <div className="flex">
+          <div className="basis-1/2">
+            <h1 className="my-6 text-[#111827] text-xl font-medium">
+              Highlight feature
+            </h1>
+            <ul className="flex gap-4 flex-col w-[70%]">
+              {/* <li className="flex justify-between gap-4 border border-1 border-[#9CA3AF] p-4 rounded-[8px] w-[70%]">
+                <div className="flex items-center gap-4">
+                  <img src={"/assets/image/admin/check.svg"} />
+                  <h3>Auto Dark Theme available220+ </h3>
+                </div>
+                <img src={"/assets/image/admin/list.svg"} />
+              </li> */}
+              <SelectFeature data={features} />
+              <SelectFeature data={features} />
+              <SelectFeature data={features} />
+              <SelectFeature data={features} />
+              <SelectFeature data={features} />
+            </ul>
+            <h1 className="my-6 text-[#111827] text-xl font-medium">
+              Link preview
+            </h1>
+
+            <div className="relative">
+              <label
+                htmlFor="name"
+                className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600"
+              >
+                Link preview
+              </label>
+              <input
+                type="text"
+                name="name"
+                id="name"
+                className={`
+                  block w-[70%] rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6
+                 px-[13px] py-[12px] rounded-r-[8px] outline-[#D1D5DB]
+                  `}
+                placeholder="http://www.nimbus.com"
+              />
+            </div>
+          </div>
+          <div className="basis-1/2">
+            <h1 className="my-6 text-[#111827] text-xl font-medium">
+              Select Category
+            </h1>
+            <Input
+              className="px-[13px] py-[9px] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB] w-[80%]"
+              type="text"
+              // status={errors.name?.message ? "error" : ""}
+              placeholder={"Type a category and press enter..."}
             />
-          </li>
-          <li className="w-full mt-2">
-            <h2>Figma features</h2>
-            <Controller
-              name="figma_features"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  className="w-[100%] px-[13px] py-[9px] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
-                  type="text"
-                  {...field}
-                  status={errors.figma_features?.message ? "error" : ""}
-                  placeholder={errors.figma_features?.message || ""}
-                />
-              )}
+            <ul className="flex flex-wrap gap-4 mt-4">
+              <li className="p-4 rounded-[8px] bg-[#E9D5FF] text-[#A855F7] w-max">
+                Template & Themes
+              </li>
+              <li className="p-4 rounded-[8px] bg-[#E9D5FF] text-[#A855F7] w-max">
+                Template & Themes
+              </li>
+              <li className="p-4 rounded-[8px] bg-[#E9D5FF] text-[#A855F7] w-max">
+                Template & Themes
+              </li>
+            </ul>
+
+            <h1 className="my-6 text-[#111827] text-xl font-medium">
+              Select Tags
+            </h1>
+            <Input
+              className="px-[13px] py-[9px] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB] w-[80%]"
+              type="text"
+              // status={errors.name?.message ? "error" : ""}
+              placeholder={"Type a tag and press enter..."}
             />
-          </li>
-        </ul>
+            <ul className="flex flex-wrap gap-4 mt-4">
+              <li className="p-4 rounded-[8px] bg-[#E0E7FF] text-[#3730A3] w-max">
+                UX/UI Design
+              </li>
+              <li className="p-4 rounded-[8px] bg-[#E0E7FF] text-[#3730A3] w-max">
+                UX/UI Design
+              </li>
+              <li className="p-4 rounded-[8px] bg-[#E0E7FF] text-[#3730A3] w-max">
+                UX/UI Design
+              </li>
+            </ul>
+          </div>
+        </div>
+        // <ul className="flex flex-col gap-4 mt-4">
+        //   <li className="w-full">
+        //     <h2>Template features</h2>
+        //     <Controller
+        //       name="template_features"
+        //       control={control}
+        //       render={({ field }) => (
+        //         <Input
+        //           className="w-[100%] px-[13px] py-[9px] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
+        //           type="text"
+        //           {...field}
+        //           status={errors.template_features?.message ? "error" : ""}
+        //           placeholder={errors.template_features?.message || ""}
+        //         />
+        //       )}
+        //     />
+        //   </li>
+        //   <li className="w-full mt-2">
+        //     <h2>Figma features</h2>
+        //     <Controller
+        //       name="figma_features"
+        //       control={control}
+        //       render={({ field }) => (
+        //         <Input
+        //           className="w-[100%] px-[13px] py-[9px] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
+        //           type="text"
+        //           {...field}
+        //           status={errors.figma_features?.message ? "error" : ""}
+        //           placeholder={errors.figma_features?.message || ""}
+        //         />
+        //       )}
+        //     />
+        //   </li>
+        // </ul>
       )}
       {tab === 2 && (
+        // <div className="flex justify-center">
+        //   <div className="mt-8 border border-1 border-[#9CA3AF] border-solid rounded-xl w-[50%] p-8">
+        //     <h2 className="text-[20px] font-semibold mb-6">Creator earnings</h2>
+        //     <div className="p-4 bg-[#F9FAFB] rounded-xl">
+        //       <div className="flex gap-4 mb-4">
+        //         <img
+        //           className="w-[16px]"
+        //           src={"/assets/image/admin/house.svg"}
+        //         />
+        //         <h2 className="font-medium">
+        //           Your contract enforces fees on OpenSea
+        //         </h2>
+        //       </div>
+        //       <p className="text-[#6B7280]">
+        //         Earn apercentage of the sale price when one of your items is
+        //         re-sold using OpenSea. Adding multiple addresses may increase
+        //         gas fees for buyers. If you set a lower fee on other
+        //         marketplaces, your fee on OpenSea will be updated to match that
+        //         amount.
+        //       </p>
+        //     </div>
+        //     <ul>
+        //       {creators.map((item: any, index: number) => (
+        //         <li key={index} className="flex gap-4 mt-4">
+        //           <Input
+        //             className="w-[70%] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
+        //             type="text"
+        //             value={item.email}
+        //             // {...field}
+        //             status={errors.owner_price?.message ? "error" : ""}
+        //             placeholder={
+        //               errors.owner_price?.message || "you@example.com"
+        //             }
+        //           />
+        //           <div className="flex w-[30%] px-[13px] py-[9px] rounded-[8px] outline-[#D1D5DB] border-2 border-solid border-[#D1D5DB]">
+        //             <Input
+        //               className="w-[80%] rounded-r-[8px] outline-none border-none"
+        //               type="text"
+        //               value={item.percent}
+        //               // {...field}
+        //               // status={errors.owner_price?.message ? "error" : ""}
+        //               placeholder={errors.owner_price?.message || "100"}
+        //             />
+        //             <span className="flex items-center w-[20%]">%</span>
+        //           </div>
+        //           <img
+        //             onClick={() => {
+        //               const newCreators = creators.filter((creator: any, creatorIndex: number) => creatorIndex !== index);
+        //               setCreators(newCreators);
+        //             }}
+        //             className="cursor-pointer"
+        //             src={"/assets/image/admin/trash.svg"}
+        //           />
+        //         </li>
+        //       ))}
+        //     </ul>
+        //     <div className="flex mt-4 gap-6">
+        //       <div
+        //         onClick={() => {
+        //           const newCreators = [
+        //             ...creators,
+        //             {
+        //               email: "hung@gmail.com",
+        //               percent: 10,
+        //             },
+        //           ];
+        //           setCreators(newCreators);
+        //         }}
+        //         className="flex cursor-pointer"
+        //       >
+        //         <img
+        //           className="cursor-pointer"
+        //           src={"/assets/image/admin/plus.svg"}
+        //         />
+        //         <h2 className="text-[#3B82F6]">
+        //           Add earnings payout address and percentage
+        //         </h2>
+        //       </div>
+        //       <h2>Total</h2>
+        //       <h2>{creators.reduce((acc: number, item: any) => {
+        //         acc += item.percent;
+        //         return acc;
+        //       }, 0)}%</h2>
+        //     </div>
+        //   </div>
+        // </div>
         <div className="">
-          <h1 className="my-6 text-[#111827] text-xl font-medium">Previews</h1>
+          <h1 className="my-6 text-[#111827] text-xl font-medium">Cover</h1>
           <ul className="flex gap-4 flex-col">
             <FileUploader
               handleChange={handleChangePreviews}
               name="file"
-              dsds
               types={previewsTypes}
-              multiple
-              classes={"h-[700px] w-[50%]"}
+              classes={"!h-max w-[100%] !max-w-full text-center"}
+              children={<Uploader />}
             />
-            <div className="flex flex-wrap gap-2">
-              {previews && previews.map((item, index) => (
-                <img key={index} className="w-[24%] h-[250px] object-cover" src={item} />
-              ))}
-            </div>
-            {/* <li></li> */}
+          </ul>
+          <h1 className="my-6 text-[#111827] text-xl font-medium">
+            Detail images (4-8 required approval)
+          </h1>
+          <ul className="flex gap-4 flex-col">
+            <FileUploader
+              handleChange={handleChangePreviews}
+              name="file"
+              types={previewsTypes}
+              classes={"!h-max w-[100%] !max-w-full text-center"}
+              children={<Uploader />}
+            />
+          </ul>
+          <h1 className="my-6 text-[#111827] text-xl font-medium">
+            Full preiviews
+          </h1>
+          <ul className="flex gap-4 flex-col">
+            <FileUploader
+              handleChange={handleChangePreviews}
+              name="file"
+              types={previewsTypes}
+              classes={"!h-max w-[100%] !max-w-full text-center"}
+              children={<Uploader />}
+            />
+          </ul>
+        </div>
+      )}
+      {tab === 3 && (
+        // <div>
+        //   <label
+        //     className="flex flex-col justify-center items-center cursor-pointer border border-1 border-solid border-[##D1D5DB] p-[48px] text-[#4B5563] w-max rounded-xl"
+        //     htmlFor="your-product"
+        //   >
+        //     <div className="text-2xl w-[48px] h-[48px] rounded-[50%] flex justify-center items-center border border-1 border-solid border-[#4B5563]">
+        //       +
+        //     </div>
+        //     <h1 className="text-xl mt-2">Choose your product.</h1>
+        //   </label>
+        //   <Input
+        //     id="your-product"
+        //     type="file"
+        //     className="hidden"
+        //     onChange={(e) => handleChangeThemeZip(e, ["application/zip"])}
+        //   />
+        // </div>
+        <div>
+          <h1 className="my-6 text-[#111827] text-xl font-medium">File</h1>
+          <ul className="flex gap-4 flex-col">
+            <FileUploader
+              handleChange={handleChangePreviews}
+              name="file"
+              multiple
+              types={previewsTypes}
+              classes={"!h-max w-[100%] !max-w-full text-center"}
+              children={<Uploader />}
+            />
           </ul>
         </div>
       )}
