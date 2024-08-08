@@ -72,7 +72,7 @@ const ModalBuyOwnership = forwardRef(
       priceOwner,
       refetch,
     }: ModalBuyOwnershipProps,
-    ref
+    ref,
   ) => {
     const { push } = useRouter();
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -122,25 +122,25 @@ const ModalBuyOwnership = forwardRef(
 
       const [listingAccount] = web3.PublicKey.findProgramAddressSync(
         [Buffer.from("listing_account_"), tokenMint.toBuffer()],
-        program.programId
+        program.programId,
       );
 
       const [marketTokenAccount] = web3.PublicKey.findProgramAddressSync(
         [Buffer.from("market_token_account_"), tokenMint.toBuffer()],
-        program.programId
+        program.programId,
       );
 
       let userTokenAccount: PublicKey;
 
       const associatedToken = getAssociatedTokenAddressSync(
         tokenMint,
-        provider.wallet.publicKey
+        provider.wallet.publicKey,
       );
 
       try {
         const { address } = await getAccount(
           provider.connection,
-          associatedToken
+          associatedToken,
         );
 
         userTokenAccount = address;
@@ -150,15 +150,15 @@ const ModalBuyOwnership = forwardRef(
             provider.wallet.publicKey,
             associatedToken,
             provider.wallet.publicKey,
-            tokenMint
-          )
+            tokenMint,
+          ),
         );
 
         await provider.sendAndConfirm(transaction);
 
         const { address } = await getAccount(
           provider.connection,
-          associatedToken
+          associatedToken,
         );
 
         userTokenAccount = address;
@@ -308,7 +308,7 @@ const ModalBuyOwnership = forwardRef(
         </div>
       </Modal>
     );
-  }
+  },
 );
 
 export default ModalBuyOwnership;

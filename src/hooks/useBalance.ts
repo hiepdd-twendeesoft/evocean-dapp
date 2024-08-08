@@ -12,7 +12,7 @@ const useBalance = (publicKey: PublicKey | null) => {
 
     const connection = new Connection(
       clusterApiUrl(WalletAdapterNetwork.Devnet) ||
-        "https://api.mainnet-beta.solana.com"
+        "https://api.mainnet-beta.solana.com",
     );
     connection
       .getBalance(publicKey)

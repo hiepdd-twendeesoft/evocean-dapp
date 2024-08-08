@@ -61,8 +61,9 @@ export const Aside = () => {
             <li key={index}>
               <Link
                 href={item.url}
-                className={`flex items-center p-[8px] text-[#4B5563] text-ellipsis text-base not-italic font-medium leading-6 hover:text-[#111827] hover:bg-[#F3F4F6] ${pathName === item.url ? 'bg-[#F3F4F6]' : 'bg-[#fff]'} `}
-                // className={`flex items-center p-[8px] text-[#4B5563] text-ellipsis text-base not-italic font-medium leading-6 hover:text-[#111827] hover:bg-[#F3F4F6] ${pathName === item.url ? 'bg-[#F3F4F6]' : 'bg-[#fff]'} `}
+                className={`flex items-center p-[8px] text-[#4B5563] text-ellipsis text-base not-italic font-medium leading-6 hover:text-[#111827] hover:bg-[#F3F4F6] ${
+                  pathName === item.url ? "bg-[#F3F4F6]" : "bg-[#fff]"
+                } `}
               >
                 <img src={item.icon} alt="eye" className="w-[18px] ml-2" />
                 <span className="ms-3">{item.title}</span>
@@ -73,7 +74,7 @@ export const Aside = () => {
         <div className="flex justify-center">
           <button
             onClick={handleClickNewProduct}
-            className="bg-[#4F46E5] text-[#fff] font-semibold absolute bottom-[10%] py-4 px-20 rounded-[18px]"
+            className="bg-primary text-[#fff] font-semibold absolute bottom-[10%] w-[calc(100%-32px)] py-4  rounded-[18px]"
           >
             New product
           </button>

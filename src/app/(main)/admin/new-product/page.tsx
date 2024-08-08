@@ -8,6 +8,7 @@ import {
 import { uploadTheme } from "@/services/theme";
 import { createThemeAction } from "@/store/actions/theme";
 import { useAppDispatch } from "@/store/store";
+import { EProductTab } from "@/types/product";
 import { createThemeSchema } from "@/validation/admin/theme.validation";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Input, message } from "antd";
@@ -33,9 +34,10 @@ function AddProductPage() {
   const [themeFile, setThemeFile] = useState<File>();
   const [previews, setPreviews] = useState<string[]>();
   const [thumbnail, setThumbnail] = useState<string>();
-  const [tab, setTab] = useState<number>(0);
+  const [tab, setTab] = useState<EProductTab>(EProductTab.OVERVIEW);
   const [status, setStatus] = useState<EThemeStatus>(EThemeStatus.DRAFT);
   const router = useRouter();
+
   const onSubmit: SubmitHandler<TCreateThemeSchema> = async (data) => {
     if (!theme) {
       message.error({
@@ -85,7 +87,6 @@ function AddProductPage() {
   };
 
   const onError = (error: any) => {
-    console.log(Object.values(error));
     for (const item of Object.values(error) as any) {
       message.error(item["message"]);
     }
@@ -119,7 +120,7 @@ function AddProductPage() {
 
   const handleChangeThemeZip = async (
     e: ChangeEvent<HTMLInputElement>,
-    allowFileTypes: string[]
+    allowFileTypes: string[],
   ) => {
     if (!e.target.files || e.target.files.length === 0) {
       return;
@@ -132,7 +133,7 @@ function AddProductPage() {
       ?.join("/")
       ?.toUpperCase();
 
-    if (!isMatchMediaType) {
+    if (isMatchMediaType) {
       message.error(`You can only upload ${allowedInputType}file!`);
       return;
     }
@@ -151,15 +152,19 @@ function AddProductPage() {
   const navLinks = [
     {
       title: "Overview",
+      value: EProductTab.OVERVIEW,
     },
     {
       title: "Features",
+      value: EProductTab.FEATURES,
     },
     {
-      title: "Images",
+      title: "Upload Images",
+      value: EProductTab.UPLOAD_IMAGE,
     },
     {
-      title: "File",
+      title: "Upload File",
+      value: EProductTab.UPLOAD_FILE,
     },
   ];
 
@@ -169,13 +174,13 @@ function AddProductPage() {
         {navLinks.map((item, index) => (
           <li
             key={index}
-            onClick={() => setTab(index)}
+            onClick={() => setTab(item.value)}
             className="flex items-center gap-4 cursor-pointer"
           >
             <span
               className={`w-[40px] flex items-center justify-center h-[40px] border border-1 rounded-[50%] ${
-                index === tab
-                  ? "border-[#4F46E5] text-[#4F46E5]"
+                item.value === tab
+                  ? "border-primary text-primary"
                   : "border-[#6B7280] text-[#6B7280]"
               }`}
             >
@@ -183,7 +188,7 @@ function AddProductPage() {
             </span>
             <p
               className={`${
-                index === tab ? "text-[#4F46E5]" : "text-[#6B7280]"
+                item.value === tab ? "text-primary" : "text-[#6B7280]"
               }`}
             >
               {item.title}
@@ -209,14 +214,14 @@ function AddProductPage() {
           </button>
           <button
             onClick={() => setStatus(EThemeStatus.PENDING)}
-            className="bg-[#4F46E5] text-white px-[17px] py-[9px] rounded-[14px] ml-4"
+            className="bg-primary text-white px-[17px] py-[9px] rounded-[14px] ml-4"
           >
             Submit for review
           </button>
         </div>
       </div>
       <NavLinkComponent />
-      {tab === 0 && (
+      {tab === EProductTab.OVERVIEW && (
         <div className="flex gap-8">
           <div className="basis-3/5">
             <div className="">
@@ -224,13 +229,16 @@ function AddProductPage() {
                 Product type
               </h1>
               <ul className="flex gap-4">
-                <li className="flex w-[50%] cursor-pointer justify-start p-[20px] bg-[#EEF2FF] border border-[#4F46E5] border-2 rounded-[8px]">
+                <li className="flex w-full cursor-pointer justify-start p-[20px] bg-[#EEF2FF] border-primary border-2 rounded-[8px]">
                   <label
                     className="flex gap-2 cursor-pointer"
                     htmlFor="single-theme"
                   >
                     <div className="pt-1">
-                      <img src={"/assets/image/admin/upload-single.svg"} />
+                      <img
+                        alt="img"
+                        src={"/assets/image/admin/upload-single.svg"}
+                      />
                     </div>
                     <div>
                       <h3 className="font-medium">Single product</h3>
@@ -254,7 +262,7 @@ function AddProductPage() {
                   />
                   {/* <Input id="single-theme" type="file" className="hidden"/> */}
                 </li>
-                <li className="flex w-[50%] cursor-pointer gap-2 justify-start p-[20px] border border-[#D1D5DB] border-2 rounded-[8px]">
+                {/* <li className="flex w-[50%] cursor-pointer gap-2 justify-start p-[20px] border border-[#D1D5DB] border-2 rounded-[8px]">
                   <label
                     className="flex gap-2 cursor-pointer"
                     htmlFor="multiple-theme"
@@ -276,8 +284,13 @@ function AddProductPage() {
                     className="hidden"
                     multiple
                   />
-                  {/* <Input id="multiple-theme" type="file" className="hidden" multiple/> */}
-                </li>
+                  <Input
+                    id="multiple-theme"
+                    type="file"
+                    className="hidden"
+                    multiple
+                  />
+                </li> */}
               </ul>
             </div>
             <div className="">
@@ -309,7 +322,7 @@ function AddProductPage() {
                     control={control}
                     render={({ field }) => (
                       <TextArea
-                        className="w-[100%] h-[100px] px-[13px] py-[9px] border text-[#64748B] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
+                        className="w-[100%] h-[100px] px-[13px] py-[9px] text-[#64748B] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
                         {...field}
                         status={errors.overview?.message ? "error" : ""}
                         placeholder={
@@ -329,7 +342,7 @@ function AddProductPage() {
               <ul className="flex flex-col gap-4">
                 <li className="w-full">
                   <h2>Selling pricing</h2>
-                  <div className="flex h-[44px] border border-[#D1D5DB] border-2 rounded-[8px]">
+                  <div className="flex h-[44px] border-[#D1D5DB] border-2 rounded-[8px]">
                     <div className="w-[62px] h-full flex justify-center items-center bg-[#EEF2FF] rounded-l-[8px]">
                       SOL
                     </div>
@@ -342,7 +355,7 @@ function AddProductPage() {
                           type="text"
                           {...field}
                           status={errors.selling_price?.message ? "error" : ""}
-                          placeholder={errors.selling_price?.message || "1.00"}
+                          placeholder={errors.selling_price?.message}
                         />
                       )}
                     />
@@ -352,10 +365,10 @@ function AddProductPage() {
                   </span>
                 </li>
                 <li className="w-full">
-                  <h2>Ownership price</h2>
+                  <h2>Percentage of Ownership</h2>
                   <div className="flex h-[44px]  border-[#D1D5DB] border-2 rounded-[8px]">
                     <div className="w-[62px] h-full flex justify-center items-center bg-[#EEF2FF] rounded-l-[8px]">
-                      SOL
+                      %
                     </div>
                     <Controller
                       name="owner_price"
@@ -366,7 +379,7 @@ function AddProductPage() {
                           type="text"
                           {...field}
                           status={errors.owner_price?.message ? "error" : ""}
-                          placeholder={errors.owner_price?.message || "1.00"}
+                          placeholder={errors.owner_price?.message}
                         />
                       )}
                     />
@@ -376,12 +389,37 @@ function AddProductPage() {
                   </span>
                 </li>
                 <li className="w-full">
+                  <h2>Ownership price</h2>
+                  <div className="flex h-[44px]  border-[#D1D5DB] border-2 rounded-[8px]">
+                    <div className="w-[62px] h-full flex justify-center items-center bg-[#EEF2FF] rounded-l-[8px]">
+                      SOL
+                    </div>
+                    <Controller
+                      name="percentageOfOwnership"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          className="w-[100%] px-[13px] py-[9px] rounded-r-[8px] outline-[#D1D5DB]"
+                          type="text"
+                          {...field}
+                          status={errors.owner_price?.message ? "error" : ""}
+                          placeholder={errors.owner_price?.message}
+                        />
+                      )}
+                    />
+                  </div>
+                  <span className="text-[#64748B]">
+                    How much would you pass with product?
+                  </span>
+                </li>
+
+                <li className="w-full">
                   <div className="flex">
-                    <img src={"/assets/image/admin/note.svg"} />
+                    <img alt="" src={"/assets/image/admin/note.svg"} />
                     <p className="pl-1">What is ownership?</p>
                   </div>
                   <div className="flex mt-1">
-                    <img src={"/assets/image/admin/note.svg"} />
+                    <img alt="img" src={"/assets/image/admin/note.svg"} />
                     <p className="pl-1">How my author price being share?</p>
                   </div>
                 </li>
@@ -400,7 +438,7 @@ function AddProductPage() {
                   types={thumbnailTypes}
                 />
                 {thumbnail && (
-                  <img className="w-[80%] h-full" src={thumbnail} />
+                  <img alt="img" className="w-[80%] h-full" src={thumbnail} />
                 )}
                 {/* <li></li> */}
               </ul>
@@ -412,6 +450,7 @@ function AddProductPage() {
               <ul className="flex gap-4 flex-wrap">
                 <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
                   <img
+                    alt="img"
                     className="w-[16px]"
                     src={"/assets/image/admin/figma.svg"}
                   />
@@ -419,6 +458,7 @@ function AddProductPage() {
                 </li>
                 <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
                   <img
+                    alt="img"
                     className="w-[16px]"
                     src={"/assets/image/admin/framer.svg"}
                   />
@@ -426,6 +466,7 @@ function AddProductPage() {
                 </li>
                 <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
                   <img
+                    alt="img"
                     className="w-[16px]"
                     src={"/assets/image/admin/blender.svg"}
                   />
@@ -433,6 +474,7 @@ function AddProductPage() {
                 </li>
                 <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
                   <img
+                    alt="img"
                     className="w-[16px]"
                     src={"/assets/image/admin/html.svg"}
                   />
@@ -440,6 +482,7 @@ function AddProductPage() {
                 </li>
                 <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
                   <img
+                    alt="img"
                     className="w-[16px]"
                     src={"/assets/image/admin/powerpoint.svg"}
                   />
@@ -447,6 +490,7 @@ function AddProductPage() {
                 </li>
                 <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
                   <img
+                    alt="img"
                     className="w-[16px]"
                     src={"/assets/image/admin/photoshop.svg"}
                   />
@@ -454,6 +498,7 @@ function AddProductPage() {
                 </li>
                 <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
                   <img
+                    alt="img"
                     className="w-[16px]"
                     src={"/assets/image/admin/illustrator.svg"}
                   />
@@ -464,10 +509,11 @@ function AddProductPage() {
           </div>
         </div>
       )}
-      {tab === 1 && (
+
+      {tab === EProductTab.FEATURES && (
         <ul className="flex flex-col gap-4 mt-4">
           <li className="w-full">
-            <h2>Template features</h2>
+            <h2 className="font-medium">Template features</h2>
             <Controller
               name="template_features"
               control={control}
@@ -483,7 +529,7 @@ function AddProductPage() {
             />
           </li>
           <li className="w-full mt-2">
-            <h2>Figma features</h2>
+            <h2 className="font-medium">Figma features</h2>
             <Controller
               name="figma_features"
               control={control}
@@ -500,7 +546,8 @@ function AddProductPage() {
           </li>
         </ul>
       )}
-      {tab === 2 && (
+
+      {EProductTab.UPLOAD_IMAGE === tab && (
         <div className="">
           <h1 className="my-6 text-[#111827] text-xl font-medium">Previews</h1>
           <ul className="flex gap-4 flex-col">
@@ -513,9 +560,15 @@ function AddProductPage() {
               classes={"h-[700px] w-[50%]"}
             />
             <div className="flex flex-wrap gap-2">
-              {previews && previews.map((item, index) => (
-                <img key={index} className="w-[24%] h-[250px] object-cover" src={item} />
-              ))}
+              {previews &&
+                previews.map((item, index) => (
+                  <img
+                    alt="img"
+                    key={index}
+                    className="w-[24%] h-[250px] object-cover"
+                    src={item}
+                  />
+                ))}
             </div>
             {/* <li></li> */}
           </ul>

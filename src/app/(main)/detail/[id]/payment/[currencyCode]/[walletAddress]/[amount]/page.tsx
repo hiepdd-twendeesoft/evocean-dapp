@@ -21,24 +21,24 @@ const DetailThemePagePayment = () => {
 
   const MoonPayProvider = dynamic(
     () => import("@moonpay/moonpay-react").then((mod) => mod.MoonPayProvider),
-    { ssr: false }
+    { ssr: false },
   );
 
   const MoonPayBuyWidget = dynamic(
     () => import("@moonpay/moonpay-react").then((mod) => mod.MoonPayBuyWidget),
-    { ssr: false }
+    { ssr: false },
   );
 
   const handleBuy = () => {
     router.push(
       `${process.env.NEXT_PUBLIC_API_URL}?apiKey=${process.env.NEXT_PUBLIC_PUBLIC_KEY_MOONPAY}&currencyCode=eth&walletAddress=0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae`,
-      { scroll: false }
+      { scroll: false },
     );
   };
 
   const handleGetSignature = async (url: string): Promise<string> => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/themes/payment?url=${url}`
+      `${process.env.NEXT_PUBLIC_API_URL}/themes/payment?url=${url}`,
     );
     const result = await response.json();
     console.log("result.signature", result.signature);

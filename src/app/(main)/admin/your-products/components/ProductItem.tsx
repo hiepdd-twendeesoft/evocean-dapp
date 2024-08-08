@@ -15,15 +15,15 @@ export const ProductItem = ({ product, key, loadData }: ProductItemProps) => {
   const dollarPrice = useConvertDollar(lamportsToSol(product.price));
   const dollarEarning = useConvertDollar(lamportsToSol(product.earning));
 
-  const confirm = async () =>  {
+  const confirm = async () => {
     try {
       await deleteTheme(product.id);
       message.success("Delete theme successfully");
       await loadData();
-    } catch(err) {
+    } catch (err) {
       message.error("Delete theme failed");
     }
-  }
+  };
 
   return (
     <tr key={key} className="border-b border-neutral-200">

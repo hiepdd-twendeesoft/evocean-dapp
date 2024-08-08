@@ -15,17 +15,17 @@ function PayoutPage() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-  const loadData = async () => {
-    const result = await queryClient.fetchQuery({
-      queryKey: ["get-dashboard-payout"],
-      queryFn: () =>
-        getDashboardPayout({
-          page: page,
-          take: INITIAL_TAKE,
-        }),
-    });
-    setPayouts(result.data);
-  };
+    const loadData = async () => {
+      const result = await queryClient.fetchQuery({
+        queryKey: ["get-dashboard-payout"],
+        queryFn: () =>
+          getDashboardPayout({
+            page: page,
+            take: INITIAL_TAKE,
+          }),
+      });
+      setPayouts(result.data);
+    };
 
     loadData();
   }, [page, queryClient]);
@@ -74,18 +74,18 @@ function PayoutPage() {
           </tbody>
         </table>
         <div className="flex justify-center mt-3">
-        <Pagination
-          total={10}
-          pageSize={INITIAL_TAKE}
-          current={page}
-          onChange={(page) => {
-            setPage(page);
-          }}
-          onShowSizeChange={(current, size) => {
-            setPage(size);
-          }}
-        />
-      </div>
+          <Pagination
+            total={10}
+            pageSize={INITIAL_TAKE}
+            current={page}
+            onChange={(page) => {
+              setPage(page);
+            }}
+            onShowSizeChange={(current, size) => {
+              setPage(size);
+            }}
+          />
+        </div>
       </div>
     </div>
   );

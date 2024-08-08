@@ -1,8 +1,4 @@
-
-
-  export interface IAccountInfo {
-    id: number;
-    email: string;
-  }
-  
-  
+export interface IAccountInfo {
+  id: number;
+  email: string;
+}

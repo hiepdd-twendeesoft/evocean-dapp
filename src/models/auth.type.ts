@@ -1,9 +1,8 @@
 export interface AuthResponse {
-    accessToken: string;
-    refreshToken: string;
-  }
+  accessToken: string;
+  refreshToken: string;
+}
 
-  export interface OAuthLoginDto {
-    access_token: string;
-  }
-  
+export interface OAuthLoginDto {
+  access_token: string;
+}

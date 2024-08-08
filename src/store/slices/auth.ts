@@ -1,46 +1,44 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from "@reduxjs/toolkit";
 
-import { IAccountInfo } from '@/models/user.type'
-import { RootState } from '.'
-import { googleLoginAction } from '../actions/auth'
-
+import { IAccountInfo } from "@/models/user.type";
+import { RootState } from ".";
+import { googleLoginAction } from "../actions/auth";
 
 interface IAuth {
-  accessToken?: string
-  accountInfo?: IAccountInfo | null,
-  isLogin: boolean,
-  loadings: Record<string, boolean | undefined>
+  accessToken?: string;
+  accountInfo?: IAccountInfo | null;
+  isLogin: boolean;
+  loadings: Record<string, boolean | undefined>;
 }
 
 const initialState: IAuth = {
   accountInfo: null,
   isLogin: false,
-  accessToken: '',
+  accessToken: "",
   loadings: {},
-}
+};
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState: initialState,
   reducers: {
     setAccessToken: (state, action) => {
-      state.accessToken = action.payload?.access_token
+      state.accessToken = action.payload?.access_token;
     },
     logout: () => {
-      return initialState
+      return initialState;
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(googleLoginAction.pending, (state) => {
-    })
+    builder.addCase(googleLoginAction.pending, (state) => {});
     builder.addCase(googleLoginAction.fulfilled, (state, action) => {
-      state.accessToken = action.payload?.accessToken
+      state.accessToken = action.payload?.accessToken;
       state.accountInfo = action.payload?.user;
       state.isLogin = true;
-    })
+    });
     builder.addCase(googleLoginAction.rejected, (state) => {
-      state.accessToken = ''
-    })
+      state.accessToken = "";
+    });
     // builder.addCase(googleLogoutAction.pending, (state) => {
     // })
     // builder.addCase(googleLogoutAction.fulfilled, (state, action) => {
@@ -51,13 +49,13 @@ const authSlice = createSlice({
     // builder.addCase(googleLogoutAction.rejected, (state) => {
     //   state.accessToken = ''
     // })
-  }
-})
+  },
+});
 
 export const authActions = {
   ...authSlice.actions,
-}
+};
 
-export const selectAuth = (state: RootState) => state.auth
+export const selectAuth = (state: RootState) => state.auth;
 
-export default authSlice.reducer
+export default authSlice.reducer;

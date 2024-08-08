@@ -10,7 +10,7 @@ const TabOwner = () => {
 
   const { data } = useFetchTheme(
     { page: 1, take: 60, author: wallet?.publicKey?.toBase58() },
-    !wallet?.publicKey
+    !wallet?.publicKey,
   );
 
   return (

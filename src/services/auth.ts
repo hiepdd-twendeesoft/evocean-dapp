@@ -6,6 +6,8 @@ import { AuthResponse, OAuthLoginDto } from "@/models/auth.type";
 //   api(`/auth/sign-in-google`, null, { method: "POST" }).then((res) => res);
 
 export async function googleLogin(body: OAuthLoginDto): Promise<any> {
-  return api(`/auth/sign-in-google`, body, { method: "POST" }).then((res) => res);
+  return api(`/auth/sign-in-google`, body, { method: "POST" }).then(
+    (res) => res,
+  );
   // return http.post(AuthApiEndPoints.GoogleLogin, body);
 }

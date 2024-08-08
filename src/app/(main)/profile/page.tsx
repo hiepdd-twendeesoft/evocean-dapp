@@ -9,7 +9,7 @@ import { shortenAddress } from "@/utils/helper";
 import { useParams, useRouter } from "next/navigation";
 
 const TabPurchase = lazy(
-  () => import("@/app/(main)/profile/components/TabPurchase")
+  () => import("@/app/(main)/profile/components/TabPurchase"),
 );
 const TabOwner = lazy(() => import("@/app/(main)/profile/components/TabOwner"));
 

@@ -17,7 +17,7 @@ const LoginPage = (props: Props) => {
 
   const quickRegisterRedirect = (
     oauthToken: string,
-    provider: "google" | "facebook"
+    provider: "google" | "facebook",
   ) => {
     redirect("/login");
   };
@@ -37,7 +37,7 @@ const LoginPage = (props: Props) => {
         await dispatch(
           googleLoginAction({
             access_token: access_token,
-          })
+          }),
         );
         router.push("/", { scroll: false });
       } catch (error: any) {

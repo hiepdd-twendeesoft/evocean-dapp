@@ -4,7 +4,7 @@ import { ApiThemes } from "./route";
 import { AxiosResponse } from "axios";
 
 export function fetchThemes(
-  params: FetchThemeParams
+  params: FetchThemeParams,
 ): Promise<ListData<ItemTheme>> {
   return api(ApiThemes.fetchThemes, null, {
     method: "GET",

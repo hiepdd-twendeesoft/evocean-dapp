@@ -4,7 +4,7 @@ import { ApiSales } from "./route";
 import { FetchSalesParams, ISaleItem } from "@/models/sale.type";
 
 export async function getDashboardSales(
-  params: FetchSalesParams
+  params: FetchSalesParams,
 ): Promise<ListData<ISaleItem>> {
   return api(ApiSales.fetchSales, null, {
     method: "GET",

@@ -66,7 +66,7 @@ function AddProductPage() {
 
     try {
       const result = await dispatch(
-        createCollectionAction(createCollectionDto)
+        createCollectionAction(createCollectionDto),
       ).unwrap();
       message.success("Create collection successfully");
       router.push("/admin/your-collections", { scroll: false });

@@ -8,10 +8,10 @@ import { useControlTab } from "@/hooks/useControlTab";
 import { TransactionTheme } from "@/models/common.type";
 
 const TabOverView = lazy(
-  () => import("@/app/(main)/detail/components/TabOverview")
+  () => import("@/app/(main)/detail/components/TabOverview"),
 );
 const TabTransaction = lazy(
-  () => import("@/app/(main)/detail/components/TabTransaction")
+  () => import("@/app/(main)/detail/components/TabTransaction"),
 );
 
 interface IProps {
