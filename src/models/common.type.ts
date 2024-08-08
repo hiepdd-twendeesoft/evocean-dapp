@@ -63,3 +63,9 @@ export type IUploadThemeRes = {
   thumbnail?: string;
   previews?: string[];
 };
+
+export interface IThemCategory {
+  id: number;
+  createdAt: Date;
+  name: string;
+}

@@ -8,7 +8,7 @@ export interface ITheme {
     thumbnail: string;
     figma_features: any[];
     template_features: any[];
-    categories: string[];
+    categories: number[];
     format: string[];
     hightlight: string[];
     live_preview: string;
@@ -47,8 +47,11 @@ export type TCreateTheme = {
   thumbnail_link?: string;
   template_features: string[];
   figma_features: string[];
+  highlightFeature?: string[];
   status?: EThemeStatus;
   percentageOfOwnership: number;
+  livePreviewLink?: string;
+  videoEmbed?: string;
 };
 
 export type TCreateThemeSchema = {
@@ -59,10 +62,15 @@ export type TCreateThemeSchema = {
   template_features: string;
   figma_features: string;
   percentageOfOwnership: number;
+  highlightFeature?: string[];
+  livePreviewLink?: string;
+  videoEmbed?: string;
+  categories?: number[];
+  tags?: number[];
 };
 
 export enum EThemeStatus {
-  DRAFT = "DRAFT",
-  PENDING = "PENDING",
-  APPROVED = "APPROVED",
+  DRAFT = 'DRAFT',
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED'
 }
