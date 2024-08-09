@@ -1,9 +1,6 @@
 // eslint-disable-next-line react-hooks/exhaustive-deps
 "use client";
 
-
-
-
 import ItemNft from "@/components/itemNft";
 import { Route } from "@/constants/route";
 import useConvertDollar from "@/hooks/useConvertDollar";
@@ -35,12 +32,12 @@ const DetailThemePage = () => {
   const wallet = useAnchorWallet();
   const { push } = useRouter();
   const { isLogin, accountInfo } = useSelector(
-    (state: RootState) => state.auth
+    (state: RootState) => state.auth,
   );
 
   const { id } = useParams<{ id: string }>();
 
-  console.log('id', id)
+  console.log("id", id);
 
   const { data, refetch } = useQuery({
     queryKey: ["get-theme", id],
@@ -50,7 +47,7 @@ const DetailThemePage = () => {
   const usdAmount = useConvertDollar(lamportsToSol(data?.sale?.price));
 
   const isBuy = data?.owner_addresses?.some(
-    (item) => item === wallet?.publicKey?.toBase58()
+    (item) => item === wallet?.publicKey?.toBase58(),
   );
 
   const isOwner = data?.author_address === wallet?.publicKey?.toBase58();
@@ -83,7 +80,7 @@ const DetailThemePage = () => {
     }
     router.push(
       `/detail/${id}/payment/eth/${data?.author_address}/${usdAmount}`,
-      { scroll: false }
+      { scroll: false },
     );
   };
 
@@ -96,7 +93,7 @@ const DetailThemePage = () => {
         return toast(
           isOwner
             ? "You already own the product"
-            : "You have purchased the product"
+            : "You have purchased the product",
         );
       }
       if (!data?.sale) {
@@ -109,7 +106,7 @@ const DetailThemePage = () => {
           fromPubkey: provider.wallet.publicKey,
           toPubkey: new PublicKey(data.author_address),
           lamports: Number(data.sale.price),
-        })
+        }),
       );
 
       const signal = await provider.sendAndConfirm(transaction);
@@ -134,7 +131,7 @@ const DetailThemePage = () => {
 
   const handleGetSignature = async (url: string): Promise<string> => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/themes/payment?url=${url}`
+      `${process.env.NEXT_PUBLIC_API_URL}/themes/payment?url=${url}`,
     );
     console.log("response", response.url);
     return response.url as string;
@@ -210,13 +207,12 @@ const DetailThemePage = () => {
               {isLogin && (
                 <div
                   onClick={() => {
-                    handleBuy()
+                    handleBuy();
                   }}
                   className="h-[50px] flex-1 flex items-center justify-center rounded-[12px]  border-[1px] cursor-pointer hover:bg-indigo-800 duration-200 bg-indigo-600"
                 >
                   <p className="text-white font-semibold text-base mr-3">
-                    Buy for {usdAmount}
-                    $
+                    Buy for {usdAmount}$
                   </p>
                 </div>
               )}

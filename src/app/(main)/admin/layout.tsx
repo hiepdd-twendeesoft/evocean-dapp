@@ -1,7 +1,5 @@
-import { Aside } from "@/components/admin/Aside";
-import Footer from "@/components/footer";
-import TabBar from "@/components/tabBar";
-import { FC, PropsWithChildren } from "react";
+import { Aside } from '@/components/admin/Aside';
+import { FC, PropsWithChildren } from 'react';
 
 const AppLayout: FC<PropsWithChildren> = ({ children }) => {
   return (

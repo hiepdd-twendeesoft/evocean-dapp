@@ -30,7 +30,7 @@ const ItemRowProduct: FC<IProps> = ({
 
   const handleHistory = () =>
     window.open(
-      `https://explorer.solana.com/address/${token_mint}?cluster=devnet`
+      `https://explorer.solana.com/address/${token_mint}?cluster=devnet`,
     );
 
   return (

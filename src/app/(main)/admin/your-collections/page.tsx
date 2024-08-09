@@ -28,16 +28,15 @@ function ProductPage() {
     loadData();
   }, [page, queryClient]);
 
-
-  const confirm = async (collection_id: number) =>  {
+  const confirm = async (collection_id: number) => {
     try {
       await deleteCollection(collection_id);
       message.success("Delete collection successfully");
       await loadData();
-    } catch(err) {
+    } catch (err) {
       message.error("Delete collection failed");
     }
-  }
+  };
 
   return (
     <div>

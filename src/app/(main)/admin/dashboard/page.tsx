@@ -20,17 +20,31 @@ function DashboardPage() {
     queryFn: () => getDashboard(),
   });
 
-  console.log("statistic", statistic);
-
-  const selling = statistic?.data?.getSellingByYear?.map((item: any) => item.total_price) || [] 
-  const owned = statistic?.data?.getOwnedByYear?.map((item: any) => item.total_price) || [] 
+  const selling =
+    statistic?.data?.getSellingByYear?.map((item: any) => item.total_price) ||
+    [];
+  const owned =
+    statistic?.data?.getOwnedByYear?.map((item: any) => item.total_price) || [];
 
   const total = selling.map((item: number, index: number) => {
-    return item + owned[index]
-  }) 
+    return item + owned[index];
+  });
 
   const data = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
     datasets: [
       {
         label: "Total",
@@ -69,7 +83,7 @@ function DashboardPage() {
             <h1 className="text-[#9CA3AF]">$</h1>
             <h1 className="text-[#111827]">
               {useConvertDollar(
-                lamportsToSol(statistic?.data?.sellingTotal || 0)
+                lamportsToSol(statistic?.data?.sellingTotal || 0),
               )}
             </h1>
           </div>
@@ -85,7 +99,8 @@ function DashboardPage() {
           </div>
           <div className="mt-[32px] flex items-center justify-between">
             <div className="w-[60%] text-[#4B5563]">
-              You selled total {statistic?.data?.sellingNumber} items started from 20 May 2024.
+              You selled total {statistic?.data?.sellingNumber} items started
+              from 20 May 2024.
             </div>
             <button className="w-[34%] flex justify-center items-center px-[17px] py-[9px] border-r border-solid border-[1px] rounded-[12px]">
               View sales
@@ -100,7 +115,7 @@ function DashboardPage() {
             <h1 className="text-[#9CA3AF]">$</h1>
             <h1 className="text-[#111827]">
               {useConvertDollar(
-                lamportsToSol(statistic?.data?.sellingOwnerTotal || 0)
+                lamportsToSol(statistic?.data?.sellingOwnerTotal || 0),
               )}
             </h1>
           </div>
@@ -116,7 +131,8 @@ function DashboardPage() {
           </div>
           <div className="mt-[32px] flex items-center justify-between rounded-[24px]">
             <div className="w-[60%] text-[#4B5563]">
-              Your {statistic?.data?.sellingOwnerProductNumber} owned product has produced {statistic?.data?.sellingOwnerProduct} sales.
+              Your {statistic?.data?.sellingOwnerProductNumber} owned product
+              has produced {statistic?.data?.sellingOwnerProduct} sales.
             </div>
             <button className="w-[34%] flex justify-center items-center px-[17px] py-[9px] border-r border-solid border-[1px] rounded-[12px]">
               View owned
@@ -131,7 +147,7 @@ function DashboardPage() {
             <h1 className="text-[#9CA3AF]">$</h1>
             <h1 className="text-[#111827]">
               {useConvertDollar(
-                lamportsToSol(statistic?.data?.totalPayout || 0)
+                lamportsToSol(statistic?.data?.totalPayout || 0),
               )}
             </h1>
           </div>

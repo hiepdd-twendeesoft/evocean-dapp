@@ -1,7 +1,8 @@
 import { Strorages } from "@/models/storage.enum";
 import axios, { AxiosRequestConfig } from "axios";
 
-const apiServerUrl = process.env.NEXT_PUBLIC_API_URL || "https://moonkit.twendeesoft.com";
+const apiServerUrl =
+  process.env.NEXT_PUBLIC_API_URL || "https://moonkit.twendeesoft.com";
 // const apiServerUrl = "https://22c0-222-252-11-28.ngrok-free.app";
 // const apiServerUrl = "http://localhost:8000";
 
@@ -12,14 +13,14 @@ export const getAxiosInstance = async () => {
   // }
 
   const accessToken = localStorage
-  .getItem(Strorages.AccessToken)
-  ?.replace(/^"(.*)"$/, '$1');
+    .getItem(Strorages.AccessToken)
+    ?.replace(/^"(.*)"$/, "$1");
 
   const axiosInstance = axios.create({
     baseURL: apiServerUrl,
     headers: {
       Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     timeout: 15000,
   });

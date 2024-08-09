@@ -53,9 +53,9 @@ function AddProductPage() {
       setValue("owner_price", Number(data.listing?.price));
       setValue("template_features", data.media?.template_features?.join(", "));
       setValue("figma_features", data.media?.figma_features?.join(", "));
-      setTheme(data.zip_link)
-      setThumbnail(data.media.thumbnail)
-      setPreviews(data.media.previews)
+      setTheme(data.zip_link);
+      setThumbnail(data.media.thumbnail);
+      setPreviews(data.media.previews);
     }
   }, [data]);
 
@@ -144,7 +144,7 @@ function AddProductPage() {
 
   const handleChangeThemeZip = async (
     e: ChangeEvent<HTMLInputElement>,
-    allowFileTypes: string[]
+    allowFileTypes: string[],
   ) => {
     if (!e.target.files || e.target.files.length === 0) {
       return;
@@ -260,8 +260,12 @@ function AddProductPage() {
                     <div>
                       <h3 className="font-medium">Single product</h3>
                       <p className="mt-1">
-                        {theme 
-                          ? themeFile ? `${themeFile.name} (${themeFile.size}MB)` : theme.split(RegExp('%2..*%2F(.*?)\?alt'))?.[1]?.split(".")[0]
+                        {theme
+                          ? themeFile
+                            ? `${themeFile.name} (${themeFile.size}MB)`
+                            : theme
+                                .split(RegExp("%2..*%2F(.*?)?alt"))?.[1]
+                                ?.split(".")[0]
                           : `
                           Any set of files to download that contain a single type of category
                           
@@ -538,9 +542,14 @@ function AddProductPage() {
               classes={"h-[700px] w-[50%]"}
             />
             <div className="flex flex-wrap gap-2">
-              {previews && previews.map((item, index) => (
-                <img key={index} className="w-[24%] h-[250px] object-cover" src={item} />
-              ))}
+              {previews &&
+                previews.map((item, index) => (
+                  <img
+                    key={index}
+                    className="w-[24%] h-[250px] object-cover"
+                    src={item}
+                  />
+                ))}
             </div>
           </ul>
         </div>

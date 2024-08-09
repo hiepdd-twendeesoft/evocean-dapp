@@ -10,7 +10,10 @@ import { FetchThemeParams } from "@/models/common.type";
 import { IThemeItem } from "@/models/theme.type";
 import { fetchCollection } from "@/services/collection";
 import { fetchThemes } from "@/services/theme";
-import { createCollectionAction, updateCollectionAction } from "@/store/actions/collection";
+import {
+  createCollectionAction,
+  updateCollectionAction,
+} from "@/store/actions/collection";
 import { useAppDispatch } from "@/store/store";
 import { createCollectionSchema } from "@/validation/admin/collection.validation";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -29,7 +32,7 @@ function AddProductPage() {
     formState: { errors },
     getValues,
     control,
-    setValue
+    setValue,
   } = useForm<TCreateCollectionSChema>({
     resolver: yupResolver(createCollectionSchema),
   });
@@ -37,7 +40,7 @@ function AddProductPage() {
   const [themes, setThemes] = useState<IThemeItem[]>();
   const [search, setSearch] = useState<string>("");
   const [collection, setCollection] = useState<ICollection>();
-  const [selectedValue, setSelectedValue]= useState<any[]>([]);
+  const [selectedValue, setSelectedValue] = useState<any[]>([]);
   const queryClient = useQueryClient();
   const [page, setPage] = useState(INITIAL_PAGE);
   const { id } = useParams<{ id: string }>();
@@ -67,14 +70,14 @@ function AddProductPage() {
         queryFn: () => fetchCollection(Number(id)),
       });
       setCollection(collection);
-      const collectionNames = collection?.themes?.map(item => {
+      const collectionNames = collection?.themes?.map((item) => {
         return {
           value: item.id,
-          label: item.name
-        }
+          label: item.name,
+        };
       });
-      
-      setSelectedValue(collectionNames)
+
+      setSelectedValue(collectionNames);
     };
 
     loadData();
@@ -83,20 +86,20 @@ function AddProductPage() {
   useEffect(() => {
     if (collection) {
       // setTheme(collection.)
-      setValue('collection_name', collection.name);
+      setValue("collection_name", collection.name);
     }
   }, [collection]);
 
   const onSubmit: SubmitHandler<TCreateCollectionSChema> = async (data) => {
     const createCollectionDto: TCreateCollection = {
       ...data,
-      theme_ids: selectedValue.map(item => Number(item.value)),
-      id: Number(id)
+      theme_ids: selectedValue.map((item) => Number(item.value)),
+      id: Number(id),
     };
 
     try {
       const result = await dispatch(
-        updateCollectionAction(createCollectionDto)
+        updateCollectionAction(createCollectionDto),
       ).unwrap();
       message.success("Update collection successfully");
       router.push("/admin/your-collections", { scroll: false });
@@ -124,10 +127,10 @@ function AddProductPage() {
     // setThemeIds
     // setSelectedValue()
     console.log(object);
-    setSelectedValue(object)
+    setSelectedValue(object);
   };
 
-  console.log('selectedValue', selectedValue)
+  console.log("selectedValue", selectedValue);
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onError)}>

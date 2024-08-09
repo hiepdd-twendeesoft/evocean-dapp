@@ -17,7 +17,7 @@ const TabBar = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isLogin, accountInfo } = useSelector(
-    (state: RootState) => state.auth
+    (state: RootState) => state.auth,
   );
   const [domLoaded, setDomLoaded] = useState(false);
   const [showOption, setShowOption] = useState<boolean>(false);

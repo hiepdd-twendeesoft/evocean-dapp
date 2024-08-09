@@ -45,7 +45,7 @@ const DetailProduct = () => {
 
   const program = new Program(
     idl as Marketplace,
-    new PublicKey(MARKET_CONTRACT_ADDRESS)
+    new PublicKey(MARKET_CONTRACT_ADDRESS),
   );
 
   const handleList = async () => {
@@ -57,22 +57,22 @@ const DetailProduct = () => {
     }
     try {
       const tokenMint = new web3.PublicKey(
-        data?.token_mint || "" //token_mint
+        data?.token_mint || "", //token_mint
       );
 
       const [listingAccount] = web3.PublicKey.findProgramAddressSync(
         [Buffer.from("listing_account_"), tokenMint.toBuffer()],
-        program.programId
+        program.programId,
       );
 
       const [marketTokenAccount] = web3.PublicKey.findProgramAddressSync(
         [Buffer.from("market_token_account_"), tokenMint.toBuffer()],
-        program.programId
+        program.programId,
       );
 
       const tokenAccount = getAssociatedTokenAddressSync(
         tokenMint,
-        wallet.publicKey
+        wallet.publicKey,
       );
 
       const instruction = await program.methods

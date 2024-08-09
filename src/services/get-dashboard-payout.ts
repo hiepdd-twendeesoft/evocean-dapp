@@ -4,7 +4,7 @@ import { FetchPayoutsParams, IPayoutItem } from "@/models/payout.type";
 import { ApiPayouts, ApiThemes } from "./route";
 
 export async function getDashboardPayout(
-  params: FetchPayoutsParams
+  params: FetchPayoutsParams,
 ): Promise<ListData<IPayoutItem>> {
   return api(ApiPayouts.fetchPayouts, null, {
     method: "GET",
