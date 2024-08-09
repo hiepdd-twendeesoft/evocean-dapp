@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
 import {
   EThemeStatus,
   TCreateTheme,
-  TCreateThemeSchema,
-} from "@/models/theme.type";
-import { getTheme } from "@/services/get-theme-detail";
-import { fetchTheme, uploadTheme } from "@/services/theme";
-import { createThemeAction, updateThemeAction } from "@/store/actions/theme";
-import { useAppDispatch } from "@/store/store";
-import { createThemeSchema } from "@/validation/admin/theme.validation";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useQuery } from "@tanstack/react-query";
-import { Input, message } from "antd";
-import TextArea from "antd/es/input/TextArea";
-import { useParams, useRouter } from "next/navigation";
-import { ChangeEvent, useEffect, useState } from "react";
-import { FileUploader } from "react-drag-drop-files";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+  TCreateThemeSchema
+} from '@/models/theme.type';
+import { getTheme } from '@/services/get-theme-detail';
+import { fetchTheme, uploadTheme } from '@/services/theme';
+import { createThemeAction, updateThemeAction } from '@/store/actions/theme';
+import { useAppDispatch } from '@/store/store';
+import { createThemeSchema } from '@/validation/admin/theme.validation';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useQuery } from '@tanstack/react-query';
+import { Input, message } from 'antd';
+import TextArea from 'antd/es/input/TextArea';
+import { useParams, useRouter } from 'next/navigation';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { FileUploader } from 'react-drag-drop-files';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
 function AddProductPage() {
   const dispatch = useAppDispatch();
@@ -27,9 +27,9 @@ function AddProductPage() {
     watch,
     formState: { errors },
     setValue,
-    control,
+    control
   } = useForm<TCreateThemeSchema>({
-    resolver: yupResolver(createThemeSchema),
+    resolver: yupResolver(createThemeSchema)
   });
   const [theme, setTheme] = useState<string>();
   const [themeFile, setThemeFile] = useState<File>();
@@ -40,26 +40,26 @@ function AddProductPage() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
   const { data, refetch } = useQuery({
-    queryKey: ["get-theme", id],
-    queryFn: () => fetchTheme(Number(id)),
+    queryKey: ['get-theme', id],
+    queryFn: () => fetchTheme(Number(id))
   });
 
   useEffect(() => {
     if (data) {
       // setTheme(data.)
-      setValue("name", data.name);
-      setValue("overview", data.overview);
-      setValue("selling_price", Number(data.sale?.price));
-      setValue("owner_price", Number(data.listing?.price));
-      setValue("template_features", data.media?.template_features?.join(", "));
-      setValue("figma_features", data.media?.figma_features?.join(", "));
+      setValue('name', data.name);
+      setValue('overview', data.overview);
+      setValue('selling_price', Number(data.sale?.price));
+      setValue('owner_price', Number(data.listing?.price));
+      setValue('template_features', data.media?.template_features?.join(', '));
+      setValue('figma_features', data.media?.figma_features?.join(', '));
       setTheme(data.zip_link);
       setThumbnail(data.media.thumbnail);
       setPreviews(data.media.previews);
     }
   }, [data]);
 
-  const onSubmit: SubmitHandler<TCreateThemeSchema> = async (data) => {
+  const onSubmit: SubmitHandler<TCreateThemeSchema> = async data => {
     // if (!theme) {
     //   message.error({
     //     content: "Product is required",
@@ -82,11 +82,11 @@ function AddProductPage() {
     // }
 
     const template_features = data.template_features
-      .split(", ")
-      .map((item) => item.trim());
+      .split(', ')
+      .map(item => item.trim());
     const figma_features = data.figma_features
-      .split(", ")
-      .map((item) => item.trim());
+      .split(', ')
+      .map(item => item.trim());
 
     const createThemeDto: TCreateTheme = {
       ...data,
@@ -96,14 +96,14 @@ function AddProductPage() {
       template_features,
       figma_features,
       status,
-      id: Number(id),
-    };
+      id: Number(id)
+    } as any;
 
     try {
-      console.log("updateThemeDto", createThemeDto);
+      console.log('updateThemeDto', createThemeDto);
       const result = await dispatch(updateThemeAction(createThemeDto)).unwrap();
-      message.success("Update theme successfully");
-      router.push("/admin/your-products", { scroll: false });
+      message.success('Update theme successfully');
+      router.push('/admin/your-products', { scroll: false });
     } catch (error: any) {
       message.error(error.message);
     }
@@ -112,39 +112,39 @@ function AddProductPage() {
   const onError = (error: any) => {
     console.log(Object.values(error));
     for (const item of Object.values(error) as any) {
-      message.error(item["message"]);
+      message.error(item['message']);
     }
   };
 
-  const thumbnailTypes = ["JPG", "PNG", "GIF"];
+  const thumbnailTypes = ['JPG', 'PNG', 'GIF'];
   const handleChangeThumbnail = async (file: any) => {
     try {
       const result = await uploadTheme({
-        thumbnail: file,
+        thumbnail: file
       });
       setThumbnail(result.data.thumbnail);
-      message.success("Update thumbnail successfully");
+      message.success('Update thumbnail successfully');
     } catch (err) {
-      message.error("Update thumbnail failed");
+      message.error('Update thumbnail failed');
     }
   };
 
-  const previewsTypes = ["JPG", "PNG", "GIF"];
+  const previewsTypes = ['JPG', 'PNG', 'GIF'];
   const handleChangePreviews = async (file: any) => {
     try {
       const result = await uploadTheme({
-        previews: file,
+        previews: file
       });
       setPreviews(result.data.previews);
-      message.success("Update previews successfully");
+      message.success('Update previews successfully');
     } catch (err) {
-      message.error("Update previews failed");
+      message.error('Update previews failed');
     }
   };
 
   const handleChangeThemeZip = async (
     e: ChangeEvent<HTMLInputElement>,
-    allowFileTypes: string[],
+    allowFileTypes: string[]
   ) => {
     if (!e.target.files || e.target.files.length === 0) {
       return;
@@ -153,8 +153,8 @@ function AddProductPage() {
     const isMatchMediaType = allowFileTypes.includes(file.type);
 
     const allowedInputType = allowFileTypes
-      ?.map((item, index) => item.split("/")[1])
-      ?.join("/")
+      ?.map((item, index) => item.split('/')[1])
+      ?.join('/')
       ?.toUpperCase();
 
     if (!isMatchMediaType) {
@@ -163,29 +163,29 @@ function AddProductPage() {
     }
     try {
       const result = await uploadTheme({
-        zip_file: e.target.files[0],
+        zip_file: e.target.files[0]
       });
       setThemeFile(e.target.files[0]);
       setTheme(result.data.zip_file);
-      message.success("Update theme zip successfully");
+      message.success('Update theme zip successfully');
     } catch (err) {
-      message.error("Update theme zip failed");
+      message.error('Update theme zip failed');
     }
   };
 
   const navLinks = [
     {
-      title: "Overview",
+      title: 'Overview'
     },
     {
-      title: "Features",
+      title: 'Features'
     },
     {
-      title: "Images",
+      title: 'Images'
     },
     {
-      title: "File",
-    },
+      title: 'File'
+    }
   ];
 
   const NavLinkComponent = () => {
@@ -200,15 +200,15 @@ function AddProductPage() {
             <span
               className={`w-[40px] flex items-center justify-center h-[40px] border border-1 rounded-[50%] ${
                 index === tab
-                  ? "border-[#4F46E5] text-[#4F46E5]"
-                  : "border-[#6B7280] text-[#6B7280]"
+                  ? 'border-[#4F46E5] text-[#4F46E5]'
+                  : 'border-[#6B7280] text-[#6B7280]'
               }`}
             >
               {index + 1}
             </span>
             <p
               className={`${
-                index === tab ? "text-[#4F46E5]" : "text-[#6B7280]"
+                index === tab ? 'text-[#4F46E5]' : 'text-[#6B7280]'
               }`}
             >
               {item.title}
@@ -255,7 +255,7 @@ function AddProductPage() {
                     htmlFor="single-theme"
                   >
                     <div className="pt-1">
-                      <img src={"/assets/image/admin/upload-single.svg"} />
+                      <img src={'/assets/image/admin/upload-single.svg'} />
                     </div>
                     <div>
                       <h3 className="font-medium">Single product</h3>
@@ -264,8 +264,8 @@ function AddProductPage() {
                           ? themeFile
                             ? `${themeFile.name} (${themeFile.size}MB)`
                             : theme
-                                .split(RegExp("%2..*%2F(.*?)?alt"))?.[1]
-                                ?.split(".")[0]
+                                .split(RegExp('%2..*%2F(.*?)?alt'))?.[1]
+                                ?.split('.')[0]
                           : `
                           Any set of files to download that contain a single type of category
                           
@@ -277,9 +277,7 @@ function AddProductPage() {
                     id="single-theme"
                     type="file"
                     className="hidden"
-                    onChange={(e) =>
-                      handleChangeThemeZip(e, ["application/zip"])
-                    }
+                    onChange={e => handleChangeThemeZip(e, ['application/zip'])}
                   />
                   {/* <Input id="single-theme" type="file" className="hidden"/> */}
                 </li>
@@ -289,7 +287,7 @@ function AddProductPage() {
                     htmlFor="multiple-theme"
                   >
                     <div className="pt-1">
-                      <img src={"/assets/image/admin/upload-bundle.svg"} />
+                      <img src={'/assets/image/admin/upload-bundle.svg'} />
                     </div>
                     <div>
                       <h3 className="font-medium">Bundle</h3>
@@ -324,8 +322,8 @@ function AddProductPage() {
                         className="w-[100%] px-[13px] py-[9px] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
                         type="text"
                         {...field}
-                        status={errors.name?.message ? "error" : ""}
-                        placeholder={errors.name?.message || ""}
+                        status={errors.name?.message ? 'error' : ''}
+                        placeholder={errors.name?.message || ''}
                       />
                     )}
                   />
@@ -340,10 +338,10 @@ function AddProductPage() {
                       <TextArea
                         className="w-[100%] h-[100px] px-[13px] py-[9px] border text-[#64748B] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
                         {...field}
-                        status={errors.overview?.message ? "error" : ""}
+                        status={errors.overview?.message ? 'error' : ''}
                         placeholder={
                           errors.overview?.message ||
-                          "Something about your product..."
+                          'Something about your product...'
                         }
                       />
                     )}
@@ -370,8 +368,8 @@ function AddProductPage() {
                           className="w-[100%] px-[13px] py-[9px] rounded-r-[8px] outline-[#D1D5DB]"
                           type="text"
                           {...field}
-                          status={errors.selling_price?.message ? "error" : ""}
-                          placeholder={errors.selling_price?.message || "1.00"}
+                          status={errors.selling_price?.message ? 'error' : ''}
+                          placeholder={errors.selling_price?.message || '1.00'}
                         />
                       )}
                     />
@@ -394,8 +392,8 @@ function AddProductPage() {
                           className="w-[100%] px-[13px] py-[9px] rounded-r-[8px] outline-[#D1D5DB]"
                           type="text"
                           {...field}
-                          status={errors.owner_price?.message ? "error" : ""}
-                          placeholder={errors.owner_price?.message || "1.00"}
+                          status={errors.owner_price?.message ? 'error' : ''}
+                          placeholder={errors.owner_price?.message || '1.00'}
                         />
                       )}
                     />
@@ -406,11 +404,11 @@ function AddProductPage() {
                 </li>
                 <li className="w-full">
                   <div className="flex">
-                    <img src={"/assets/image/admin/note.svg"} />
+                    <img src={'/assets/image/admin/note.svg'} />
                     <p className="pl-1">What is ownership?</p>
                   </div>
                   <div className="flex mt-1">
-                    <img src={"/assets/image/admin/note.svg"} />
+                    <img src={'/assets/image/admin/note.svg'} />
                     <p className="pl-1">How my author price being share?</p>
                   </div>
                 </li>
@@ -442,49 +440,49 @@ function AddProductPage() {
                 <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
                   <img
                     className="w-[16px]"
-                    src={"/assets/image/admin/figma.svg"}
+                    src={'/assets/image/admin/figma.svg'}
                   />
                   <h2>Figma</h2>
                 </li>
                 <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
                   <img
                     className="w-[16px]"
-                    src={"/assets/image/admin/framer.svg"}
+                    src={'/assets/image/admin/framer.svg'}
                   />
                   <h2>Framer</h2>
                 </li>
                 <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
                   <img
                     className="w-[16px]"
-                    src={"/assets/image/admin/blender.svg"}
+                    src={'/assets/image/admin/blender.svg'}
                   />
                   <h2>Blender</h2>
                 </li>
                 <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
                   <img
                     className="w-[16px]"
-                    src={"/assets/image/admin/html.svg"}
+                    src={'/assets/image/admin/html.svg'}
                   />
                   <h2>HTML</h2>
                 </li>
                 <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
                   <img
                     className="w-[16px]"
-                    src={"/assets/image/admin/powerpoint.svg"}
+                    src={'/assets/image/admin/powerpoint.svg'}
                   />
                   <h2>Powerpoint</h2>
                 </li>
                 <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
                   <img
                     className="w-[16px]"
-                    src={"/assets/image/admin/photoshop.svg"}
+                    src={'/assets/image/admin/photoshop.svg'}
                   />
                   <h2>Photoshop</h2>
                 </li>
                 <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
                   <img
                     className="w-[16px]"
-                    src={"/assets/image/admin/illustrator.svg"}
+                    src={'/assets/image/admin/illustrator.svg'}
                   />
                   <h2>Illustrator</h2>
                 </li>
@@ -505,8 +503,8 @@ function AddProductPage() {
                   className="w-[100%] px-[13px] py-[9px] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
                   type="text"
                   {...field}
-                  status={errors.template_features?.message ? "error" : ""}
-                  placeholder={errors.template_features?.message || ""}
+                  status={errors.template_features?.message ? 'error' : ''}
+                  placeholder={errors.template_features?.message || ''}
                 />
               )}
             />
@@ -521,8 +519,8 @@ function AddProductPage() {
                   className="w-[100%] px-[13px] py-[9px] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
                   type="text"
                   {...field}
-                  status={errors.figma_features?.message ? "error" : ""}
-                  placeholder={errors.figma_features?.message || ""}
+                  status={errors.figma_features?.message ? 'error' : ''}
+                  placeholder={errors.figma_features?.message || ''}
                 />
               )}
             />
@@ -539,7 +537,7 @@ function AddProductPage() {
               dsds
               types={previewsTypes}
               multiple
-              classes={"h-[700px] w-[50%]"}
+              classes={'h-[700px] w-[50%]'}
             />
             <div className="flex flex-wrap gap-2">
               {previews &&
