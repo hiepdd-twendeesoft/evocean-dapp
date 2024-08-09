@@ -24,6 +24,10 @@ import CheckIcon from '../../../../../public/assets/icon/CheckIcon';
 import DoubleLine from '../../../../../public/assets/icon/DoubleLineIcon';
 import useFetchAllTags from '@/hooks/useFetchAllTags';
 import UploadFile from '@/components/common/UploadFile';
+import ReactImageUploading, { ImageListType } from 'react-images-uploading';
+import Image from 'next/image';
+import { CloseOutlined } from '@ant-design/icons';
+import { NAV_LINKS } from '@/types/common';
 
 function AddProductPage() {
   const dispatch = useAppDispatch();
@@ -39,33 +43,46 @@ function AddProductPage() {
   });
   const [theme, setTheme] = useState<string>();
   const [themeFile, setThemeFile] = useState<File>();
-  const [previews, setPreviews] = useState<string[]>();
+  const [coverImage, setCoverImage] = useState<ImageListType>([]);
+  const [detailImages, setDetailImages] = useState<ImageListType>([]);
+  const [fullPreviews, setFullPreViewImages] = useState<ImageListType>([]);
   const [thumbnail, setThumbnail] = useState<string>();
   const [tab, setTab] = useState<EProductTab>(EProductTab.OVERVIEW);
   const [status, setStatus] = useState<EThemeStatus>(EThemeStatus.DRAFT);
   const router = useRouter();
 
   const onSubmit: SubmitHandler<TCreateThemeSchema> = async data => {
-    if (!theme) {
-      message.error({
-        content: 'Product is required'
-      });
-      return;
-    }
+    switch (true) {
+      case !theme:
+        message.error({ content: 'Product is required' });
+        break;
 
-    if (!previews) {
-      message.error({
-        content: 'Previews is required'
-      });
-      return;
-    }
+      case !thumbnail:
+        message.error({ content: 'Thumbnail is required' });
 
-    if (!thumbnail) {
-      message.error({
-        content: 'Thumbnail is required'
-      });
-      return;
+      case isEmpty(coverImage):
+        message.error({ content: 'Cover image is required' });
+
+      case isEmpty(detailImages):
+        message.error({ content: 'Detail image is required' });
+
+      case isEmpty(fullPreviews):
+        message.error({ content: 'Preview image is required' });
+        break;
+      default:
+        break;
     }
+    const coverImageCreated: any = await uploadTheme({
+      thumbnail: coverImage[0].file
+    });
+
+    const previewsImages: any = await uploadTheme({
+      previews: fullPreviews.map(item => item.file)
+    });
+
+    const detailImage: any = await uploadTheme({
+      previews: detailImages.map(item => item.file)
+    });
 
     const template_features = data.template_features
       .split(', ')
@@ -77,11 +94,13 @@ function AddProductPage() {
     const createThemeDto: TCreateTheme = {
       ...data,
       zip_link: theme,
-      previews_links: previews,
       thumbnail_link: thumbnail,
       template_features,
       figma_features,
-      status
+      status,
+      coverImages: [coverImageCreated.data.thumbnail],
+      fullPreviewImages: previewsImages.data.previews,
+      detailImages: detailImage.data.previews
     };
 
     try {
@@ -90,6 +109,7 @@ function AddProductPage() {
       router.push('/admin/dashboard', { scroll: false });
     } catch (error: any) {
       message.error(error.message);
+      console.log(error);
     }
   };
 
@@ -99,7 +119,7 @@ function AddProductPage() {
     }
   };
 
-  const thumbnailTypes = ['JPG', 'PNG', 'GIF'];
+  const productImageAcceptTypes = ['JPG', 'PNG', 'GIF'];
   const handleChangeThumbnail = async (file: any) => {
     try {
       const result = await uploadTheme({
@@ -109,19 +129,6 @@ function AddProductPage() {
       message.success('Update thumbnail successfully');
     } catch (err) {
       message.error('Update thumbnail failed');
-    }
-  };
-
-  const previewsTypes = ['JPG', 'PNG', 'GIF'];
-  const handleChangePreviews = async (file: any) => {
-    try {
-      const result = await uploadTheme({
-        previews: file
-      });
-      setPreviews(result.data.previews);
-      message.success('Update previews successfully');
-    } catch (err) {
-      message.error('Update previews failed');
     }
   };
 
@@ -156,25 +163,6 @@ function AddProductPage() {
     }
   };
 
-  const navLinks = [
-    {
-      title: 'Overview',
-      value: EProductTab.OVERVIEW
-    },
-    {
-      title: 'Features',
-      value: EProductTab.FEATURES
-    },
-    {
-      title: 'Upload Images',
-      value: EProductTab.UPLOAD_IMAGE
-    },
-    {
-      title: 'Upload File',
-      value: EProductTab.UPLOAD_FILE
-    }
-  ];
-
   const getColorIcon = useCallback((value: string[], index: number) => {
     return isEmpty(value ? value[index] : '') ? '#E4E4E7' : '#4338CA';
   }, []);
@@ -185,7 +173,7 @@ function AddProductPage() {
   const NavLinkComponent = () => {
     return (
       <ul className="flex items-center font-medium mt-[32px] gap-10">
-        {navLinks.map((item, index) => (
+        {NAV_LINKS.map((item, index) => (
           <li
             key={index}
             onClick={() => setTab(item.value)}
@@ -259,10 +247,7 @@ function AddProductPage() {
                       <p className="mt-1">
                         {theme && themeFile
                           ? `${themeFile.name} (${themeFile.size}MB)`
-                          : `
-                          Any set of files to download that contain a single type of category
-                          
-                          `}
+                          : `Any set of files to download that contain a single type of category`}
                       </p>
                     </div>
                   </label>
@@ -272,37 +257,7 @@ function AddProductPage() {
                     className="hidden"
                     onChange={e => handleChangeThemeZip(e, ['application/zip'])}
                   />
-                  {/* <Input id="single-theme" type="file" className="hidden"/> */}
                 </li>
-                {/* <li className="flex w-[50%] cursor-pointer gap-2 justify-start p-[20px] border border-[#D1D5DB] border-2 rounded-[8px]">
-                  <label
-                    className="flex gap-2 cursor-pointer"
-                    htmlFor="multiple-theme"
-                  >
-                    <div className="pt-1">
-                      <img src={"/assets/image/admin/upload-bundle.svg"} />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Bundle</h3>
-                      <p className="mt-1">
-                        Sell two or more existing products as a new pack and new
-                        price
-                      </p>
-                    </div>
-                  </label>
-                  <Input
-                    id="multiple-theme"
-                    type="file"
-                    className="hidden"
-                    multiple
-                  />
-                  <Input
-                    id="multiple-theme"
-                    type="file"
-                    className="hidden"
-                    multiple
-                  />
-                </li> */}
               </ul>
             </div>
             <div className="">
@@ -448,7 +403,7 @@ function AddProductPage() {
                 <FileUploader
                   handleChange={handleChangeThumbnail}
                   name="file"
-                  types={thumbnailTypes}
+                  types={productImageAcceptTypes}
                 />
                 {thumbnail && (
                   <img alt="img" className="w-[80%] h-full" src={thumbnail} />
@@ -530,7 +485,7 @@ function AddProductPage() {
               <div className="mt-6">
                 <div className="flex flex-col gap-3">
                   <Controller
-                    name="highlightFeature"
+                    name="highlight"
                     control={control}
                     render={({ field: { onChange, value } }) => {
                       return (
@@ -570,7 +525,7 @@ function AddProductPage() {
               <div className="mt-6">
                 <div className="flex flex-col gap-3">
                   <Controller
-                    name="livePreviewLink"
+                    name="linkPreview"
                     control={control}
                     render={({ field: { onChange, value } }) => {
                       return (
@@ -579,23 +534,6 @@ function AddProductPage() {
                             onChange={onChange}
                             value={value}
                             className="h-[46px]"
-                          />
-                        </>
-                      );
-                    }}
-                  />
-                </div>
-                <div className="flex flex-col gap-3">
-                  <Controller
-                    name="videoEmbed"
-                    control={control}
-                    render={({ field: { onChange, value } }) => {
-                      return (
-                        <>
-                          <Input
-                            onChange={onChange}
-                            value={value}
-                            className="h-[46px] mt-1"
                           />
                         </>
                       );
@@ -660,7 +598,7 @@ function AddProductPage() {
           </div>
           <ul className="flex flex-1 flex-col gap-4">
             <li className="w-full">
-              <h2 className="font-medium">Template features</h2>
+              <h2 className="font-medium mb-6">Template features</h2>
               <Controller
                 name="template_features"
                 control={control}
@@ -696,30 +634,164 @@ function AddProductPage() {
       )}
 
       {EProductTab.UPLOAD_IMAGE === tab && (
-        <div className="">
-          <h1 className="my-6 text-[#111827] text-xl font-medium">Previews</h1>
-          <ul className="flex gap-4 flex-col">
-            <UploadFile />
-            <FileUploader
-              handleChange={handleChangePreviews}
-              name="file"
-              types={previewsTypes}
-              multiple
-              classes={'h-[700px] w-[50%]'}
-            />
-            <div className="flex flex-wrap gap-2">
-              {previews &&
-                previews.map((item, index) => (
-                  <img
-                    alt="img"
-                    key={index}
-                    className="w-[24%] h-[250px] object-cover"
-                    src={item}
-                  />
-                ))}
-            </div>
-            {/* <li></li> */}
-          </ul>
+        <div className="flex flex-col gap-[60px]">
+          <div>
+            <h1 className="my-6 text-[#111827] text-xl font-medium">Cover</h1>
+
+            <ul className="flex gap-4 flex-col">
+              <ReactImageUploading
+                acceptType={productImageAcceptTypes}
+                multiple
+                value={[]}
+                maxNumber={1}
+                dataURLKey="dataUrl"
+                onChange={e => {
+                  setCoverImage(e);
+                }}
+              >
+                {({ onImageUpload, dragProps }) => (
+                  <div onClick={onImageUpload} {...dragProps}>
+                    {isEmpty(coverImage) ? (
+                      <UploadFile />
+                    ) : (
+                      <Image
+                        {...dragProps}
+                        width={500}
+                        height={500}
+                        src={coverImage && coverImage[0]?.dataUrl}
+                        alt="cover"
+                        className="w-full max-h-[600px] object-cover rounded-[20px]"
+                      />
+                    )}
+                  </div>
+                )}
+              </ReactImageUploading>
+            </ul>
+          </div>
+          <div>
+            <h1 className="my-6 text-[#111827] text-xl font-medium">
+              Detail images (4-8 required approval)
+            </h1>
+            <ul className="flex gap-4 flex-col">
+              <ReactImageUploading
+                multiple
+                value={[]}
+                maxNumber={8}
+                dataURLKey="dataUrl"
+                acceptType={productImageAcceptTypes}
+                onChange={data =>
+                  setDetailImages(preState => [...preState, ...data])
+                }
+              >
+                {({ onImageUpload, dragProps }) => (
+                  <div>
+                    <div onClick={onImageUpload} {...dragProps}>
+                      <UploadFile />
+                    </div>
+
+                    <div className="flex flex-wrap gap-[20px] mt-[40px]">
+                      {detailImages?.map((image, index) => (
+                        <div
+                          key={index}
+                          className="w-[calc(50%-10px)] max-h-[400px] relative"
+                        >
+                          <div
+                            onClick={() =>
+                              setDetailImages(preState =>
+                                preState.filter(
+                                  item => item.file?.name !== image.file?.name
+                                )
+                              )
+                            }
+                            className="bg-white rounded-full w-[30px] h-[30px] absolute top-0 right-0 flex justify-center items-center cursor-pointer border-[1px] border-solid"
+                          >
+                            <CloseOutlined className="text-gray-500" />
+                          </div>
+                          <Image
+                            key={index}
+                            width={500}
+                            height={500}
+                            src={image && image?.dataUrl}
+                            alt="cover"
+                            className="object-cover w-full rounded-[20px] max-h-[400px]"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </ReactImageUploading>
+            </ul>
+          </div>
+          <div>
+            <h1 className="my-6 text-[#111827] text-xl font-medium">
+              Full preiviews
+            </h1>
+            <ul className="flex gap-4 flex-col">
+              <ReactImageUploading
+                acceptType={productImageAcceptTypes}
+                multiple
+                value={[]}
+                maxNumber={8}
+                dataURLKey="dataUrl"
+                onChange={data =>
+                  setFullPreViewImages(preState => [...preState, ...data])
+                }
+              >
+                {({ onImageUpload, dragProps }) => (
+                  <div>
+                    <div onClick={onImageUpload} {...dragProps}>
+                      <UploadFile />
+                    </div>
+
+                    <div className="flex flex-wrap gap-[20px] mt-[40px]">
+                      {fullPreviews?.map((image, index) => (
+                        <div
+                          key={index}
+                          className="w-[calc(50%-10px)] max-h-[400px] relative"
+                        >
+                          <div
+                            onClick={() =>
+                              setFullPreViewImages(preState =>
+                                preState.filter(
+                                  item => item.file?.name !== image.file?.name
+                                )
+                              )
+                            }
+                            className="bg-white rounded-full w-[30px] h-[30px] absolute top-0 right-0 flex justify-center items-center cursor-pointer border-[1px] border-solid"
+                          >
+                            <CloseOutlined className="text-gray-500" />
+                          </div>
+                          <Image
+                            key={index}
+                            width={500}
+                            height={500}
+                            src={image && image?.dataUrl}
+                            alt="cover"
+                            className="object-cover w-full rounded-[20px] max-h-[400px]"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </ReactImageUploading>
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {EProductTab.UPLOAD_FILE === tab && (
+        <div className="flex flex-col gap-[60px]">
+          <div>
+            <h1 className="my-6 text-[#111827] text-xl font-medium">File</h1>
+
+            <ul className="flex gap-4 flex-col">
+              <FileUploader>
+                <UploadFile />
+              </FileUploader>
+            </ul>
+          </div>
         </div>
       )}
     </form>

@@ -47,11 +47,13 @@ export type TCreateTheme = {
   thumbnail_link?: string;
   template_features: string[];
   figma_features: string[];
-  highlightFeature?: string[];
+  highlight?: string[];
+  coverImages: string[];
+  detailImages: string[];
+  fullPreviewImages: string[];
   status?: EThemeStatus;
   percentageOfOwnership: number;
   livePreviewLink?: string;
-  videoEmbed?: string;
 };
 
 export type TCreateThemeSchema = {
@@ -62,11 +64,11 @@ export type TCreateThemeSchema = {
   template_features: string;
   figma_features: string;
   percentageOfOwnership: number;
-  highlightFeature?: string[];
+  highlight?: string[];
   livePreviewLink?: string;
-  videoEmbed?: string;
   categories?: number[];
   tags?: number[];
+  linkPreview?: string;
 };
 
 export enum EThemeStatus {

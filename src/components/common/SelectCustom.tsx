@@ -25,8 +25,6 @@ export default function SelectCustom({
     return options.filter(item => currentValue?.includes(item.value));
   }, [currentValue, options]);
 
-  console.log('tagClassname', tagClassName);
-
   return (
     <div>
       <Select
