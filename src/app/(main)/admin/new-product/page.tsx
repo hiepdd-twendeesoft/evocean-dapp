@@ -42,6 +42,8 @@ function AddProductPage() {
     resolver: yupResolver(createThemeSchema)
   });
   const [theme, setTheme] = useState<string>();
+  const [file, setFile] = useState<string>();
+  const [fileLocal, setFileLocal] = useState<File>();
   const [themeFile, setThemeFile] = useState<File>();
   const [coverImage, setCoverImage] = useState<ImageListType>([]);
   const [detailImages, setDetailImages] = useState<ImageListType>([]);
@@ -55,6 +57,9 @@ function AddProductPage() {
     switch (true) {
       case !theme:
         message.error({ content: 'Product is required' });
+        break;
+      case !file:
+        message.error({ content: 'Theme file is required' });
         break;
 
       case !thumbnail:
@@ -131,6 +136,36 @@ function AddProductPage() {
       message.error('Update thumbnail failed');
     }
   };
+  const handleFileTheme = async (
+    e: ChangeEvent<HTMLInputElement>,
+    allowFileTypes: string[]
+  ) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      return;
+    }
+    const file = e.target.files[0];
+    const isMatchMediaType = allowFileTypes.includes(file.type);
+
+    const allowedInputType = allowFileTypes
+      ?.map((item, index) => item.split('/')[1])
+      ?.join('/')
+      ?.toUpperCase();
+
+    if (isMatchMediaType) {
+      message.error(`You can only upload ${allowedInputType}file!`);
+      return;
+    }
+    try {
+      const result = await uploadTheme({
+        zip_file: e.target.files[0]
+      });
+      setThemeFile(e.target.files[0]);
+      setTheme(result.data.zip_file);
+      message.success('Update theme zip successfully');
+    } catch (err) {
+      message.error('Update theme zip failed');
+    }
+  };
 
   const handleChangeThemeZip = async (
     e: ChangeEvent<HTMLInputElement>,
@@ -157,6 +192,36 @@ function AddProductPage() {
       });
       setThemeFile(e.target.files[0]);
       setTheme(result.data.zip_file);
+      message.success('Update theme zip successfully');
+    } catch (err) {
+      message.error('Update theme zip failed');
+    }
+  };
+  const handleFileThemeZip = async (
+    e: ChangeEvent<HTMLInputElement>,
+    allowFileTypes: string[]
+  ) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      return;
+    }
+    const file = e.target.files[0];
+    const isMatchMediaType = allowFileTypes.includes(file.type);
+
+    const allowedInputType = allowFileTypes
+      ?.map((item, index) => item.split('/')[1])
+      ?.join('/')
+      ?.toUpperCase();
+
+    if (isMatchMediaType) {
+      message.error(`You can only upload ${allowedInputType}file!`);
+      return;
+    }
+    try {
+      const result = await uploadTheme({
+        zip_file: e.target.files[0]
+      });
+      setFileLocal(e.target.files[0]);
+      setFile(result.data.zip_file);
       message.success('Update theme zip successfully');
     } catch (err) {
       message.error('Update theme zip failed');
@@ -550,7 +615,6 @@ function AddProductPage() {
                     name="categories"
                     control={control}
                     render={({ field: { onChange, value } }) => {
-                      console.log(value, value);
                       return (
                         <SelectCustom
                           options={
@@ -786,11 +850,30 @@ function AddProductPage() {
           <div>
             <h1 className="my-6 text-[#111827] text-xl font-medium">File</h1>
 
-            <ul className="flex gap-4 flex-col">
-              <FileUploader>
-                <UploadFile />
-              </FileUploader>
-            </ul>
+            <label htmlFor="file-theme" className="flex gap-4 flex-col">
+              <UploadFile
+                title="Drag & drop file or click on to upload."
+                isShowDesctiption={false}
+              />
+              {fileLocal && file && (
+                <div className="border-dashed border-[1px] border-gray-300 px-[100px] rounded-[20px] py-[25px] flex items-center gap-[46px]">
+                  <Image
+                    alt="zip-file-icon"
+                    width={50}
+                    height={50}
+                    src={'/assets/icon/zip-file.svg'}
+                  />
+                  <div>{`${fileLocal.name} (${fileLocal.size}MB)`}</div>
+                </div>
+              )}
+
+              <Input
+                id="file-theme"
+                type="file"
+                className="hidden"
+                onChange={e => handleFileThemeZip(e, ['application/zip'])}
+              />
+            </label>
           </div>
         </div>
       )}
