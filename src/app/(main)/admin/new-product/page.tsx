@@ -43,6 +43,7 @@ function AddProductPage() {
   });
   const [theme, setTheme] = useState<string>();
   const [file, setFile] = useState<string>();
+  console.log('file', file);
   const [fileLocal, setFileLocal] = useState<File>();
   const [themeFile, setThemeFile] = useState<File>();
   const [coverImage, setCoverImage] = useState<ImageListType>([]);
@@ -52,28 +53,34 @@ function AddProductPage() {
   const [tab, setTab] = useState<EProductTab>(EProductTab.OVERVIEW);
   const [status, setStatus] = useState<EThemeStatus>(EThemeStatus.DRAFT);
   const router = useRouter();
+  console.log('file', file);
 
   const onSubmit: SubmitHandler<TCreateThemeSchema> = async data => {
     switch (true) {
       case !theme:
         message.error({ content: 'Product is required' });
-        break;
+        return;
+
       case !file:
         message.error({ content: 'Theme file is required' });
-        break;
+        return;
 
       case !thumbnail:
         message.error({ content: 'Thumbnail is required' });
+        return;
 
       case isEmpty(coverImage):
         message.error({ content: 'Cover image is required' });
+        return;
 
       case isEmpty(detailImages):
         message.error({ content: 'Detail image is required' });
+        return;
 
       case isEmpty(fullPreviews):
         message.error({ content: 'Preview image is required' });
-        break;
+        return;
+
       default:
         break;
     }
