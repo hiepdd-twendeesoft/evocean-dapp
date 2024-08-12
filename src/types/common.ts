@@ -2,7 +2,8 @@ import { EProductTab } from './product';
 
 export enum EQueryKeys {
   PRODUCT_CATEGOIES = 'product_categories',
-  PRODUCT_TAGS = 'product_tags'
+  PRODUCT_TAGS = 'product_tags',
+  THEME_DETAIL = 'theme_detail'
 }
 
 export const NAV_LINKS = [

@@ -8,7 +8,7 @@ export const createThemeSchema = Yup.object()
     owner_price: Yup.number().required('Owner price is required'),
     template_features: Yup.string().required('Template features is required'),
     figma_features: Yup.string().required('Figma feature is required'),
-    percentageOfOwnership: Yup.number().required(
+    percentageOfOwnership: Yup.string().required(
       'Percentage of ownership  is required'
     )
   })

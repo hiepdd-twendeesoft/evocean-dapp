@@ -10,9 +10,11 @@ export interface ITheme {
     template_features: any[];
     categories: number[];
     format: string[];
-    hightlight: string[];
+    highlight: string[];
     live_preview: string;
     pages: string[];
+    coverImages: string[];
+    detailImages: string[];
   };
   owner_addresses: string[];
   token_mint: string;
@@ -25,6 +27,19 @@ export interface ITheme {
     theme_id: number;
     price: string;
   };
+  percentageOfOwnership: string;
+  linkPreview?: string;
+  categories: IThemeCategory[];
+  tags: IThemeTag[];
+}
+
+export interface IThemeCategory {
+  id: number;
+  name: string;
+}
+export interface IThemeTag {
+  id: number;
+  name: string;
 }
 
 export interface IThemeItem {
@@ -52,7 +67,7 @@ export type TCreateTheme = {
   detailImages: string[];
   fullPreviewImages: string[];
   status?: EThemeStatus;
-  percentageOfOwnership: number;
+  percentageOfOwnership: string;
   livePreviewLink?: string;
 };
 
@@ -63,7 +78,7 @@ export type TCreateThemeSchema = {
   owner_price: number;
   template_features: string;
   figma_features: string;
-  percentageOfOwnership: number;
+  percentageOfOwnership: string;
   highlight?: string[];
   livePreviewLink?: string;
   categories?: number[];

@@ -32,9 +32,8 @@ export default function SelectCustom({
         {...props}
         mode="multiple"
         style={{ width: '100%' }}
-        onChange={e => {
-          onChange(e);
-        }}
+        onChange={e => onChange(e)}
+        value={currentValue}
         tokenSeparators={[',']}
         options={options}
         showSearch={false}
