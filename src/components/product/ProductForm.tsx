@@ -29,6 +29,8 @@ import ReactImageUploading, { ImageListType } from 'react-images-uploading';
 import Image from 'next/image';
 import { CloseOutlined } from '@ant-design/icons';
 import { NAV_LINKS } from '@/types/common';
+import UploadFileTab from './UploadFileTab';
+import { productImageAcceptTypes } from '@/constants/common';
 
 interface IProductFormProps {
   themeDetail?: ITheme;
@@ -103,13 +105,6 @@ function ProductForm({ themeDetail }: IProductFormProps) {
       setFullPreViewImages(themeDetail.media.previews);
     }
   }, [setValue, themeDetail]);
-
-  console.log(
-    'previewsImages',
-    JSON.parse(
-      '{\n  "type": "validation",\n  "on": "body",\n  "property": "/linkPreview",\n  "message": "Expected string",\n  "expected": {\n    "zip_link": "",\n    "name": "",\n    "overview": "",\n    "selling_price": 0,\n    "owner_price": 0,\n    "percentageOfOwnership": 0,\n    "thumbnail_link": "",\n    "status": "DRAFT",\n    "coverImages": [],\n    "detailImages": [],\n    "fullPreviewImages": []\n  },\n  "found": {\n    "name": "theme5",\n    "overview": "1",\n    "selling_price": 1,\n    "owner_price": 1,\n    "percentageOfOwnership": "1",\n    "template_features": [\n      "1"\n    ],\n    "highlight": [\n      "1",\n      "1"\n    ],\n    "linkPreview": null,\n    "figma_features": [\n      "1"\n    ],\n    "categories": [\n      3\n    ],\n    "tags": [\n      7\n    ],\n    "zip_link": "https://firebasestorage.googleapis.com/v0/b/evocean-25bc7.appspot.com/o/themes%2Fzip%2F1723266981409_moonkit_env.zip?alt=media&token=efb37337-1792-4146-add0-7e9b21f608c5",\n    "thumbnail_link": "https://firebasestorage.googleapis.com/v0/b/evocean-25bc7.appspot.com/o/themes%2Fimages%2F1723266975720_Frame29.png?alt=media&token=215cf96d-eaa8-4766-b061-461b28525d24",\n    "status": "PENDING",\n    "coverImages": [\n      "https://firebasestorage.googleapis.com/v0/b/evocean-25bc7.appspot.com/o/themes%2Fimages%2F1723267027510_Frame11.png?alt=media&token=dff5211e-3253-4e03-be5e-19483f38c10a"\n    ],\n    "fullPreviewImages": [\n      "https://firebasestorage.googleapis.com/v0/b/evocean-25bc7.appspot.com/o/themes%2Fimages%2F1723267028689_news-details.png?alt=media&token=bccce830-1c65-48a9-97e2-ac5369146612"\n    ],\n    "detailImages": [\n      "https://firebasestorage.googleapis.com/v0/b/evocean-25bc7.appspot.com/o/themes%2Fimages%2F1723267030341_menu-banner.png?alt=media&token=b3a9b754-d146-463b-91b4-74b63068a8c6"\n    ]\n  },\n  "errors": [\n    {\n      "type": 54,\n      "schema": {\n        "type": "string"\n      },\n      "path": "/linkPreview",\n      "value": null,\n      "message": "Expected string"\n    }\n  ]\n}'
-    )
-  );
 
   const onSubmit: SubmitHandler<TCreateThemeSchema> = async data => {
     switch (true) {
@@ -201,7 +196,6 @@ function ProductForm({ themeDetail }: IProductFormProps) {
     }
   };
 
-  const productImageAcceptTypes = ['JPG', 'PNG', 'GIF'];
   const handleChangeThumbnail = async (file: any) => {
     try {
       const result = await uploadTheme({
@@ -340,6 +334,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
         </div>
       </div>
       <NavLinkComponent />
+
       {tab === EProductTab.OVERVIEW && (
         <div className="flex gap-8">
           <div className="basis-3/5">
@@ -911,36 +906,11 @@ function ProductForm({ themeDetail }: IProductFormProps) {
       )}
 
       {EProductTab.UPLOAD_FILE === tab && (
-        <div className="flex flex-col gap-[60px]">
-          <div>
-            <h1 className="my-6 text-[#111827] text-xl font-medium">File</h1>
-
-            <label htmlFor="file-theme" className="flex gap-4 flex-col">
-              <UploadFile
-                title="Drag & drop file or click on to upload."
-                isShowDesctiption={false}
-              />
-              {fileLocal && themeFile && (
-                <div className="border-dashed border-[1px] border-gray-300 px-[100px] rounded-[20px] py-[25px] flex items-center gap-[46px]">
-                  <Image
-                    alt="zip-file-icon"
-                    width={50}
-                    height={50}
-                    src={'/assets/icon/zip-file.svg'}
-                  />
-                  <div>{`${fileLocal.name} (${fileLocal.size}MB)`}</div>
-                </div>
-              )}
-
-              <Input
-                id="file-theme"
-                type="file"
-                className="hidden"
-                onChange={e => handleFileThemeZip(e, ['application/zip'])}
-              />
-            </label>
-          </div>
-        </div>
+        <UploadFileTab
+          fileLocal={fileLocal}
+          themeFile={themeFile}
+          handleFileThemeZip={handleFileThemeZip}
+        />
       )}
     </form>
   );

@@ -8,7 +8,7 @@ import { useParams } from 'next/navigation';
 
 function AddProductPage() {
   const { id } = useParams<{ id: string }>();
-  const { data: themeDetail, refetch } = useQuery({
+  const { data: themeDetail } = useQuery({
     queryKey: [EQueryKeys.THEME_DETAIL, id],
     queryFn: () => fetchTheme(Number(id))
   });
