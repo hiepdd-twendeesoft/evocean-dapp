@@ -31,7 +31,7 @@ export default function UploadFileTab({
               isShowDesctiption={false}
             />
           </label>
-          {fileLocal && themeFile && (
+          {(fileLocal || themeFile) && (
             <div className="border-dashed border-[1px] border-gray-300 px-[100px] rounded-[20px] py-[25px] flex items-center gap-[46px]">
               <div className="flex items-center gap-[46px] flex-1">
                 <Image
@@ -41,7 +41,9 @@ export default function UploadFileTab({
                   src={'/assets/icon/zip-file.svg'}
                 />
                 <div className="flex-1">
-                  <span>{`${fileLocal.name}`}</span>
+                  {themeFile && (
+                    <span>{`${themeFile?.split(RegExp('%2..*%2F(.*?)?alt'))?.[1]}`}</span>
+                  )}
                   <div className="flex justify-between">
                     <div className="flex gap-2 items-center">
                       <Image
@@ -50,9 +52,11 @@ export default function UploadFileTab({
                         height={20}
                         src={'/assets/icon/check-green.svg'}
                       />
-                      <span className="text-gray-400 font-semibold text-[16px]">
-                        {fileLocal.size} MB
-                      </span>
+                      {fileLocal && (
+                        <span className="text-gray-400 font-semibold text-[16px]">
+                          {fileLocal.size} MB
+                        </span>
+                      )}
                     </div>
                     <div className="flex gap-[32px] items-center">
                       <span>Paid product</span>
@@ -69,12 +73,12 @@ export default function UploadFileTab({
                           defaultChecked
                         />
                       </ConfigProvider>
-                      <Image
+                      {/* <Image
                         alt="zip-file-icon"
                         width={33}
                         height={33}
                         src={'/assets/icon/trash-icon.svg'}
-                      />
+                      /> */}
                     </div>
                   </div>
                 </div>

@@ -6,7 +6,8 @@ export enum ApiThemes {
   createProducts = '/themes/creating',
   updateProduct = '/themes/updating',
   deleteProduct = '/themes/deleting',
-  uploadTheme = '/themes/upload'
+  uploadTheme = '/themes/upload',
+  theme = '/themes'
 }
 
 export enum ApiCollections {

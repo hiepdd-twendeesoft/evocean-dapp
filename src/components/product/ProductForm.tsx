@@ -1,36 +1,47 @@
 'use client';
 
 import SelectCustom from '@/components/common/SelectCustom';
+import UploadFile from '@/components/common/UploadFile';
+import { productImageAcceptTypes } from '@/constants/common';
+import useFetchAllTags from '@/hooks/useFetchAllTags';
 import useFetchCategories from '@/hooks/useFetchCategories';
 import {
   EThemeStatus,
   ITheme,
+  IThemeFeatureType,
   TCreateTheme,
   TCreateThemeSchema
 } from '@/models/theme.type';
-import { uploadTheme } from '@/services/theme';
+import { fetchFeatureType } from '@/services/common.service';
+import { updateTheme, uploadTheme } from '@/services/theme';
 import { createThemeAction } from '@/store/actions/theme';
 import { useAppDispatch } from '@/store/store';
+import { EQueryKeys, NAV_LINKS } from '@/types/common';
 import { EProductTab } from '@/types/product';
 import { createThemeSchema } from '@/validation/admin/theme.validation';
+import { CloseOutlined } from '@ant-design/icons';
 import { yupResolver } from '@hookform/resolvers/yup';
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient
+} from '@tanstack/react-query';
 import { Input, message } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
-import { forEach, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import ReactImageUploading, { ImageListType } from 'react-images-uploading';
 import CheckIcon from '../../../public/assets/icon/CheckIcon';
 import DoubleLine from '../../../public/assets/icon/DoubleLineIcon';
-import useFetchAllTags from '@/hooks/useFetchAllTags';
-import UploadFile from '@/components/common/UploadFile';
-import ReactImageUploading, { ImageListType } from 'react-images-uploading';
-import Image from 'next/image';
-import { CloseOutlined } from '@ant-design/icons';
-import { NAV_LINKS } from '@/types/common';
 import UploadFileTab from './UploadFileTab';
-import { productImageAcceptTypes } from '@/constants/common';
+import clsx from 'clsx';
+import SelectFeatureTag from '../common/SelectFeatureTag';
+import { getThemeFeatureIds } from '@/utils/helper';
 
 interface IProductFormProps {
   themeDetail?: ITheme;
@@ -47,7 +58,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
     getValues,
     control
   } = useForm<TCreateThemeSchema>({
-    resolver: yupResolver(createThemeSchema)
+    resolver: yupResolver(createThemeSchema as any)
   });
   const [productFile, setProductFile] = useState<string>();
   const [productFileLocal, setProductFileLocal] = useState<File>();
@@ -63,10 +74,10 @@ function ProductForm({ themeDetail }: IProductFormProps) {
   const [thumbnail, setThumbnail] = useState<string>();
   const [tab, setTab] = useState<EProductTab>(EProductTab.OVERVIEW);
   const [status, setStatus] = useState<EThemeStatus>(EThemeStatus.DRAFT);
+  const [fileTypeSelect, setFileTypeSelect] = useState<IThemeFeatureType[]>([]);
   const router = useRouter();
 
   const isUpdate = useMemo(() => themeDetail, [themeDetail]);
-
   const getImageLocal = useCallback((data: any) => {
     return data.filter((item: any) => item?.dataUrl);
   }, []);
@@ -74,6 +85,25 @@ function ProductForm({ themeDetail }: IProductFormProps) {
   const getImageServer = useCallback((data: any) => {
     return data.filter((item: any) => !item?.dataUrl);
   }, []);
+
+  const { data: featureTypes } = useQuery({
+    queryKey: [EQueryKeys.FEATURE_TYPE],
+    queryFn: () => fetchFeatureType()
+  });
+
+  const queryClient = useQueryClient();
+
+  const { mutate: handleUpdateTheme } = useMutation({
+    mutationFn: updateTheme,
+    onSuccess: () => {
+      message.success('Update theme successfully');
+      queryClient.invalidateQueries({ queryKey: [EQueryKeys.YOUR_PRODUCTS] });
+      router.push('/admin/your-products', { scroll: false });
+    },
+    onError: error => {
+      message.error(error.message);
+    }
+  });
 
   useEffect(() => {
     if (themeDetail) {
@@ -98,11 +128,14 @@ function ProductForm({ themeDetail }: IProductFormProps) {
         'tags',
         themeDetail?.tags?.map(item => item.id)
       );
+      setValue('feature_ids', getThemeFeatureIds(themeDetail?.themeFeatures));
       setProductFile(themeDetail.zip_link);
       setCoverImage(themeDetail.media.coverImages);
       setThumbnail(themeDetail.media.thumbnail);
       setDetailImages(themeDetail.media.detailImages);
       setFullPreViewImages(themeDetail.media.previews);
+      setThemeFileLocal(themeDetail?.fileUrl);
+      setFileTypeSelect(themeDetail?.themeFeatures.map(item => item.type));
     }
   }, [setValue, themeDetail]);
 
@@ -154,23 +187,14 @@ function ProductForm({ themeDetail }: IProductFormProps) {
       })
     });
 
-    const template_features = data.template_features
-      .split(', ')
-      .map(item => item.trim());
-    const figma_features = data.figma_features
-      .split(', ')
-      .map(item => item.trim());
-
     const createThemeDto: TCreateTheme = {
       ...data,
       zip_link: productFile,
       thumbnail_link: thumbnail,
-      template_features,
-      figma_features,
+      fileUrl: themeFile,
       status,
-      coverImages: [
-        ...(coverImageCreated.data?.thumbnail ?? getImageServer(coverImage))
-      ],
+      coverImages:
+        coverImageCreated.data?.thumbnail ?? getImageServer(coverImage),
       fullPreviewImages: [
         ...getImageServer(fullPreviewImages),
         ...(previewsImages.data?.previews ?? [])
@@ -180,6 +204,15 @@ function ProductForm({ themeDetail }: IProductFormProps) {
         ...(detailImage.data?.previews ?? [])
       ]
     };
+
+    if (isUpdate) {
+      const updateThemeDto = { ...createThemeDto };
+      handleUpdateTheme({
+        themeId: Number(themeDetail?.id),
+        body: updateThemeDto
+      });
+      return;
+    }
 
     try {
       await dispatch(createThemeAction(createThemeDto)).unwrap();
@@ -311,6 +344,22 @@ function ProductForm({ themeDetail }: IProductFormProps) {
   const getImageUrl = useCallback((data: any) => {
     return data?.dataUrl ?? data;
   }, []);
+
+  const handleSelecFileType = useCallback(
+    (typeData: IThemeFeatureType) => {
+      const typeExists = fileTypeSelect.find(type => type.id === typeData.id);
+      if (typeExists) {
+        setFileTypeSelect(preState =>
+          preState.filter(type => type !== typeExists)
+        );
+      } else {
+        setFileTypeSelect(preState => [...preState, typeData]);
+      }
+    },
+    [fileTypeSelect]
+  );
+  const checkFileTypeActive = (typeId: number) =>
+    fileTypeSelect?.find(type => type?.id === typeId);
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onError)}>
@@ -533,62 +582,19 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                 File type included
               </h1>
               <ul className="flex gap-4 flex-wrap">
-                <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
-                  <img
-                    alt="img"
-                    className="w-[16px]"
-                    src={'/assets/image/admin/figma.svg'}
-                  />
-                  <h2>Figma</h2>
-                </li>
-                <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
-                  <img
-                    alt="img"
-                    className="w-[16px]"
-                    src={'/assets/image/admin/framer.svg'}
-                  />
-                  <h2>Framer</h2>
-                </li>
-                <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
-                  <img
-                    alt="img"
-                    className="w-[16px]"
-                    src={'/assets/image/admin/blender.svg'}
-                  />
-                  <h2>Blender</h2>
-                </li>
-                <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
-                  <img
-                    alt="img"
-                    className="w-[16px]"
-                    src={'/assets/image/admin/html.svg'}
-                  />
-                  <h2>HTML</h2>
-                </li>
-                <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
-                  <img
-                    alt="img"
-                    className="w-[16px]"
-                    src={'/assets/image/admin/powerpoint.svg'}
-                  />
-                  <h2>Powerpoint</h2>
-                </li>
-                <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
-                  <img
-                    alt="img"
-                    className="w-[16px]"
-                    src={'/assets/image/admin/photoshop.svg'}
-                  />
-                  <h2>Photoshop</h2>
-                </li>
-                <li className="flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[48%]">
-                  <img
-                    alt="img"
-                    className="w-[16px]"
-                    src={'/assets/image/admin/illustrator.svg'}
-                  />
-                  <h2>Illustrator</h2>
-                </li>
+                {featureTypes?.map((type: IThemeFeatureType) => (
+                  <li
+                    key={type.id}
+                    onClick={() => handleSelecFileType(type)}
+                    className={clsx(
+                      'flex gap-4 items-center p-[12px] rounded-[8px] border-[#D1D5DB] border-2 w-[calc(50%-10px)] cursor-pointer',
+                      checkFileTypeActive(type.id) && 'bg-indigo-100'
+                    )}
+                  >
+                    <img alt="img" className="w-[16px]" src={type.iconUrl} />
+                    <h2>{type.name}</h2>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -649,9 +655,11 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                       return (
                         <>
                           <Input
+                            placeholder="Link preview"
                             onChange={onChange}
                             value={value}
                             className="h-[46px]"
+                            status={errors.linkPreview?.message ? 'error' : ''}
                           />
                         </>
                       );
@@ -712,40 +720,24 @@ function ProductForm({ themeDetail }: IProductFormProps) {
               </div>
             </div>
           </div>
-          <ul className="flex flex-1 flex-col gap-4">
-            <li className="w-full">
-              <h2 className="font-medium mb-6">Template features</h2>
-              <Controller
-                name="template_features"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    className="w-[100%] px-[13px] py-[9px] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
-                    type="text"
-                    {...field}
-                    status={errors.template_features?.message ? 'error' : ''}
-                    placeholder={errors.template_features?.message || ''}
-                  />
-                )}
-              />
-            </li>
-            <li className="w-full mt-2">
-              <h2 className="font-medium">Figma features</h2>
-              <Controller
-                name="figma_features"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    className="w-[100%] px-[13px] py-[9px] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
-                    type="text"
-                    {...field}
-                    status={errors.figma_features?.message ? 'error' : ''}
-                    placeholder={errors.figma_features?.message || ''}
-                  />
-                )}
-              />
-            </li>
-          </ul>
+          <Controller
+            name="feature_ids"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <ul className="flex flex-1 flex-col gap-4">
+                {fileTypeSelect.map(type => (
+                  <li key={type.id} className="w-full">
+                    <h2 className="font-medium mb-6">{type.name}</h2>
+                    <SelectFeatureTag
+                      onChange={onChange}
+                      typeId={type.id}
+                      currentValue={value}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          />
         </div>
       )}
 

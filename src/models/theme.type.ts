@@ -31,8 +31,23 @@ export interface ITheme {
   linkPreview?: string;
   categories: IThemeCategory[];
   tags: IThemeTag[];
+  fileUrl: string;
+  themeFeatures: ThemeFeature[];
 }
 
+export interface ThemeFeature {
+  features: {
+    name: string;
+    id: number;
+  }[];
+  type: ITypeTheme;
+}
+
+export interface ITypeTheme {
+  id: number;
+  name: string;
+  iconUrl: string;
+}
 export interface IThemeCategory {
   id: number;
   name: string;
@@ -60,15 +75,15 @@ export type TCreateTheme = {
   owner_price: number;
   previews_links?: string[];
   thumbnail_link?: string;
-  template_features: string[];
-  figma_features: string[];
   highlight?: string[];
-  coverImages: string[];
+  coverImages: string;
   detailImages: string[];
   fullPreviewImages: string[];
   status?: EThemeStatus;
   percentageOfOwnership: string;
   livePreviewLink?: string;
+  feature_ids?: number[];
+  fileUrl: string;
 };
 
 export type TCreateThemeSchema = {
@@ -84,10 +99,25 @@ export type TCreateThemeSchema = {
   categories?: number[];
   tags?: number[];
   linkPreview?: string;
+  feature_ids?: number[];
 };
 
 export enum EThemeStatus {
   DRAFT = 'DRAFT',
   PENDING = 'PENDING',
   APPROVED = 'APPROVED'
+}
+
+export interface IThemeFeatureType {
+  id: number;
+  name: string;
+  createdAt?: string;
+  iconUrl: string;
+}
+export interface IFeatureTag {
+  id: number;
+  name: string;
+  featureTypeId: number;
+  createdAt: string;
+  iconUrl: string;
 }
