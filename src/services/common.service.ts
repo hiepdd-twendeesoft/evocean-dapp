@@ -6,6 +6,7 @@ import {
 } from '@/models/common.type';
 import api from './axios';
 import { ApiThemes } from './route';
+import { IFeatureTag, IThemeFeatureType } from '@/models/theme.type';
 
 export function fetchThemes(
   params: FetchThemeParams
@@ -26,6 +27,21 @@ export function fetchThemeCategories(): Promise<IThemCategory[]> {
 }
 export function fetchThemeTags(): Promise<IThemCategory[]> {
   return api(ApiThemes.fetchThemeTags, null, {
+    method: 'GET'
+  })
+    .then(res => res.data)
+    .catch(err => err);
+}
+
+export function fetchFeatureType(): Promise<IThemeFeatureType[]> {
+  return api(`${ApiThemes.theme}/feature-type`, null, {
+    method: 'GET'
+  })
+    .then(res => res.data)
+    .catch(err => err);
+}
+export function fetchFeatureTag(typeId: number): Promise<IFeatureTag[]> {
+  return api(`${ApiThemes.theme}/feature-tag/${typeId}`, null, {
     method: 'GET'
   })
     .then(res => res.data)

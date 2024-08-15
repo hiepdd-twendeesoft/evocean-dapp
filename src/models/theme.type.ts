@@ -10,9 +10,11 @@ export interface ITheme {
     template_features: any[];
     categories: number[];
     format: string[];
-    hightlight: string[];
+    highlight: string[];
     live_preview: string;
     pages: string[];
+    coverImages: string[];
+    detailImages: string[];
   };
   owner_addresses: string[];
   token_mint: string;
@@ -25,6 +27,34 @@ export interface ITheme {
     theme_id: number;
     price: string;
   };
+  percentageOfOwnership: string;
+  linkPreview?: string;
+  categories: IThemeCategory[];
+  tags: IThemeTag[];
+  fileUrl: string;
+  themeFeatures: ThemeFeature[];
+}
+
+export interface ThemeFeature {
+  features: {
+    name: string;
+    id: number;
+  }[];
+  type: ITypeTheme;
+}
+
+export interface ITypeTheme {
+  id: number;
+  name: string;
+  iconUrl: string;
+}
+export interface IThemeCategory {
+  id: number;
+  name: string;
+}
+export interface IThemeTag {
+  id: number;
+  name: string;
 }
 
 export interface IThemeItem {
@@ -45,15 +75,15 @@ export type TCreateTheme = {
   owner_price: number;
   previews_links?: string[];
   thumbnail_link?: string;
-  template_features: string[];
-  figma_features: string[];
   highlight?: string[];
-  coverImages: string[];
+  coverImages: string;
   detailImages: string[];
   fullPreviewImages: string[];
   status?: EThemeStatus;
-  percentageOfOwnership: number;
+  percentageOfOwnership: string;
   livePreviewLink?: string;
+  feature_ids?: number[];
+  fileUrl: string;
 };
 
 export type TCreateThemeSchema = {
@@ -63,16 +93,31 @@ export type TCreateThemeSchema = {
   owner_price: number;
   template_features: string;
   figma_features: string;
-  percentageOfOwnership: number;
+  percentageOfOwnership: string;
   highlight?: string[];
   livePreviewLink?: string;
   categories?: number[];
   tags?: number[];
   linkPreview?: string;
+  feature_ids?: number[];
 };
 
 export enum EThemeStatus {
   DRAFT = 'DRAFT',
   PENDING = 'PENDING',
   APPROVED = 'APPROVED'
+}
+
+export interface IThemeFeatureType {
+  id: number;
+  name: string;
+  createdAt?: string;
+  iconUrl: string;
+}
+export interface IFeatureTag {
+  id: number;
+  name: string;
+  featureTypeId: number;
+  createdAt: string;
+  iconUrl: string;
 }

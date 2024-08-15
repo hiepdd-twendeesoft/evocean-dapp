@@ -1,4 +1,4 @@
-import { Select } from 'antd';
+import { ConfigProvider, Select } from 'antd';
 import { BaseOptionType } from 'antd/es/select';
 import { iteratee } from 'lodash';
 import React, { useMemo } from 'react';
@@ -26,30 +26,41 @@ export default function SelectCustom({
   }, [currentValue, options]);
 
   return (
-    <div>
-      <Select
-        size="large"
-        {...props}
-        mode="multiple"
-        style={{ width: '100%' }}
-        onChange={e => {
-          onChange(e);
-        }}
-        tokenSeparators={[',']}
-        options={options}
-        showSearch={false}
-        placeholder="Type a tag and press enter..."
-      />
-      <div className="mt-[20px] flex flex-wrap gap-[12px]">
-        {currentOptions.map(item => (
-          <div
-            key={item.value}
-            className={`px-[24px] py-[8px] ${tagClassName} rounded-lg  w-fit`}
-          >
-            {item.label}
-          </div>
-        ))}
+    <ConfigProvider
+      theme={{
+        components: {
+          Select: {
+            multipleItemHeight: 50
+          }
+        }
+      }}
+    >
+      <div>
+        <Select
+          size="large"
+          mode="multiple"
+          style={{ width: '100%' }}
+          onChange={e => {
+            onChange(e);
+          }}
+          className="!min-h-[50px]"
+          value={currentValue}
+          tokenSeparators={[',']}
+          options={options}
+          showSearch={false}
+          placeholder="Type a tag and press enter..."
+        />
+        <div className="mt-[20px] flex flex-wrap gap-[12px]">
+          {currentOptions.map(item => (
+            <div
+              key={item.value}
+              className={`px-[24px] py-[8px] ${tagClassName} rounded-lg  w-fit`}
+            >
+              {item.label}
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </ConfigProvider>
   );
 }
