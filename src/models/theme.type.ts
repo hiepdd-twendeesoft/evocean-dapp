@@ -76,14 +76,14 @@ export type TCreateTheme = {
   previews_links?: string[];
   thumbnail_link?: string;
   highlight?: string[];
-  coverImages: string;
-  detailImages: string[];
-  fullPreviewImages: string[];
+  coverImages?: string[];
+  detailImages?: string[];
+  fullPreviewImages?: string[];
   status?: EThemeStatus;
   percentageOfOwnership: string;
   livePreviewLink?: string;
   feature_ids?: number[];
-  fileUrl: string;
+  theme_id?: number;
 };
 
 export type TCreateThemeSchema = {
@@ -91,8 +91,6 @@ export type TCreateThemeSchema = {
   overview: string;
   selling_price: number;
   owner_price: number;
-  template_features: string;
-  figma_features: string;
   percentageOfOwnership: string;
   highlight?: string[];
   livePreviewLink?: string;
@@ -100,6 +98,7 @@ export type TCreateThemeSchema = {
   tags?: number[];
   linkPreview?: string;
   feature_ids?: number[];
+  thumbnail_link?: string;
 };
 
 export enum EThemeStatus {
@@ -120,4 +119,9 @@ export interface IFeatureTag {
   featureTypeId: number;
   createdAt: string;
   iconUrl: string;
+}
+
+export interface ICreateThemeResponse {
+  themId: number;
+  createdAt: string;
 }

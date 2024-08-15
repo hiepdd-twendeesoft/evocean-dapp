@@ -46,39 +46,20 @@ export default function UploadFileTab({
                   )}
                   <div className="flex justify-between">
                     <div className="flex gap-2 items-center">
-                      <Image
-                        alt="zip-file-icon"
-                        width={20}
-                        height={20}
-                        src={'/assets/icon/check-green.svg'}
-                      />
                       {fileLocal && (
-                        <span className="text-gray-400 font-semibold text-[16px]">
-                          {fileLocal.size} MB
-                        </span>
+                        <>
+                          <Image
+                            alt="zip-file-icon"
+                            width={20}
+                            height={20}
+                            src={'/assets/icon/check-green.svg'}
+                          />
+
+                          <span className="text-gray-400 font-semibold text-[16px]">
+                            {fileLocal.size} MB
+                          </span>
+                        </>
                       )}
-                    </div>
-                    <div className="flex gap-[32px] items-center">
-                      <span>Paid product</span>
-                      <ConfigProvider
-                        theme={{
-                          token: {
-                            colorPrimary: '#22BB5F'
-                          }
-                        }}
-                      >
-                        <Switch
-                          className="text-red-400"
-                          size="default"
-                          defaultChecked
-                        />
-                      </ConfigProvider>
-                      {/* <Image
-                        alt="zip-file-icon"
-                        width={33}
-                        height={33}
-                        src={'/assets/icon/trash-icon.svg'}
-                      /> */}
                     </div>
                   </div>
                 </div>
