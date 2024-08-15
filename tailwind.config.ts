@@ -1,3 +1,4 @@
+import { error } from 'console';
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
@@ -10,7 +11,8 @@ const config: Config = {
     extend: {
       colors: {
         primary: '#4F46E5',
-        'purple-200': '#E9D5FF'
+        'purple-200': '#E9D5FF',
+        error: '#ff4d4f'
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

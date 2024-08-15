@@ -9,7 +9,8 @@ import {
 } from '@/models/common.type';
 import { ApiThemes } from './route';
 
-export async function createTheme(body: TCreateTheme | any): Promise<any> {
+export async function createTheme(body: TCreateTheme): Promise<any> {
+  console.log('body', body);
   return api(ApiThemes.createProducts, body);
 }
 

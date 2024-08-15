@@ -13,22 +13,17 @@ import {
   TCreateThemeSchema
 } from '@/models/theme.type';
 import { fetchFeatureType } from '@/services/common.service';
-import { updateTheme, uploadTheme } from '@/services/theme';
-import { createThemeAction } from '@/store/actions/theme';
-import { useAppDispatch } from '@/store/store';
+import { createTheme, updateTheme, uploadTheme } from '@/services/theme';
 import { EQueryKeys, NAV_LINKS } from '@/types/common';
 import { EProductTab } from '@/types/product';
+import { getThemeFeatureIds } from '@/utils/helper';
 import { createThemeSchema } from '@/validation/admin/theme.validation';
 import { CloseOutlined } from '@ant-design/icons';
 import { yupResolver } from '@hookform/resolvers/yup';
-import {
-  QueryClient,
-  useMutation,
-  useQuery,
-  useQueryClient
-} from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Input, message } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
+import clsx from 'clsx';
 import { isEmpty } from 'lodash';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -38,17 +33,15 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import ReactImageUploading, { ImageListType } from 'react-images-uploading';
 import CheckIcon from '../../../public/assets/icon/CheckIcon';
 import DoubleLine from '../../../public/assets/icon/DoubleLineIcon';
-import UploadFileTab from './UploadFileTab';
-import clsx from 'clsx';
+import InputMessage from '../common/InputMessage';
 import SelectFeatureTag from '../common/SelectFeatureTag';
-import { getThemeFeatureIds } from '@/utils/helper';
+import UploadFileTab from './UploadFileTab';
 
 interface IProductFormProps {
   themeDetail?: ITheme;
 }
 
 function ProductForm({ themeDetail }: IProductFormProps) {
-  const dispatch = useAppDispatch();
   const {
     register,
     handleSubmit,
@@ -60,23 +53,24 @@ function ProductForm({ themeDetail }: IProductFormProps) {
   } = useForm<TCreateThemeSchema>({
     resolver: yupResolver(createThemeSchema as any)
   });
-  const [productFile, setProductFile] = useState<string>();
-  const [productFileLocal, setProductFileLocal] = useState<File>();
-  const [themeFile, setThemeFileLocal] = useState<string>();
+  const [themeFileLink, setThemeFileLink] = useState<string>();
   const [fileLocal, setFileLocal] = useState<File>();
-  const [coverImage, setCoverImage] = useState<ImageListType | string[]>([]);
-  const [detailImages, setDetailImages] = useState<ImageListType | string[]>(
-    []
-  );
-  const [fullPreviewImages, setFullPreViewImages] = useState<
-    ImageListType | string[]
-  >([]);
+  const [coverImage, setCoverImage] = useState<string[]>([]);
+  const [detailImages, setDetailImages] = useState<string[]>([]);
+  const [fullPreviewImages, setFullPreViewImages] = useState<string[]>([]);
   const [thumbnail, setThumbnail] = useState<string>();
   const [tab, setTab] = useState<EProductTab>(EProductTab.OVERVIEW);
   const [status, setStatus] = useState<EThemeStatus>(EThemeStatus.DRAFT);
   const [fileTypeSelect, setFileTypeSelect] = useState<IThemeFeatureType[]>([]);
+  const [themeId, setThemeId] = useState();
   const router = useRouter();
 
+  const tabList = [
+    EProductTab.OVERVIEW,
+    EProductTab.FEATURES,
+    EProductTab.UPLOAD_IMAGE,
+    EProductTab.UPLOAD_FILE
+  ];
   const isUpdate = useMemo(() => themeDetail, [themeDetail]);
   const getImageLocal = useCallback((data: any) => {
     return data.filter((item: any) => item?.dataUrl);
@@ -107,19 +101,13 @@ function ProductForm({ themeDetail }: IProductFormProps) {
 
   useEffect(() => {
     if (themeDetail) {
-      setProductFile(themeDetail.zip_link);
       setValue('name', themeDetail.name);
       setValue('overview', themeDetail.overview);
       setValue('selling_price', Number(themeDetail.sale?.price));
       setValue('owner_price', Number(themeDetail.listing?.price));
-      setValue(
-        'template_features',
-        themeDetail.media?.template_features?.join(', ')
-      );
       setValue('percentageOfOwnership', themeDetail.percentageOfOwnership);
       setValue('highlight', themeDetail?.media?.highlight);
-      setValue('linkPreview', themeDetail.linkPreview);
-      setValue('figma_features', themeDetail.media?.figma_features?.join(', '));
+      setValue('linkPreview', themeDetail?.linkPreview || undefined);
       setValue(
         'categories',
         themeDetail?.categories?.map(item => item.id)
@@ -129,84 +117,80 @@ function ProductForm({ themeDetail }: IProductFormProps) {
         themeDetail?.tags?.map(item => item.id)
       );
       setValue('feature_ids', getThemeFeatureIds(themeDetail?.themeFeatures));
-      setProductFile(themeDetail.zip_link);
       setCoverImage(themeDetail.media.coverImages);
       setThumbnail(themeDetail.media.thumbnail);
-      setDetailImages(themeDetail.media.detailImages);
-      setFullPreViewImages(themeDetail.media.previews);
-      setThemeFileLocal(themeDetail?.fileUrl);
+      setValue('thumbnail_link', themeDetail?.media.thumbnail);
+      setDetailImages(themeDetail.media?.detailImages || []);
+      setFullPreViewImages(themeDetail?.media?.previews || []);
+      setThemeFileLink(themeDetail.zip_link);
       setFileTypeSelect(themeDetail?.themeFeatures.map(item => item.type));
     }
   }, [setValue, themeDetail]);
 
-  const onSubmit: SubmitHandler<TCreateThemeSchema> = async data => {
-    switch (true) {
-      case !productFile:
-        message.error({ content: 'Product is required' });
+  const { mutate: handleCreateTheme } = useMutation({
+    mutationFn: createTheme,
+    onSuccess: data => {
+      if (status === EThemeStatus.DRAFT) {
+        router.push('/admin/your-products', { scroll: false });
         return;
+      }
+      setThemeId(data?.data.themeId || data.data.id);
 
-      case !themeFile:
-        message.error({ content: 'Theme file is required' });
-        return;
-
-      case !thumbnail:
-        message.error({ content: 'Thumbnail is required' });
-        return;
-
-      case isEmpty(coverImage):
-        message.error({ content: 'Cover image is required' });
-        return;
-
-      case isEmpty(detailImages):
-        message.error({ content: 'Detail image is required' });
-        return;
-
-      case isEmpty(fullPreviewImages):
-        message.error({ content: 'Preview image is required' });
-        return;
-
-      default:
-        break;
+      if (tab !== EProductTab.UPLOAD_FILE) {
+        setTab((preState: EProductTab) => {
+          const currentTabIndex = tabList.indexOf(preState);
+          return tabList[currentTabIndex + 1];
+        });
+      } else {
+        message.success('Create theme successfully');
+        router.push('/admin/your-products', { scroll: false });
+      }
+    },
+    onError: error => {
+      message.error(error.message);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [EQueryKeys.YOUR_PRODUCTS] });
     }
+  });
 
-    const coverImageCreated: any = (coverImage[0] as any).file
-      ? await uploadTheme({
-          thumbnail: (coverImage[0] as any).file
-        })
-      : coverImage[0];
-
-    const previewsImages: any = await uploadTheme({
-      previews: getImageLocal(fullPreviewImages).map((item: any) => {
-        if (item?.file) return item?.file;
-      })
-    });
-
-    const detailImage: any = await uploadTheme({
-      previews: getImageLocal(detailImages).map((item: any) => {
-        if (item?.file) return item?.file;
-      })
-    });
-
+  const onSubmit: SubmitHandler<TCreateThemeSchema> = async data => {
     const createThemeDto: TCreateTheme = {
       ...data,
-      zip_link: productFile,
-      thumbnail_link: thumbnail,
-      fileUrl: themeFile,
+
       status,
-      coverImages:
-        coverImageCreated.data?.thumbnail ?? getImageServer(coverImage),
-      fullPreviewImages: [
-        ...getImageServer(fullPreviewImages),
-        ...(previewsImages.data?.previews ?? [])
-      ],
-      detailImages: [
-        ...getImageServer(detailImages),
-        ...(detailImage.data?.previews ?? [])
-      ]
+      zip_link: themeFileLink
     };
 
+    if (tab === EProductTab.UPLOAD_IMAGE) {
+      if (isEmpty(coverImage)) {
+        message.error({ content: 'Cover image is required' });
+        return;
+      }
+      if (isEmpty(detailImages)) {
+        message.error({ content: 'Detail image is required' });
+        return;
+      }
+      if (isEmpty(fullPreviewImages)) {
+        message.error({ content: 'Preview image is required' });
+        return;
+      }
+    }
+
+    if (tab === EProductTab.UPLOAD_FILE) {
+      if (!themeFileLink) {
+        message.error({ content: 'Theme file is required' });
+        return;
+      }
+    }
+
     if (isUpdate) {
-      const updateThemeDto = { ...createThemeDto };
+      const updateThemeDto = {
+        ...createThemeDto,
+        fullPreviewImages,
+        detailImages,
+        coverImages: coverImage
+      };
       handleUpdateTheme({
         themeId: Number(themeDetail?.id),
         body: updateThemeDto
@@ -214,61 +198,70 @@ function ProductForm({ themeDetail }: IProductFormProps) {
       return;
     }
 
+    if (tab !== EProductTab.OVERVIEW) {
+      handleCreateTheme({
+        ...createThemeDto,
+        theme_id: themeId,
+        coverImages: coverImage,
+        fullPreviewImages,
+        detailImages
+      });
+      return;
+    }
+
+    handleCreateTheme(createThemeDto);
+  };
+
+  const uploadCoverImage = async (data: ImageListType) => {
     try {
-      await dispatch(createThemeAction(createThemeDto)).unwrap();
-      message.success('Create theme successfully');
-      router.push('/admin/dashboard', { scroll: false });
-    } catch (error: any) {
-      message.error(error.message);
-    }
+      const result = await uploadTheme({
+        thumbnail: data[0].file
+      });
+      message.success('Successfully');
+      setCoverImage([result.data.thumbnail as string]);
+    } catch (error) {}
   };
 
-  const onError = (error: any) => {
-    for (const item of Object.values(error) as any) {
-      message.error(item['message']);
-    }
+  const uploadFullPreivewImages = async (data: any) => {
+    try {
+      const result = await uploadTheme({
+        previews: getImageLocal(data).map((item: any) => {
+          if (item?.file) return item?.file;
+        })
+      });
+      if (result.data.previews) {
+        setFullPreViewImages([
+          ...getImageServer(data),
+          ...result.data.previews
+        ]);
+      }
+      message.success('Successfully');
+    } catch (error) {}
+  };
+  const uploadDetailImages = async (data: any) => {
+    try {
+      const result = await uploadTheme({
+        previews: getImageLocal(data).map((item: any) => {
+          if (item?.file) return item?.file;
+        })
+      });
+      if (result.data.previews) {
+        setDetailImages([...getImageServer(data), ...result.data.previews]);
+      }
+      message.success('Successfully');
+    } catch (error) {}
   };
 
-  const handleChangeThumbnail = async (file: any) => {
+  const handleChangeThumbnail = async (file: ImageListType) => {
     try {
       const result = await uploadTheme({
         thumbnail: file
       });
       setThumbnail(result.data.thumbnail);
+      setValue('thumbnail_link', result.data.thumbnail);
       message.success('Update thumbnail successfully');
     } catch (err) {
       message.error('Update thumbnail failed');
-    }
-  };
-
-  const handleFileTheme = async (
-    e: ChangeEvent<HTMLInputElement>,
-    allowFileTypes: string[]
-  ) => {
-    if (!e.target.files || e.target.files.length === 0) {
-      return;
-    }
-    const file = e.target.files[0];
-    const isMatchMediaType = allowFileTypes.includes(file.type);
-
-    const allowedInputType = allowFileTypes
-      ?.map(item => item.split('/')[1])
-      ?.join('/')
-      ?.toUpperCase();
-
-    if (isMatchMediaType) {
-      message.error(`You can only upload ${allowedInputType}file!`);
-      return;
-    }
-    try {
-      const result = await uploadTheme({
-        zip_file: e.target.files[0]
-      });
-      setProductFileLocal(e.target.files[0]);
-      setProductFile(result.data.zip_file);
-      message.success('Update theme zip successfully');
-    } catch (err) {
-      message.error('Update theme zip failed');
     }
   };
 
@@ -296,7 +289,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
         zip_file: e.target.files[0]
       });
       setFileLocal(e.target.files[0]);
-      setThemeFileLocal(result.data.zip_file);
+      setThemeFileLink(result.data.zip_file);
       message.success('Update theme zip successfully');
     } catch (err) {
       message.error('Update theme zip failed');
@@ -316,7 +309,10 @@ function ProductForm({ themeDetail }: IProductFormProps) {
         {NAV_LINKS.map((item, index) => (
           <li
             key={index}
-            onClick={() => setTab(item.value)}
+            onClick={() => {
+              if (!isUpdate) return;
+              setTab(item.value);
+            }}
             className="flex items-center gap-4 cursor-pointer"
           >
             <span
@@ -362,7 +358,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
     fileTypeSelect?.find(type => type?.id === typeId);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, onError)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex justify-between">
         <h1 className="text-[#111827] text-3xl not-italic font-bold leading-9">
           {isUpdate ? 'Update product' : 'Add new product'}
@@ -375,10 +371,14 @@ function ProductForm({ themeDetail }: IProductFormProps) {
             Save as draft
           </button>
           <button
-            onClick={() => setStatus(EThemeStatus.PENDING)}
+            onClick={() => {
+              setStatus(EThemeStatus.PENDING);
+            }}
             className="bg-primary text-white px-[17px] py-[9px] rounded-[14px] ml-4"
           >
-            Submit for review
+            {tab === EProductTab.UPLOAD_FILE || isUpdate
+              ? 'Submit for review'
+              : 'Next step'}
           </button>
         </div>
       </div>
@@ -405,25 +405,13 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                     </div>
                     <div>
                       <h3 className="font-medium">Single product</h3>
-                      {isUpdate && !productFileLocal ? (
-                        <p className="mt-1">
-                          {productFile?.split(RegExp('%2..*%2F(.*?)?alt'))?.[1]}
-                        </p>
-                      ) : (
-                        <p className="mt-1">
-                          {productFile && productFileLocal
-                            ? `${productFileLocal.name} (${productFileLocal.size}MB)`
-                            : `Any set of files to download that contain a single type of category`}
-                        </p>
-                      )}
+
+                      <p className="mt-1">
+                        Any set of files to download that contain a single type
+                        of category
+                      </p>
                     </div>
                   </label>
-                  <Input
-                    id="single-theme"
-                    type="file"
-                    className="hidden"
-                    onChange={e => handleFileTheme(e, ['application/zip'])}
-                  />
                 </li>
               </ul>
             </div>
@@ -433,39 +421,36 @@ function ProductForm({ themeDetail }: IProductFormProps) {
               </h1>
               <ul className="flex flex-col gap-4">
                 <li className="w-full">
-                  <h2>Name</h2>
+                  <h2 className="mb-1">Name</h2>
                   <Controller
                     name="name"
                     control={control}
                     render={({ field }) => (
                       <Input
-                        className="w-[100%] px-[13px] py-[9px] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
+                        className="w-[100%] px-[13px] py-[9px] border-[#D1D5DB] border-1 rounded-[8px] outline-[#D1D5DB]"
                         type="text"
                         {...field}
                         status={errors.name?.message ? 'error' : ''}
-                        placeholder={errors.name?.message || ''}
                       />
                     )}
                   />
+                  <InputMessage errorMessage={errors.name?.message} />
                   <span className="text-[#64748B]">Give it a catchy name</span>
                 </li>
                 <li className="w-full mt-2">
-                  <h2>Description</h2>
+                  <h2 className="mb-1">Description</h2>
                   <Controller
                     name="overview"
                     control={control}
                     render={({ field }) => (
                       <TextArea
-                        className="w-[100%] h-[100px] px-[13px] py-[9px] text-[#64748B] border-[#D1D5DB] border-2 rounded-[8px] outline-[#D1D5DB]"
+                        className="w-[100%] h-[100px] px-[13px] py-[9px] border-[#D1D5DB] border-1 rounded-[8px] outline-[#D1D5DB]"
                         {...field}
                         status={errors.overview?.message ? 'error' : ''}
-                        placeholder={
-                          errors.overview?.message ||
-                          'Something about your product...'
-                        }
                       />
                     )}
                   />
+                  <InputMessage errorMessage={errors.overview?.message} />
                 </li>
               </ul>
             </div>
@@ -475,73 +460,74 @@ function ProductForm({ themeDetail }: IProductFormProps) {
               </h1>
               <ul className="flex flex-col gap-4">
                 <li className="w-full">
-                  <h2>Selling pricing</h2>
-                  <div className="flex h-[44px] border-[#D1D5DB] border-2 rounded-[8px]">
-                    <div className="w-[62px] h-full flex justify-center items-center bg-[#EEF2FF] rounded-l-[8px]">
-                      SOL
-                    </div>
-                    <Controller
-                      name="selling_price"
-                      control={control}
-                      render={({ field }) => (
+                  <h2 className="mb-1">Selling pricing</h2>
+                  <Controller
+                    name="selling_price"
+                    control={control}
+                    render={({ field }) => (
+                      <div>
                         <Input
-                          className="w-[100%] px-[13px] py-[9px] rounded-r-[8px] outline-[#D1D5DB]"
-                          type="text"
                           {...field}
                           status={errors.selling_price?.message ? 'error' : ''}
-                          placeholder={errors.selling_price?.message}
+                          size="large"
+                          addonBefore="SOL"
                         />
-                      )}
-                    />
-                  </div>
+                        <InputMessage
+                          errorMessage={errors.selling_price?.message}
+                        />
+                      </div>
+                    )}
+                  />
                   <span className="text-[#64748B]">
                     How much do you want to sell this?
                   </span>
                 </li>
                 <li className="w-full">
-                  <h2>Percentage of Ownership</h2>
-                  <div className="flex h-[44px]  border-[#D1D5DB] border-2 rounded-[8px]">
-                    <div className="w-[62px] h-full flex justify-center items-center bg-[#EEF2FF] rounded-l-[8px]">
-                      %
-                    </div>
-                    <Controller
-                      name="owner_price"
-                      control={control}
-                      render={({ field }) => (
+                  <h2 className="mb-1">Percentage of Ownership</h2>
+                  <Controller
+                    name="percentageOfOwnership"
+                    control={control}
+                    render={({ field }) => (
+                      <div>
                         <Input
-                          className="w-[100%] px-[13px] py-[9px] rounded-r-[8px] outline-[#D1D5DB]"
-                          type="text"
                           {...field}
-                          status={errors.owner_price?.message ? 'error' : ''}
-                          placeholder={errors.owner_price?.message}
+                          status={
+                            errors.percentageOfOwnership?.message ? 'error' : ''
+                          }
+                          size="large"
+                          addonBefore="%"
                         />
-                      )}
-                    />
-                  </div>
+                        <InputMessage
+                          errorMessage={errors.percentageOfOwnership?.message}
+                        />
+                      </div>
+                    )}
+                  />
                   <span className="text-[#64748B]">
                     How much would you pass with product?
                   </span>
                 </li>
                 <li className="w-full">
-                  <h2>Ownership price</h2>
-                  <div className="flex h-[44px]  border-[#D1D5DB] border-2 rounded-[8px]">
-                    <div className="w-[62px] h-full flex justify-center items-center bg-[#EEF2FF] rounded-l-[8px]">
-                      SOL
-                    </div>
-                    <Controller
-                      name="percentageOfOwnership"
-                      control={control}
-                      render={({ field }) => (
+                  <h2 className="mb-1">Ownership price</h2>
+                  <Controller
+                    name="owner_price"
+                    control={control}
+                    render={({ field }) => (
+                      <div>
                         <Input
-                          className="w-[100%] px-[13px] py-[9px] rounded-r-[8px] outline-[#D1D5DB]"
+                          className="w-[100%] rounded-r-[8px] outline-[#D1D5DB]"
                           type="text"
                           {...field}
+                          size="large"
+                          addonBefore="SOL"
                           status={errors.owner_price?.message ? 'error' : ''}
-                          placeholder={errors.owner_price?.message}
                         />
-                      )}
-                    />
-                  </div>
+                        <InputMessage
+                          errorMessage={errors.owner_price?.message}
+                        />
+                      </div>
+                    )}
+                  />
                   <span className="text-[#64748B]">
                     How much would you pass with product?
                   </span>
@@ -571,10 +557,21 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                   handleChange={handleChangeThumbnail}
                   name="file"
                   types={productImageAcceptTypes}
-                />
-                {thumbnail && (
-                  <img alt="img" className="w-[80%] h-full" src={thumbnail} />
-                )}
+                >
+                  {thumbnail ? (
+                    <img
+                      alt="img"
+                      className="w-full h-full rounded-2xl object-cover"
+                      src={thumbnail}
+                    />
+                  ) : (
+                    <UploadFile
+                      customClassname={
+                        errors.thumbnail_link ? 'border-error border-[2px]' : ''
+                      }
+                    />
+                  )}
+                </FileUploader>
               </ul>
             </div>
             <div>
@@ -753,7 +750,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                 value={[]}
                 maxNumber={1}
                 dataURLKey="dataUrl"
-                onChange={e => setCoverImage(e)}
+                onChange={e => uploadCoverImage(e)}
               >
                 {({ onImageUpload, dragProps }) => (
                   <div onClick={onImageUpload} {...dragProps}>
@@ -786,7 +783,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                 dataURLKey="dataUrl"
                 acceptType={productImageAcceptTypes}
                 onChange={data =>
-                  setDetailImages(preState => [...preState, ...(data as any)])
+                  uploadDetailImages([...detailImages, ...data])
                 }
               >
                 {({ onImageUpload, dragProps }) => (
@@ -845,9 +842,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                 maxNumber={8}
                 dataURLKey="dataUrl"
                 onChange={data =>
-                  setFullPreViewImages(
-                    preState => [...preState, ...data] as any
-                  )
+                  uploadFullPreivewImages([...fullPreviewImages, ...data])
                 }
               >
                 {({ onImageUpload, dragProps }) => (
@@ -900,7 +895,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
       {EProductTab.UPLOAD_FILE === tab && (
         <UploadFileTab
           fileLocal={fileLocal}
-          themeFile={themeFile}
+          themeFile={themeFileLink}
           handleFileThemeZip={handleFileThemeZip}
         />
       )}
