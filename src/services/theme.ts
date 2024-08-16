@@ -10,7 +10,6 @@ import {
 import { ApiThemes } from './route';
 
 export async function createTheme(body: TCreateTheme): Promise<any> {
-  console.log('body', body);
   return api(ApiThemes.createProducts, body);
 }
 

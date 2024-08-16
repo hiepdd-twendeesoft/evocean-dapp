@@ -1,3 +1,4 @@
+import { ECollectionTab } from '@/models/collection.type';
 import { EProductTab } from './product';
 
 export enum EQueryKeys {
@@ -24,5 +25,20 @@ export const NAV_LINKS = [
   {
     title: 'Upload File',
     value: EProductTab.UPLOAD_FILE
+  }
+];
+
+export const COLLECTION_NAV_LINKS = [
+  {
+    title: 'Overview',
+    value: ECollectionTab.OVERVIEW
+  },
+  {
+    title: 'Features',
+    value: ECollectionTab.FEATURES
+  },
+  {
+    title: 'Choose Products',
+    value: ECollectionTab.CHOOSE_PRODUCTS
   }
 ];
