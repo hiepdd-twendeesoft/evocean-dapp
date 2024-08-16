@@ -60,7 +60,7 @@ const ContentTab: FC<IProps> = ({
             indexTab === 1 ? 'hidden' : ''
           }`}
         >
-          <h4 className="text-lg font-medium text-gray-900 mb-4">Tagss</h4>
+          <h4 className="text-lg font-medium text-gray-900 mb-4">Tags</h4>
           <div className="flex items-center flex-wrap">
             {tags?.map((item, index) => {
               return (

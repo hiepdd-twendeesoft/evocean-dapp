@@ -126,8 +126,6 @@ const DetailThemePage = () => {
     window.open(data?.media?.live_preview);
   };
 
-  console.log('data', data?.themeFeatures);
-
   const themeFormat = useMemo(
     () => data?.themeFeatures.map(item => item.type),
     [data?.themeFeatures]
