@@ -1,3 +1,5 @@
+import { IThemeCategory, IThemeTag, ThemeFeature } from './theme.type';
+
 export interface FetchThemeParams {
   page: number;
   take: number;
@@ -22,11 +24,9 @@ export interface ItemTheme {
     previews: string[];
     figma_features: any[];
     template_features: any[];
-    categories: string[];
     format: string[];
-    hightlight: string[];
+    highlight: string[];
     live_preview: string;
-    pages: string[];
   };
   owner_addresses: string[];
   token_mint: string;
@@ -40,6 +40,9 @@ export interface ItemTheme {
     price: string;
   };
   Transactions: TransactionTheme[];
+  categories: IThemeCategory[];
+  tags: IThemeTag[];
+  themeFeatures: ThemeFeature[];
 }
 
 export type TransactionTheme = {

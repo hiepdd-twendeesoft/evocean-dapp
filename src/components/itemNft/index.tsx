@@ -1,21 +1,20 @@
-"use client";
+'use client';
 
-import { Route } from "@/constants/route";
-import useConvertDollar from "@/hooks/useConvertDollar";
-import { ItemTheme } from "@/models/common.type";
-import { lamportsToSol } from "@/utils/lamports-to-sol";
-import { toFormatPrice } from "@/utils/utils";
-import { useRouter } from "next/navigation";
-import { FC, memo } from "react";
+import { Route } from '@/constants/route';
+import useConvertDollar from '@/hooks/useConvertDollar';
+import { ItemTheme } from '@/models/common.type';
+import { lamportsToSol } from '@/utils/lamports-to-sol';
+import { toFormatPrice } from '@/utils/utils';
+import { useRouter } from 'next/navigation';
+import { FC, memo } from 'react';
 
-interface IProps extends Partial<ItemTheme> {
+interface IItemNftProps extends Partial<ItemTheme> {
   handleItem?: (id: number) => void;
   image?: string;
   hidePrice?: boolean;
-  categories?: string[];
 }
 
-const ItemNft: FC<IProps> = ({
+const ItemNft: FC<IItemNftProps> = ({
   handleItem,
   image,
   name,
@@ -23,7 +22,7 @@ const ItemNft: FC<IProps> = ({
   sale,
   hidePrice,
   listing,
-  categories,
+  categories
 }) => {
   const router = useRouter();
 
@@ -42,15 +41,15 @@ const ItemNft: FC<IProps> = ({
       className="mb-[12px] cursor-pointer hover:-translate-y-1 duration-200"
     >
       <img
-        src={image || "/assets/image/theme.png"}
+        src={image || '/assets/image/theme.png'}
         alt="Theme"
         className="w-[100%] rounded-[16px] border-gray-300 border-[1px] h-[200px]"
       />
       <h2 className="text-base text-gray-900 font-semibold mt-[12px] line-clamp-1">
-        {name || "DataWise Framer - Multi-Layout SaaS Framer Template"}
+        {name || 'DataWise Framer - Multi-Layout SaaS Framer Template'}
       </h2>
       <p className="text-[#565E76] text-sm font-normal mr-2 line-clamp-1">
-        {categories?.map((item) => `${item} `)}
+        {categories?.map(item => `${item} `)}
       </p>
 
       {!hidePrice && (
@@ -58,7 +57,7 @@ const ItemNft: FC<IProps> = ({
           <div className="flex item-center w-[50%] justify-center px-[12px]">
             <div className="flex items-center mr-1">
               <img
-                src={"/assets/image/SOL.svg"}
+                src={'/assets/image/SOL.svg'}
                 alt="SOL"
                 className="w-[14px] h-[14px]"
               />
@@ -76,7 +75,7 @@ const ItemNft: FC<IProps> = ({
               Ownership:
             </p>
             <img
-              src={"/assets/image/SOL.svg"}
+              src={'/assets/image/SOL.svg'}
               alt="SOL"
               className="w-[14px] h-[14px]"
             />
