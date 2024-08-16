@@ -13,7 +13,23 @@ export interface ICreateCollection {
   collectionTags?: string[];
   collectionFeatureTypes?: string[];
   theme_ids?: string[];
+  colleciton_id?: number;
 }
+
+export type TCreateCollectionSchema = {
+  collection_name: string;
+  description: string;
+  sellingPricing: number;
+  ownershipPrice: number;
+  percentageOfOwnership: string;
+  highlights?: string[];
+  livePreviewLink?: string;
+  collectionCategories?: number[];
+  collectionTags?: number[];
+  linkPreview?: string;
+  feature_ids?: number[];
+  thumbnail?: string;
+};
 
 export interface ICollection {
   id: number;

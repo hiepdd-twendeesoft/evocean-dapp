@@ -16,7 +16,12 @@ import { fetchFeatureType } from '@/services/common.service';
 import { createTheme, updateTheme, uploadTheme } from '@/services/theme';
 import { COLLECTION_NAV_LINKS, EQueryKeys } from '@/types/common';
 
-import { ECollectionTab } from '@/models/collection.type';
+import {
+  ECollectionTab,
+  ICreateCollection,
+  TCreateCollectionSChema,
+  TCreateCollectionSchema
+} from '@/models/collection.type';
 import { getThemeFeatureIds } from '@/utils/helper';
 import { createThemeSchema } from '@/validation/admin/theme.validation';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -35,6 +40,8 @@ import DoubleLine from '../../../public/assets/icon/DoubleLineIcon';
 import InputMessage from '../common/InputMessage';
 import SelectFeatureTag from '../common/SelectFeatureTag';
 import { createCollection } from '@/services/collection';
+import { createCollectionSchema } from '@/validation/admin/collection.validation';
+import ChooseProductModal from '@/app/(main)/profile/components/ChooseProductModal';
 
 interface IProductFormProps {
   themeDetail?: ITheme;
@@ -49,8 +56,8 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
     formState: { errors },
     getValues,
     control
-  } = useForm<TCreateThemeSchema>({
-    resolver: yupResolver(createThemeSchema as any)
+  } = useForm<TCreateCollectionSchema>({
+    resolver: yupResolver(createCollectionSchema as any)
   });
 
   const [fullPreviewImages, setFullPreViewImages] = useState<string[]>([]);
@@ -58,9 +65,10 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
   const [tab, setTab] = useState<ECollectionTab>(ECollectionTab.OVERVIEW);
   const [status, setStatus] = useState<EThemeStatus>(EThemeStatus.DRAFT);
   const [fileTypeSelect, setFileTypeSelect] = useState<IThemeFeatureType[]>([]);
-  const [themeId, setThemeId] = useState();
+  const [collectionId, setCollection] = useState<number>();
   const router = useRouter();
 
+  console.log('collecttionId', collectionId);
   const tabList = [
     ECollectionTab.OVERVIEW,
     ECollectionTab.FEATURES,
@@ -89,24 +97,24 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
 
   useEffect(() => {
     if (themeDetail) {
-      setValue('name', themeDetail.name);
-      setValue('overview', themeDetail.overview);
-      setValue('selling_price', Number(themeDetail.sale?.price));
-      setValue('owner_price', Number(themeDetail.listing?.price));
+      setValue('collection_name', themeDetail.name);
+      setValue('description', themeDetail.overview);
+      setValue('sellingPricing', Number(themeDetail.sale?.price));
+      setValue('ownershipPrice', Number(themeDetail.listing?.price));
       setValue('percentageOfOwnership', themeDetail.percentageOfOwnership);
-      setValue('highlight', themeDetail?.media?.highlight);
+      setValue('highlights', themeDetail?.media?.highlight);
       setValue('linkPreview', themeDetail?.linkPreview || undefined);
       setValue(
-        'categories',
+        'collectionCategories',
         themeDetail?.categories?.map(item => item.id)
       );
       setValue(
-        'tags',
+        'collectionTags',
         themeDetail?.tags?.map(item => item.id)
       );
       setValue('feature_ids', getThemeFeatureIds(themeDetail?.themeFeatures));
       setThumbnail(themeDetail.media.thumbnail);
-      setValue('thumbnail_link', themeDetail?.media.thumbnail);
+      setValue('thumbnail', themeDetail?.media.thumbnail);
       setFullPreViewImages(themeDetail?.media?.previews || []);
       setFileTypeSelect(themeDetail?.themeFeatures.map(item => item.type));
     }
@@ -116,10 +124,10 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
     mutationFn: createCollection,
     onSuccess: data => {
       if (status === EThemeStatus.DRAFT) {
-        router.push('/admin/your-products', { scroll: false });
+        router.push('/your-collections', { scroll: false });
         return;
       }
-      setThemeId(data?.data.themeId || data.data.id);
+      setCollection(data?.id);
 
       if (tab !== ECollectionTab.CHOOSE_PRODUCTS) {
         setTab((preState: ECollectionTab) => {
@@ -128,7 +136,7 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
         });
       } else {
         message.success('Create theme successfully');
-        router.push('/admin/your-products', { scroll: false });
+        router.push('/your-collections', { scroll: false });
       }
     },
     onError: error => {
@@ -139,34 +147,32 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
     }
   });
 
-  const onSubmit: SubmitHandler<TCreateThemeSchema> = async data => {
-    const createThemeDto: TCreateTheme = {
-      ...data,
-
-      status
+  const onSubmit: SubmitHandler<any> = async (data: ICreateCollection) => {
+    console.log('run', data);
+    const createCollectionDto: ICreateCollection = {
+      ...data
     };
-
     if (isUpdate) {
-      const updateThemeDto = {
-        ...createThemeDto,
+      const updateCollection = {
+        ...createCollectionDto,
         fullPreviewImages
       };
-      handleUpdateTheme({
-        themeId: Number(themeDetail?.id),
-        body: updateThemeDto
-      });
+      //   handleUpdateTheme({
+      //     collectionId: Number(themeDetail?.id),
+      //     body: updateThemeDto
+      //   });
       return;
     }
 
     if (tab !== ECollectionTab.OVERVIEW) {
       handleCreateCollection({
-        ...createThemeDto,
-        theme_id: themeId
+        ...createCollectionDto,
+        colleciton_id: collectionId
       });
       return;
     }
 
-    handleCreateCollection(createThemeDto);
+    handleCreateCollection(createCollectionDto);
   };
 
   const handleChangeThumbnail = async (file: ImageListType) => {
@@ -175,7 +181,7 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
         thumbnail: file
       });
       setThumbnail(result.data.thumbnail);
-      setValue('thumbnail_link', result.data.thumbnail);
+      setValue('thumbnail', result.data.thumbnail);
       message.success('Update thumbnail successfully');
     } catch (err) {
       message.error('Update thumbnail failed');
@@ -302,34 +308,36 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
                 <li className="w-full">
                   <h2 className="mb-1">Name</h2>
                   <Controller
-                    name="name"
+                    name="collection_name"
                     control={control}
                     render={({ field }) => (
                       <Input
                         className="w-[100%] px-[13px] py-[9px] border-[#D1D5DB] border-1 rounded-[8px] outline-[#D1D5DB]"
                         type="text"
                         {...field}
-                        status={errors.name?.message ? 'error' : ''}
+                        status={errors.collection_name?.message ? 'error' : ''}
                       />
                     )}
                   />
-                  <InputMessage errorMessage={errors.name?.message} />
+                  <InputMessage
+                    errorMessage={errors.collection_name?.message}
+                  />
                   <span className="text-[#64748B]">Give it a catchy name</span>
                 </li>
                 <li className="w-full mt-2">
                   <h2 className="mb-1">Description</h2>
                   <Controller
-                    name="overview"
+                    name="description"
                     control={control}
                     render={({ field }) => (
                       <TextArea
                         className="w-[100%] h-[100px] px-[13px] py-[9px] border-[#D1D5DB] border-1 rounded-[8px] outline-[#D1D5DB]"
                         {...field}
-                        status={errors.overview?.message ? 'error' : ''}
+                        status={errors.description?.message ? 'error' : ''}
                       />
                     )}
                   />
-                  <InputMessage errorMessage={errors.overview?.message} />
+                  <InputMessage errorMessage={errors.description?.message} />
                 </li>
               </ul>
             </div>
@@ -341,18 +349,18 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
                 <li className="w-full">
                   <h2 className="mb-1">Selling pricing</h2>
                   <Controller
-                    name="selling_price"
+                    name="sellingPricing"
                     control={control}
                     render={({ field }) => (
                       <div>
                         <Input
                           {...field}
-                          status={errors.selling_price?.message ? 'error' : ''}
+                          status={errors.sellingPricing?.message ? 'error' : ''}
                           size="large"
                           addonBefore="SOL"
                         />
                         <InputMessage
-                          errorMessage={errors.selling_price?.message}
+                          errorMessage={errors.sellingPricing?.message}
                         />
                       </div>
                     )}
@@ -389,7 +397,7 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
                 <li className="w-full">
                   <h2 className="mb-1">Ownership price</h2>
                   <Controller
-                    name="owner_price"
+                    name="ownershipPrice"
                     control={control}
                     render={({ field }) => (
                       <div>
@@ -399,10 +407,10 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
                           {...field}
                           size="large"
                           addonBefore="SOL"
-                          status={errors.owner_price?.message ? 'error' : ''}
+                          status={errors.ownershipPrice?.message ? 'error' : ''}
                         />
                         <InputMessage
-                          errorMessage={errors.owner_price?.message}
+                          errorMessage={errors.ownershipPrice?.message}
                         />
                       </div>
                     )}
@@ -446,7 +454,7 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
                   ) : (
                     <UploadFile
                       customClassname={
-                        errors.thumbnail_link ? 'border-error border-[2px]' : ''
+                        errors.thumbnail ? 'border-error border-[2px]' : ''
                       }
                     />
                   )}
@@ -485,7 +493,7 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
               <div className="mt-6">
                 <div className="flex flex-col gap-3">
                   <Controller
-                    name="highlight"
+                    name="highlights"
                     control={control}
                     render={({ field: { onChange, value } }) => {
                       return (
@@ -549,7 +557,7 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
               <div className="mt-6">
                 <div className="flex flex-col gap-3">
                   <Controller
-                    name="categories"
+                    name="collectionCategories"
                     control={control}
                     render={({ field: { onChange, value } }) => {
                       return (
@@ -574,7 +582,7 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
               <div className="mt-6">
                 <div className="flex flex-col gap-3">
                   <Controller
-                    name="tags"
+                    name="collectionTags"
                     control={control}
                     render={({ field: { onChange, value } }) => {
                       return (
@@ -614,6 +622,22 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
               </ul>
             )}
           />
+        </div>
+      )}
+
+      {tab === ECollectionTab.CHOOSE_PRODUCTS && (
+        <div className="grid grid-cols-3 gap-[32px] mt-[32px]">
+          <div className="border rounded-2xl p-[32px]">
+            <div className="m-auto flex flex-col items-center justify-center h-[262px]">
+              <img
+                className="w-[36px] h-[36px]"
+                alt="icon"
+                src="/assets/icon/plus-icon.svg"
+              />
+              <p className="text-gray-600">Choose your product.</p>
+            </div>
+          </div>
+          <ChooseProductModal />
         </div>
       )}
     </form>
