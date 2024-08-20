@@ -41,10 +41,16 @@ import InputMessage from '../common/InputMessage';
 import SelectFeatureTag from '../common/SelectFeatureTag';
 import { createCollection } from '@/services/collection';
 import { createCollectionSchema } from '@/validation/admin/collection.validation';
-import ChooseProductModal from '@/app/(main)/profile/components/ChooseProductModal';
+import ChooseProductModal from './ChooseProductModal';
+import Image from 'next/image';
+import CreatorEarning from './CreatorEarning';
 
 interface IProductFormProps {
   themeDetail?: ITheme;
+}
+export interface IProductSelect {
+  id: number;
+  thumbnail: string;
 }
 
 function CollectionForm({ themeDetail }: IProductFormProps) {
@@ -67,8 +73,9 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
   const [fileTypeSelect, setFileTypeSelect] = useState<IThemeFeatureType[]>([]);
   const [collectionId, setCollection] = useState<number>();
   const router = useRouter();
+  const [openChooseProductModal, setOpenChooseProductModal] = useState(false);
+  const [themeSelect, setThemeSelect] = useState<IProductSelect[]>([]);
 
-  console.log('collecttionId', collectionId);
   const tabList = [
     ECollectionTab.OVERVIEW,
     ECollectionTab.FEATURES,
@@ -124,7 +131,7 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
     mutationFn: createCollection,
     onSuccess: data => {
       if (status === EThemeStatus.DRAFT) {
-        router.push('/your-collections', { scroll: false });
+        router.push('admin/your-collections', { scroll: false });
         return;
       }
       setCollection(data?.id);
@@ -148,7 +155,6 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
   });
 
   const onSubmit: SubmitHandler<any> = async (data: ICreateCollection) => {
-    console.log('run', data);
     const createCollectionDto: ICreateCollection = {
       ...data
     };
@@ -167,7 +173,8 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
     if (tab !== ECollectionTab.OVERVIEW) {
       handleCreateCollection({
         ...createCollectionDto,
-        colleciton_id: collectionId
+        colleciton_id: collectionId,
+        theme_ids: themeSelect.map(item => `${item.id}`)
       });
       return;
     }
@@ -192,6 +199,10 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
     return isEmpty(value ? value[index] : '') ? '#E4E4E7' : '#4338CA';
   }, []);
 
+  const handleSetThemSelect = useCallback((data: IProductSelect[]) => {
+    setThemeSelect(data);
+  }, []);
+
   const { data: themeCategories } = useFetchCategories();
   const { data: themeTags } = useFetchAllTags();
 
@@ -202,7 +213,7 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
           <li
             key={index}
             onClick={() => {
-              if (!isUpdate) return;
+              // if (!isUpdate) return;
               setTab(item.value);
             }}
             className="flex items-center gap-4 cursor-pointer"
@@ -625,10 +636,29 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
         </div>
       )}
 
+      {tab === ECollectionTab.CREATOR_EARNING && <CreatorEarning />}
       {tab === ECollectionTab.CHOOSE_PRODUCTS && (
-        <div className="grid grid-cols-3 gap-[32px] mt-[32px]">
-          <div className="border rounded-2xl p-[32px]">
-            <div className="m-auto flex flex-col items-center justify-center h-[262px]">
+        <div className="grid xl:grid-cols-3 sm:grid-cols-2 gap-[32px] mt-[32px]">
+          {themeSelect?.map(item => {
+            return (
+              <div key={item.id}>
+                {' '}
+                <Image
+                  alt="theme-image"
+                  src={item.thumbnail}
+                  width={370}
+                  height={280}
+                  className="h-[280px] w-full object-cover rounded-xl"
+                />
+              </div>
+            );
+          })}
+
+          <div className="border rounded-2xl p-[32px] h-[280px] ">
+            <div
+              onClick={() => setOpenChooseProductModal(true)}
+              className="m-auto flex flex-col items-center justify-center h-full"
+            >
               <img
                 className="w-[36px] h-[36px]"
                 alt="icon"
@@ -637,7 +667,14 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
               <p className="text-gray-600">Choose your product.</p>
             </div>
           </div>
-          <ChooseProductModal />
+          {openChooseProductModal && (
+            <ChooseProductModal
+              open={openChooseProductModal}
+              themeSelect={themeSelect}
+              handleSetThemSelect={handleSetThemSelect}
+              onClose={() => setOpenChooseProductModal(false)}
+            />
+          )}
         </div>
       )}
     </form>

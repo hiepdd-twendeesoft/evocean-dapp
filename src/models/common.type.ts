@@ -19,14 +19,11 @@ export interface ItemTheme {
   name: string;
   overview: string;
   media: {
-    previews: string[];
-    figma_features: any[];
-    template_features: any[];
-    categories: string[];
-    format: string[];
     hightlight: string[];
-    live_preview: string;
-    pages: string[];
+    coverImages: string[];
+    detailImages: string[];
+    previews: string[];
+    thumbnail: string;
   };
   owner_addresses: string[];
   token_mint: string;
@@ -40,6 +37,8 @@ export interface ItemTheme {
     price: string;
   };
   Transactions: TransactionTheme[];
+  themeCategories: { category: IThemCategory }[];
+  themeTags: { tag: IThemCategory }[];
 }
 
 export type TransactionTheme = {
@@ -65,6 +64,11 @@ export type IUploadThemeRes = {
 };
 
 export interface IThemCategory {
+  id: number;
+  createdAt: Date;
+  name: string;
+}
+export interface IThemeTag {
   id: number;
   createdAt: Date;
   name: string;

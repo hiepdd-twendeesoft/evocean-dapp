@@ -51,5 +51,6 @@ export interface FetchCollectionParams {
 export enum ECollectionTab {
   OVERVIEW = 'Overview',
   FEATURES = 'Features',
-  CHOOSE_PRODUCTS = 'ChooseProducts'
+  CHOOSE_PRODUCTS = 'ChooseProducts',
+  CREATOR_EARNING = 'CreatorEarning'
 }

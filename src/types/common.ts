@@ -38,6 +38,10 @@ export const COLLECTION_NAV_LINKS = [
     value: ECollectionTab.FEATURES
   },
   {
+    title: 'Creator earning',
+    value: ECollectionTab.CREATOR_EARNING
+  },
+  {
     title: 'Choose Products',
     value: ECollectionTab.CHOOSE_PRODUCTS
   }
