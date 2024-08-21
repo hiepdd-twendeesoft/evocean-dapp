@@ -1,14 +1,14 @@
-import { INITIAL_PAGE, CHOOSE_PRODUCT_PAGE_SIZE } from '@/constants/base';
+import { CHOOSE_PRODUCT_PAGE_SIZE, INITIAL_PAGE } from '@/constants/base';
+import { COLOR } from '@/constants/common';
+import { ItemTheme } from '@/models/common.type';
 import { fetchThemes } from '@/services/common.service';
 import { EQueryKeys } from '@/types/common';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Button, ConfigProvider, Modal, Pagination } from 'antd';
-import React, { useCallback, useState } from 'react';
-import ProductCard from './ProductCard';
-import { ItemTheme } from '@/models/common.type';
-import { COLOR } from '@/constants/common';
+import { uniqBy } from 'lodash';
+import { useCallback, useState } from 'react';
 import { IProductSelect } from './CollectionForm';
-import { ucs2 } from 'punycode';
+import ProductCard from './ProductCard';
 
 interface IChooseProductModalProps {
   open: boolean;
@@ -20,11 +20,13 @@ interface IChooseProductModalProps {
 export default function ChooseProductModal({
   open,
   onClose,
-  handleSetThemSelect
+  handleSetThemSelect,
+  themeSelect
 }: IChooseProductModalProps) {
   const [page, setPage] = useState(INITIAL_PAGE);
-  const [productSelect, setProductSelect] = useState<ItemTheme[]>([]);
-
+  const [productSelect, setProductSelect] = useState<IProductSelect[]>(
+    themeSelect || []
+  );
   const { data: productResponse } = useQuery({
     queryKey: [EQueryKeys.YOUR_PRODUCTS, { page }],
     queryFn: () =>
@@ -35,12 +37,32 @@ export default function ChooseProductModal({
     placeholderData: keepPreviousData
   });
 
+  const selectAll = useCallback(() => {
+    setProductSelect(preState => {
+      const allThemeInPage = productResponse?.data.map(theme => {
+        return {
+          id: theme.id,
+          thumbnail: theme.media.thumbnail
+        };
+      });
+      const uniqThemeSelect = uniqBy(
+        [...preState, ...(allThemeInPage || [])],
+        'id'
+      );
+      return uniqThemeSelect as any;
+    });
+  }, [productResponse?.data]);
+
   const handleClickProductCard = useCallback(
     (theme: ItemTheme) => {
       const productExists = productSelect.find(p => p.id === theme.id);
       if (productExists) {
         setProductSelect(pre => pre.filter(item => item.id !== theme.id));
-      } else setProductSelect(pre => [...pre, theme]);
+      } else
+        setProductSelect(
+          pre =>
+            [...pre, { id: theme.id, thumbnail: theme.media.thumbnail }] as any
+        );
     },
     [productSelect]
   );
@@ -56,7 +78,7 @@ export default function ChooseProductModal({
   const handleSaveProduct = useCallback(() => {
     const productSelectList: IProductSelect[] = productSelect.map(item => ({
       id: item.id,
-      thumbnail: item.media.thumbnail
+      thumbnail: item.thumbnail
     }));
     handleSetThemSelect(productSelectList);
     onClose();
@@ -104,7 +126,10 @@ export default function ChooseProductModal({
     >
       <div className="flex justify-between">
         <h2 className="text-[30px] font-bold ">Your products</h2>
-        <Button className="text-indigo-600 border-indigo-600 hover:!text-indigo-600 hover:!border-indigo-600 rounded-xl font-semibold px-[40px] py-[9px] h-[42px] text-[16px] leading-6">
+        <Button
+          onClick={selectAll}
+          className="text-indigo-600 border-indigo-600 hover:!text-indigo-600 hover:!border-indigo-600 rounded-xl font-semibold px-[40px] py-[9px] h-[42px] text-[16px] leading-6"
+        >
           Select all
         </Button>
       </div>

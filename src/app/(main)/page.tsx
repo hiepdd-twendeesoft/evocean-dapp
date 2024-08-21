@@ -1,14 +1,14 @@
-"use client";
-import ItemNft from "@/components/itemNft";
-import { useFetchTheme } from "@/hooks/useFetchTheme";
-import { Fragment } from "react";
-import Category from "./components/Category";
+'use client';
+import ItemNft from '@/components/itemNft';
+import { useFetchTheme } from '@/hooks/useFetchTheme';
+import { Fragment } from 'react';
+import Category from './components/Category';
 
 const HomePage = () => {
   const { data, fetchNextPage, hasNextPage } = useFetchTheme({
     page: 1,
     take: 12,
-    listing: true,
+    listing: true
   });
 
   return (
@@ -33,7 +33,6 @@ const HomePage = () => {
                 image={item.media?.previews?.[0]}
                 sale={item.sale}
                 listing={item.listing}
-                categories={item?.media?.categories}
               />
             ))}
           </Fragment>

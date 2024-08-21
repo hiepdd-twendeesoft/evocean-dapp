@@ -1,11 +1,28 @@
-import React from 'react';
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Card, Form, Input, Space } from 'antd';
+import useFetchUser from '@/hooks/useFetchUser';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, Card, Form, InputNumber, Select, Space } from 'antd';
+import { uniqBy } from 'lodash';
 import Image from 'next/image';
 
-const onFinish = (values: any) => {};
+export interface IEarning {
+  percentage: number;
+  userId: number;
+}
 
-const CreatorEarning = () => {
+interface ICreatorEarningProps {
+  handleSaveEarning: (v: { earnings: IEarning[] }) => void;
+  form: any;
+}
+
+const CreatorEarning = ({ handleSaveEarning, form }: ICreatorEarningProps) => {
+  const initField = {
+    name: 0,
+    key: 0,
+    isListField: true,
+    fieldKey: 0
+  };
+  const { data: userList } = useFetchUser();
+
   return (
     <Card className="mt-[68px] w-[680px] mx-auto rounded-2xl">
       <span className="text-[20px] font-medium leading-5">
@@ -34,55 +51,74 @@ const CreatorEarning = () => {
         </div>
       </div>
       <Form
+        form={form}
         name="dynamic_form_nest_item"
-        onFinish={onFinish}
+        onFinish={handleSaveEarning}
         style={{ maxWidth: 600 }}
         autoComplete="off"
       >
-        <Form.List name="users">
-          {(fields, { add, remove }) => (
-            <>
-              {fields.map(({ key, name, ...restField }) => (
-                <Space
-                  key={key}
-                  style={{ display: 'flex', marginBottom: 8 }}
-                  align="baseline"
-                >
-                  <Form.Item
-                    {...restField}
-                    name={[name, 'first']}
-                    rules={[{ required: true, message: 'Missing first name' }]}
+        <Form.List name="earnings">
+          {(fields, { add, remove }) => {
+            return (
+              <>
+                {uniqBy([initField, ...fields], 'key').map(
+                  ({ key, name, ...restField }) => (
+                    <Space
+                      key={key}
+                      style={{
+                        display: 'flex',
+                        marginBottom: 8,
+                        alignItems: 'center'
+                      }}
+                    >
+                      <Form.Item
+                        className="flex-1"
+                        {...restField}
+                        name={[name, 'userId']}
+                      >
+                        <Select
+                          showSearch
+                          size={'large'}
+                          placeholder="you@example.com"
+                          style={{ width: 400 }}
+                          optionFilterProp="label"
+                          options={userList?.map(item => ({
+                            label: item.email,
+                            value: item.id
+                          }))}
+                        />
+                      </Form.Item>
+                      <Form.Item {...restField} name={[name, 'percentage']}>
+                        <InputNumber max={100} size="large" suffix="%" />
+                      </Form.Item>
+                      <Form.Item>
+                        <Image
+                          onClick={() => remove(name)}
+                          alt="icon"
+                          width={24}
+                          height={24}
+                          src={'/assets/icon/trash.svg'}
+                          className="cursor-pointer"
+                        />
+                      </Form.Item>
+                    </Space>
+                  )
+                )}
+                <Form.Item>
+                  <Button
+                    type="text"
+                    onClick={() => add()}
+                    block
+                    icon={<PlusOutlined />}
+                    className="text-blue-500"
                   >
-                    <Input size="large" placeholder="First Name" />
-                  </Form.Item>
-                  <Form.Item
-                    {...restField}
-                    name={[name, 'last']}
-                    rules={[{ required: true, message: 'Missing last name' }]}
-                  >
-                    <Input size="large" placeholder="Last Name" />
-                  </Form.Item>
-                  <MinusCircleOutlined onClick={() => remove(name)} />
-                </Space>
-              ))}
-              <Form.Item>
-                <Button
-                  type="dashed"
-                  onClick={() => add()}
-                  block
-                  icon={<PlusOutlined />}
-                >
-                  Add field
-                </Button>
-              </Form.Item>
-            </>
-          )}
+                    Add earnings payout address and percentage
+                  </Button>
+                </Form.Item>
+              </>
+            );
+          }}
         </Form.List>
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-        </Form.Item>
       </Form>
     </Card>
   );

@@ -17,7 +17,7 @@ export default function ProductCard({ product, isActive }: IProductCardProps) {
           className="rounded-md w-[154px] h-[115px] object-cover"
           width={154}
           height={115}
-          src={product?.media?.thumbnail}
+          src={product?.media?.thumbnail as any}
         />
       </div>
       <div className="flex-1 h-full overflow-auto no-scrollbar">
@@ -26,7 +26,7 @@ export default function ProductCard({ product, isActive }: IProductCardProps) {
           <span className="text-[12px]">Category:</span>
 
           <div className="flex gap-2 flex-wrap">
-            {product?.themeCategories?.map(item => (
+            {(product as any)?.themeCategories?.map((item: any) => (
               <div
                 className="px-[8px] h-[24px] bg-purple-200 text-purple-500 rounded-lg  w-fit"
                 key={item?.category?.id}
@@ -40,7 +40,7 @@ export default function ProductCard({ product, isActive }: IProductCardProps) {
           <span className="text-[12px]">Tag:</span>
 
           <div className="flex flex-wrap gap-2">
-            {product?.themeTags?.map(item => (
+            {(product as any)?.themeTags?.map((item: any) => (
               <div
                 className="px-[8px] h-[24px] bg-indigo-200 text-indigo-800 rounded-lg  w-fit"
                 key={item?.tag?.id}

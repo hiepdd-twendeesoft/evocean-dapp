@@ -5,31 +5,26 @@ import UploadFile from '@/components/common/UploadFile';
 import { productImageAcceptTypes } from '@/constants/common';
 import useFetchAllTags from '@/hooks/useFetchAllTags';
 import useFetchCategories from '@/hooks/useFetchCategories';
-import {
-  EThemeStatus,
-  ITheme,
-  IThemeFeatureType,
-  TCreateTheme,
-  TCreateThemeSchema
-} from '@/models/theme.type';
+import { EThemeStatus, IThemeFeatureType } from '@/models/theme.type';
 import { fetchFeatureType } from '@/services/common.service';
-import { createTheme, updateTheme, uploadTheme } from '@/services/theme';
+import { uploadTheme } from '@/services/theme';
 import { COLLECTION_NAV_LINKS, EQueryKeys } from '@/types/common';
 
 import {
   ECollectionTab,
+  ICollection,
   ICreateCollection,
-  TCreateCollectionSChema,
   TCreateCollectionSchema
 } from '@/models/collection.type';
-import { getThemeFeatureIds } from '@/utils/helper';
-import { createThemeSchema } from '@/validation/admin/theme.validation';
+import { createCollection, updateCollection } from '@/services/collection';
+import { createCollectionSchema } from '@/validation/admin/collection.validation';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Input, message } from 'antd';
+import { Form, Input, message } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import clsx from 'clsx';
 import { isEmpty } from 'lodash';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
@@ -38,35 +33,30 @@ import { ImageListType } from 'react-images-uploading';
 import CheckIcon from '../../../public/assets/icon/CheckIcon';
 import DoubleLine from '../../../public/assets/icon/DoubleLineIcon';
 import InputMessage from '../common/InputMessage';
-import SelectFeatureTag from '../common/SelectFeatureTag';
-import { createCollection } from '@/services/collection';
-import { createCollectionSchema } from '@/validation/admin/collection.validation';
 import ChooseProductModal from './ChooseProductModal';
-import Image from 'next/image';
-import CreatorEarning from './CreatorEarning';
+import CreatorEarning, { IEarning } from './CreatorEarning';
 
 interface IProductFormProps {
-  themeDetail?: ITheme;
+  collectionDetail?: ICollection;
 }
 export interface IProductSelect {
   id: number;
   thumbnail: string;
 }
 
-function CollectionForm({ themeDetail }: IProductFormProps) {
+function CollectionForm({ collectionDetail }: IProductFormProps) {
   const {
     register,
     handleSubmit,
     watch,
     setValue,
     formState: { errors },
-    getValues,
+
     control
   } = useForm<TCreateCollectionSchema>({
     resolver: yupResolver(createCollectionSchema as any)
   });
 
-  const [fullPreviewImages, setFullPreViewImages] = useState<string[]>([]);
   const [thumbnail, setThumbnail] = useState<string>();
   const [tab, setTab] = useState<ECollectionTab>(ECollectionTab.OVERVIEW);
   const [status, setStatus] = useState<EThemeStatus>(EThemeStatus.DRAFT);
@@ -75,13 +65,18 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
   const router = useRouter();
   const [openChooseProductModal, setOpenChooseProductModal] = useState(false);
   const [themeSelect, setThemeSelect] = useState<IProductSelect[]>([]);
+  //creator earning form
+  const [form] = Form.useForm();
+
+  const { collection_name } = watch();
 
   const tabList = [
     ECollectionTab.OVERVIEW,
     ECollectionTab.FEATURES,
+    ECollectionTab.CREATOR_EARNING,
     ECollectionTab.CHOOSE_PRODUCTS
   ];
-  const isUpdate = useMemo(() => themeDetail, [themeDetail]);
+  const isUpdate = useMemo(() => collectionDetail, [collectionDetail]);
 
   const { data: featureTypes } = useQuery({
     queryKey: [EQueryKeys.FEATURE_TYPE],
@@ -90,12 +85,11 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
 
   const queryClient = useQueryClient();
 
-  const { mutate: handleUpdateTheme } = useMutation({
-    mutationFn: updateTheme,
+  const { mutate: handleUpdateCollection } = useMutation({
+    mutationFn: updateCollection,
     onSuccess: () => {
       message.success('Update theme successfully');
-      queryClient.invalidateQueries({ queryKey: [EQueryKeys.YOUR_PRODUCTS] });
-      router.push('/admin/your-products', { scroll: false });
+      router.push('/admin/your-collections', { scroll: false });
     },
     onError: error => {
       message.error(error.message);
@@ -103,35 +97,53 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
   });
 
   useEffect(() => {
-    if (themeDetail) {
-      setValue('collection_name', themeDetail.name);
-      setValue('description', themeDetail.overview);
-      setValue('sellingPricing', Number(themeDetail.sale?.price));
-      setValue('ownershipPrice', Number(themeDetail.listing?.price));
-      setValue('percentageOfOwnership', themeDetail.percentageOfOwnership);
-      setValue('highlights', themeDetail?.media?.highlight);
-      setValue('linkPreview', themeDetail?.linkPreview || undefined);
+    if (collectionDetail) {
+      setValue('collection_name', collectionDetail.name);
+      setValue('description', collectionDetail.description);
+      setValue('sellingPricing', Number(collectionDetail.sellingPricing));
+      setValue('ownershipPrice', Number(collectionDetail.ownershipPrice));
+      setValue('percentageOfOwnership', collectionDetail.percentageOfOwnership);
+      setValue(
+        'highlights',
+        isEmpty(collectionDetail?.media) ? [] : collectionDetail?.media
+      );
+      setValue('linkPreview', collectionDetail?.linkPreview || undefined);
       setValue(
         'collectionCategories',
-        themeDetail?.categories?.map(item => item.id)
+        collectionDetail?.collectionCategories?.map(item => item.category.id)
       );
       setValue(
         'collectionTags',
-        themeDetail?.tags?.map(item => item.id)
+        collectionDetail?.collectionTags?.map(item => item.tag.id)
       );
-      setValue('feature_ids', getThemeFeatureIds(themeDetail?.themeFeatures));
-      setThumbnail(themeDetail.media.thumbnail);
-      setValue('thumbnail', themeDetail?.media.thumbnail);
-      setFullPreViewImages(themeDetail?.media?.previews || []);
-      setFileTypeSelect(themeDetail?.themeFeatures.map(item => item.type));
+      form.setFieldValue(
+        'earnings',
+        collectionDetail?.collectionEarnings?.map(item => ({
+          userId: item.user.id,
+          percentage: item.percentage
+        }))
+      );
+      setFileTypeSelect(
+        collectionDetail?.collectionFeatureTypes?.map(item => item.featureTypes)
+      );
+      if (!isEmpty(collectionDetail?.themeCollection)) {
+        setThemeSelect(
+          collectionDetail?.themeCollection?.map(item => ({
+            id: item.id,
+            thumbnail: item.media.thumbnail
+          })) as IProductSelect[]
+        );
+      }
+      setThumbnail(collectionDetail.thumbnail);
+      setValue('thumbnail', collectionDetail?.thumbnail);
     }
-  }, [setValue, themeDetail]);
+  }, [setValue, collectionDetail, form]);
 
   const { mutate: handleCreateCollection } = useMutation({
     mutationFn: createCollection,
     onSuccess: data => {
       if (status === EThemeStatus.DRAFT) {
-        router.push('admin/your-collections', { scroll: false });
+        router.push('/admin/your-collections', { scroll: false });
         return;
       }
       setCollection(data?.id);
@@ -143,7 +155,7 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
         });
       } else {
         message.success('Create theme successfully');
-        router.push('/your-collections', { scroll: false });
+        router.push('/admin/your-collections', { scroll: false });
       }
     },
     onError: error => {
@@ -156,24 +168,30 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
 
   const onSubmit: SubmitHandler<any> = async (data: ICreateCollection) => {
     const createCollectionDto: ICreateCollection = {
-      ...data
+      ...data,
+      collectionFeatureTypes: fileTypeSelect.map(item => item.id.toString())
     };
+    if (tab === ECollectionTab.CREATOR_EARNING) {
+      form.submit();
+      return;
+    }
+
     if (isUpdate) {
       const updateCollection = {
         ...createCollectionDto,
-        fullPreviewImages
+        theme_ids: themeSelect.map(item => `${item.id}`)
       };
-      //   handleUpdateTheme({
-      //     collectionId: Number(themeDetail?.id),
-      //     body: updateThemeDto
-      //   });
+      handleUpdateCollection({
+        id: Number(collectionDetail?.id),
+        body: updateCollection
+      });
       return;
     }
 
     if (tab !== ECollectionTab.OVERVIEW) {
       handleCreateCollection({
         ...createCollectionDto,
-        colleciton_id: collectionId,
+        collectionId: collectionId,
         theme_ids: themeSelect.map(item => `${item.id}`)
       });
       return;
@@ -181,6 +199,36 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
 
     handleCreateCollection(createCollectionDto);
   };
+
+  const handleSaveEarning = useCallback(
+    (data: { earnings: IEarning[] }) => {
+      const earnings = data.earnings.filter(
+        item => item.percentage && item.percentage
+      );
+      if (isUpdate) {
+        handleUpdateCollection({
+          id: Number(collectionDetail?.id),
+          body: {
+            earnings
+          } as ICreateCollection
+        });
+      } else {
+        handleCreateCollection({
+          collection_name,
+          collectionId: collectionId,
+          earnings
+        } as ICreateCollection);
+      }
+    },
+    [
+      collectionDetail?.id,
+      collectionId,
+      collection_name,
+      handleCreateCollection,
+      handleUpdateCollection,
+      isUpdate
+    ]
+  );
 
   const handleChangeThumbnail = async (file: ImageListType) => {
     try {
@@ -213,7 +261,7 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
           <li
             key={index}
             onClick={() => {
-              // if (!isUpdate) return;
+              if (!isUpdate) return;
               setTab(item.value);
             }}
             className="flex items-center gap-4 cursor-pointer"
@@ -563,6 +611,8 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
                 </div>
               </div>
             </div>
+          </div>
+          <div className="flex-1">
             <div>
               <p className="font-medium">Select Category</p>
               <div className="mt-6">
@@ -615,28 +665,12 @@ function CollectionForm({ themeDetail }: IProductFormProps) {
               </div>
             </div>
           </div>
-          <Controller
-            name="feature_ids"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <ul className="flex flex-1 flex-col gap-4">
-                {fileTypeSelect.map(type => (
-                  <li key={type.id} className="w-full">
-                    <h2 className="font-medium mb-6">{type.name}</h2>
-                    <SelectFeatureTag
-                      onChange={onChange}
-                      typeId={type.id}
-                      currentValue={value}
-                    />
-                  </li>
-                ))}
-              </ul>
-            )}
-          />
         </div>
       )}
 
-      {tab === ECollectionTab.CREATOR_EARNING && <CreatorEarning />}
+      {tab === ECollectionTab.CREATOR_EARNING && (
+        <CreatorEarning form={form} handleSaveEarning={handleSaveEarning} />
+      )}
       {tab === ECollectionTab.CHOOSE_PRODUCTS && (
         <div className="grid xl:grid-cols-3 sm:grid-cols-2 gap-[32px] mt-[32px]">
           {themeSelect?.map(item => {

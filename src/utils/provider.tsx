@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import ReduxProvider from "@/store/redux-provider";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
+import ReduxProvider from '@/store/redux-provider';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import {
   ConnectionProvider,
-  WalletProvider,
-} from "@solana/wallet-adapter-react";
-import { clusterApiUrl } from "@solana/web3.js";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { FC, PropsWithChildren } from "react";
-import { ToastContainer, Bounce } from "react-toastify";
+  WalletProvider
+} from '@solana/wallet-adapter-react';
+import { clusterApiUrl } from '@solana/web3.js';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { FC, PropsWithChildren } from 'react';
+import { Bounce, ToastContainer } from 'react-toastify';
 // import "react-toastify/dist/ReactToastify.css";
-import "react-toastify/dist/ReactToastify.min.css";
+import 'react-toastify/dist/ReactToastify.min.css';
 
 const client = new QueryClient();
 const Providers: FC<PropsWithChildren> = ({ children }) => {

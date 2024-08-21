@@ -1,4 +1,11 @@
-import { IThemeItem } from './theme.type';
+import { IEarning } from '@/components/collection/CreatorEarning';
+import {
+  IThemeFeatureType,
+  IThemeItem,
+  IThemeMedia,
+  IThemeTag
+} from './theme.type';
+import { IThemCategory } from './common.type';
 
 export interface ICreateCollection {
   collection_name: string;
@@ -13,7 +20,8 @@ export interface ICreateCollection {
   collectionTags?: string[];
   collectionFeatureTypes?: string[];
   theme_ids?: string[];
-  colleciton_id?: number;
+  collectionId?: number;
+  earnings?: IEarning[];
 }
 
 export type TCreateCollectionSchema = {
@@ -36,6 +44,30 @@ export interface ICollection {
   name: string;
   theme_ids: number[];
   themes: IThemeItem[];
+  created_by: number;
+  description: string;
+  linkPreview: string;
+  ownershipPrice: string;
+  media?: string[];
+  percentageOfOwnership: string;
+  sellingPricing: string;
+  themeCollection?: IThemeCollection[];
+  thumbnail: string;
+  collectionTags: { tag: IThemeTag }[];
+  collectionCategories: { category: IThemCategory }[];
+  collectionFeatureTypes: { featureTypes: IThemeFeatureType }[];
+  collectionEarnings: ICollectionEarning[];
+}
+
+interface ICollectionEarning {
+  percentage: string;
+  user: { id: string; email: string };
+}
+
+export interface IThemeCollection {
+  id: number;
+  name: string;
+  media: IThemeMedia;
 }
 
 export type TCreateCollectionSChema = {

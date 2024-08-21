@@ -17,10 +17,13 @@ export async function createCollection(
     .catch(err => err);
 }
 
-export async function updateCollection(
-  id: number,
-  body: ICreateCollection
-): Promise<ICollection> {
+export async function updateCollection({
+  id,
+  body
+}: {
+  id: number;
+  body: ICreateCollection;
+}): Promise<ICollection> {
   return api(`${ApiCollections.updateCollection}/${id}`, body, {
     method: 'PUT'
   })

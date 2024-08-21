@@ -40,10 +40,10 @@ export interface ThemeFeature {
     name: string;
     id: number;
   }[];
-  type: ITypeTheme;
+  type: IThemeType;
 }
 
-export interface ITypeTheme {
+export interface IThemeType {
   id: number;
   name: string;
   iconUrl: string;
@@ -124,4 +124,8 @@ export interface IFeatureTag {
 export interface ICreateThemeResponse {
   themId: number;
   createdAt: string;
+}
+
+export interface IThemeMedia {
+  thumbnail: string;
 }

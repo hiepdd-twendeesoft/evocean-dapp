@@ -1,30 +1,29 @@
 // eslint-disable-next-line react-hooks/exhaustive-deps
-"use client";
+'use client';
 
-import ItemNft from "@/components/itemNft";
-import { Route } from "@/constants/route";
-import useConvertDollar from "@/hooks/useConvertDollar";
-import { useFetchTheme } from "@/hooks/useFetchTheme";
-import { useTx } from "@/hooks/useTx";
-import { buyTheme } from "@/services/buy-theme";
-import { getTheme } from "@/services/get-theme-detail";
-import { RootState } from "@/store/slices";
-import { shortenAddress } from "@/utils/helper";
-import { lamportsToSol } from "@/utils/lamports-to-sol";
-import { useAnchorWallet } from "@solana/wallet-adapter-react";
-import { PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
-import { useQuery } from "@tanstack/react-query";
-import dynamic from "next/dynamic";
-import { useParams, useRouter } from "next/navigation";
-import { Fragment, useState } from "react";
-import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import ContentTab from "../components/ContentTab";
+import ItemNft from '@/components/itemNft';
+import { Route } from '@/constants/route';
+import useConvertDollar from '@/hooks/useConvertDollar';
+import { useFetchTheme } from '@/hooks/useFetchTheme';
+import { useTx } from '@/hooks/useTx';
+import { buyTheme } from '@/services/buy-theme';
+import { getTheme } from '@/services/get-theme-detail';
+import { RootState } from '@/store/slices';
+import { shortenAddress } from '@/utils/helper';
+import { lamportsToSol } from '@/utils/lamports-to-sol';
+import { useAnchorWallet } from '@solana/wallet-adapter-react';
+import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
+import { useQuery } from '@tanstack/react-query';
+import { useParams, useRouter } from 'next/navigation';
+import { Fragment, useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import ContentTab from '../components/ContentTab';
 import ModalBuyOwnership, {
   modalBuyOwnershipControl,
-  refModalBuyOwnership,
-} from "../components/ModalBuyOwnership";
-import Preview from "../components/Preview";
+  refModalBuyOwnership
+} from '../components/ModalBuyOwnership';
+import Preview from '../components/Preview';
 
 const DetailThemePage = () => {
   const router = useRouter();
@@ -32,32 +31,30 @@ const DetailThemePage = () => {
   const wallet = useAnchorWallet();
   const { push } = useRouter();
   const { isLogin, accountInfo } = useSelector(
-    (state: RootState) => state.auth,
+    (state: RootState) => state.auth
   );
 
   const { id } = useParams<{ id: string }>();
 
-  console.log("id", id);
-
   const { data, refetch } = useQuery({
-    queryKey: ["get-theme", id],
-    queryFn: () => getTheme(Number(id)),
+    queryKey: ['get-theme', id],
+    queryFn: () => getTheme(Number(id))
   });
 
   const usdAmount = useConvertDollar(lamportsToSol(data?.sale?.price));
 
   const isBuy = data?.owner_addresses?.some(
-    (item) => item === wallet?.publicKey?.toBase58(),
+    item => item === wallet?.publicKey?.toBase58()
   );
 
   const isOwner = data?.author_address === wallet?.publicKey?.toBase58();
 
   const handleBuyOwner = () => {
     if (isOwner) {
-      return toast("You already own the product");
+      return toast('You already own the product');
     }
     if (!wallet?.publicKey) {
-      return toast.warn("Please connect your wallet before purchasing");
+      return toast.warn('Please connect your wallet before purchasing');
     }
     modalBuyOwnershipControl.show();
   };
@@ -65,39 +62,39 @@ const DetailThemePage = () => {
   const { data: listThemes } = useFetchTheme({
     page: 1,
     take: 10,
-    listing: true,
+    listing: true
   });
 
   const handleBuy = () => {
     if (!data?.sale || !data.author_address) {
-      toast.warn("sale not found");
+      toast.warn('sale not found');
       return;
     }
     // check if the buyer has been added to the owner_address array
     if (data.owner_addresses.includes(id)) {
-      toast.warn("You have already bought this theme");
+      toast.warn('You have already bought this theme');
       return;
     }
     router.push(
       `/detail/${id}/payment/eth/${data?.author_address}/${usdAmount}`,
-      { scroll: false },
+      { scroll: false }
     );
   };
 
   const handleBuySol = async () => {
     try {
       if (!wallet?.publicKey) {
-        return toast.warn("Please connect your wallet before purchasing");
+        return toast.warn('Please connect your wallet before purchasing');
       }
       if (isBuy || isOwner) {
         return toast(
           isOwner
-            ? "You already own the product"
-            : "You have purchased the product",
+            ? 'You already own the product'
+            : 'You have purchased the product'
         );
       }
       if (!data?.sale) {
-        toast.warn("sale not found");
+        toast.warn('sale not found');
         return;
       }
 
@@ -105,23 +102,23 @@ const DetailThemePage = () => {
         SystemProgram.transfer({
           fromPubkey: provider.wallet.publicKey,
           toPubkey: new PublicKey(data.author_address),
-          lamports: Number(data.sale.price),
-        }),
+          lamports: Number(data.sale.price)
+        })
       );
 
       const signal = await provider.sendAndConfirm(transaction);
 
       await buyTheme({
         buyer: provider.wallet.publicKey.toBase58(),
-        theme_id: data.id,
+        theme_id: data.id
       });
       refetch();
-      toast.success("Buy success");
+      toast.success('Buy success');
       push(Route.PROFILE);
     } catch (error) {
-      console.error("error buy");
+      console.error('error buy');
       console.error(error);
-      toast.error("Failed to buy this theme");
+      toast.error('Failed to buy this theme');
     }
   };
 
@@ -129,11 +126,16 @@ const DetailThemePage = () => {
     window.open(data?.media?.live_preview);
   };
 
+  const themeFormat = useMemo(
+    () => data?.themeFeatures.map(item => item.type),
+    [data?.themeFeatures]
+  );
+
   const handleGetSignature = async (url: string): Promise<string> => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/themes/payment?url=${url}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/themes/payment?url=${url}`
     );
-    console.log("response", response.url);
+    console.log('response', response.url);
     return response.url as string;
   };
 
@@ -154,16 +156,6 @@ const DetailThemePage = () => {
           <Preview data={data?.media?.previews} />
           {data?.media?.live_preview && (
             <div className="flex items-center mt-6">
-              {/* <button className="flex items-center justify-center h-[50px] rounded-[12px] bg-indigo-50 flex-1 mr-4 hover:bg-indigo-100">
-              <p className="text-base font-semibold text-indigo-700">
-                Full preview
-              </p>
-              <img
-                src={"/assets/image/eye.svg"}
-                alt="eye"
-                className="w-[20px] ml-2"
-              />
-            </button> */}
               <button
                 onClick={handleLivePreview}
                 className="flex items-center justify-center h-[50px] rounded-[12px] bg-indigo-50 flex-1 hover:bg-indigo-100"
@@ -172,7 +164,7 @@ const DetailThemePage = () => {
                   Live preview
                 </p>
                 <img
-                  src={"/assets/image/global.svg"}
+                  src={'/assets/image/global.svg'}
                   alt="eye"
                   className="w-[18px] ml-2"
                 />
@@ -182,12 +174,14 @@ const DetailThemePage = () => {
         </div>
         <div className="w-[43%] max-md:mt-4 max-md:w-[100%]">
           <div className="flex items-center flex-wrap mb-6">
-            {data?.media?.categories?.map((item, index) => (
+            {data?.categories.map((item, index) => (
               <div
                 key={index}
                 className="h-[28px] bg-indigo-100 rounded-[12px] px-[16px] mr-[12px] flex items-center justify-center"
               >
-                <p className="text-sm text-indigo-800 font-medium">{item}</p>
+                <p className="text-sm text-indigo-800 font-medium">
+                  {item.name}
+                </p>
               </div>
             ))}
           </div>
@@ -196,7 +190,7 @@ const DetailThemePage = () => {
           </h2>
           {(isBuy || isOwner) && (
             <p className="text-sm text-green-600 font-medium">
-              {isOwner ? "You are the owner" : "Purchased"}
+              {isOwner ? 'You are the owner' : 'Purchased'}
             </p>
           )}
           <p className="text-gray-600 text-base font-normal mt-1 line-clamp-2">
@@ -224,7 +218,7 @@ const DetailThemePage = () => {
                   Buy for {lamportsToSol(data?.sale?.price)} SOL
                 </p>
                 <img
-                  src={"/assets/image/SOL.svg"}
+                  src={'/assets/image/SOL.svg'}
                   alt="SOL"
                   className="w-[20px]"
                 />
@@ -234,21 +228,21 @@ const DetailThemePage = () => {
               <div className="flex flex-1 items-center justify-center">
                 <p className="text-sm font-medium text-gray-900">sale</p>
                 <img
-                  src={"/assets/image/sale.svg"}
+                  src={'/assets/image/sale.svg'}
                   alt="sale"
                   className="w-[14px] mx-[4px]"
                 />
                 <p className="text-sm font-medium text-gray-900">312</p>
               </div>
               <img
-                src={"/assets/image/arrow-right.svg"}
+                src={'/assets/image/arrow-right.svg'}
                 alt="arrow"
                 className="w-[14px]"
               />
               <div className="flex flex-1 items-center justify-center">
                 <p className="text-sm font-medium text-gray-900">Volume</p>
                 <img
-                  src={"/assets/image/SOL.svg"}
+                  src={'/assets/image/SOL.svg'}
                   alt="SOL"
                   className="w-[14px] mx-[4px]"
                 />
@@ -259,12 +253,12 @@ const DetailThemePage = () => {
           <div className="mt-10 border-t-gray-200 border-t-[1px] pt-10 flex items-center">
             <p className="text-sm text-gray-500 font-medium">Owner</p>
             <img
-              src={"/assets/image/SOL.svg"}
+              src={'/assets/image/SOL.svg'}
               alt="SOL"
               className="w-[20px] mx-[8px]"
             />
             <p className="text-sm text-gray-900 font-medium">
-              {shortenAddress(data?.author_address || "")}
+              {shortenAddress(data?.author_address || '')}
             </p>
           </div>
           <p className="text-base font-normal text-gray-600 mt-4">
@@ -283,7 +277,7 @@ const DetailThemePage = () => {
             <p className="text-sm font-medium text-gray-500 mx-4">or</p>
             <div className="flex items-center">
               <img
-                src={"/assets/image/SOL.svg"}
+                src={'/assets/image/SOL.svg'}
                 alt="SOL"
                 className="w-[14px] mr-[4px]"
               />
@@ -294,7 +288,7 @@ const DetailThemePage = () => {
           </div>
           <button className="flex items-center mt-6 group">
             <img
-              src={"/assets/icon/info-icon.svg"}
+              src={'/assets/icon/info-icon.svg'}
               alt="icon"
               className="w-[20px]"
             />
@@ -304,7 +298,7 @@ const DetailThemePage = () => {
           </button>
           <button className="flex items-center mt-2 group">
             <img
-              src={"/assets/icon/info-icon.svg"}
+              src={'/assets/icon/info-icon.svg'}
               alt="icon"
               className="w-[20px]"
             />
@@ -315,11 +309,10 @@ const DetailThemePage = () => {
         </div>
       </div>
       <ContentTab
-        hightlight={data?.media?.hightlight}
-        pages={data?.media?.pages}
-        format={data?.media?.format}
-        template_features={data?.media?.template_features}
-        figma_features={data?.media?.figma_features}
+        highlight={data?.media?.highlight}
+        tags={data?.tags}
+        format={themeFormat}
+        themeFeatures={data?.themeFeatures}
         overview={data?.overview}
         Transactions={data?.Transactions}
       />
@@ -332,7 +325,7 @@ const DetailThemePage = () => {
             View all
           </p>
           <img
-            src={"/assets/image/arrow-right.svg"}
+            src={'/assets/image/arrow-right.svg'}
             alt="arrow"
             className="w-[14px]"
           />
