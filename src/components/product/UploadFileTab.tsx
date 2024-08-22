@@ -67,11 +67,11 @@ export default function UploadFileTab({
             </div>
           )}
 
-          <Input
+          <input
             id="file-theme"
             type="file"
             className="hidden"
-            accept="application/zip"
+            accept="zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed"
             onChange={e => handleFileThemeZip(e, ['application/zip'])}
           />
         </div>

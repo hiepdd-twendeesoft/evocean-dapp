@@ -272,18 +272,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
     if (!e.target.files || e.target.files.length === 0) {
       return;
     }
-    const file = e.target.files[0];
-    const isMatchMediaType = allowFileTypes.includes(file.type);
 
-    const allowedInputType = allowFileTypes
-      ?.map((item, _) => item.split('/')[1])
-      ?.join('/')
-      ?.toUpperCase();
-
-    if (isMatchMediaType) {
-      message.error(`You can only upload ${allowedInputType}file!`);
-      return;
-    }
     try {
       const result = await uploadTheme({
         zip_file: e.target.files[0]
