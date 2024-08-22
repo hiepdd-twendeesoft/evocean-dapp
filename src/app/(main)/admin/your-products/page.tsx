@@ -13,7 +13,7 @@ import { EQueryKeys } from '@/types/common';
 function ProductPage() {
   const [page, setPage] = useState(INITIAL_PAGE);
 
-  const { data: productResponse, isLoading } = useQuery({
+  const { data: productResponse } = useQuery({
     queryKey: [EQueryKeys.YOUR_PRODUCTS, { page }],
     queryFn: () =>
       fetchThemes({

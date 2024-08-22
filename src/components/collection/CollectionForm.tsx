@@ -5,77 +5,78 @@ import UploadFile from '@/components/common/UploadFile';
 import { productImageAcceptTypes } from '@/constants/common';
 import useFetchAllTags from '@/hooks/useFetchAllTags';
 import useFetchCategories from '@/hooks/useFetchCategories';
-import {
-  EThemeStatus,
-  ITheme,
-  IThemeFeatureType,
-  TCreateTheme,
-  TCreateThemeSchema
-} from '@/models/theme.type';
+import { EThemeStatus, IThemeFeatureType } from '@/models/theme.type';
 import { fetchFeatureType } from '@/services/common.service';
-import { createTheme, updateTheme, uploadTheme } from '@/services/theme';
-import { EQueryKeys, NAV_LINKS } from '@/types/common';
-import { EProductTab } from '@/types/product';
-import { getThemeFeatureIds } from '@/utils/helper';
-import { createThemeSchema } from '@/validation/admin/theme.validation';
-import { CloseOutlined } from '@ant-design/icons';
+import { uploadTheme } from '@/services/theme';
+import { COLLECTION_NAV_LINKS, EQueryKeys } from '@/types/common';
+
+import {
+  ECollectionTab,
+  ICollection,
+  ICreateCollection,
+  TCreateCollectionSchema
+} from '@/models/collection.type';
+import { createCollection, updateCollection } from '@/services/collection';
+import { createCollectionSchema } from '@/validation/admin/collection.validation';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Input, message } from 'antd';
+import { Form, Input, message } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import clsx from 'clsx';
 import { isEmpty } from 'lodash';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import ReactImageUploading, { ImageListType } from 'react-images-uploading';
+import { ImageListType } from 'react-images-uploading';
 import CheckIcon from '../../../public/assets/icon/CheckIcon';
 import DoubleLine from '../../../public/assets/icon/DoubleLineIcon';
 import InputMessage from '../common/InputMessage';
-import SelectFeatureTag from '../common/SelectFeatureTag';
-import UploadFileTab from './UploadFileTab';
+import ChooseProductModal from './ChooseProductModal';
+import CreatorEarning, { IEarning } from './CreatorEarning';
 
 interface IProductFormProps {
-  themeDetail?: ITheme;
+  collectionDetail?: ICollection;
+}
+export interface IProductSelect {
+  id: number;
+  thumbnail: string;
 }
 
-function ProductForm({ themeDetail }: IProductFormProps) {
+function CollectionForm({ collectionDetail }: IProductFormProps) {
   const {
+    register,
     handleSubmit,
+    watch,
     setValue,
     formState: { errors },
+
     control
-  } = useForm<TCreateThemeSchema>({
-    resolver: yupResolver(createThemeSchema as any)
+  } = useForm<TCreateCollectionSchema>({
+    resolver: yupResolver(createCollectionSchema as any)
   });
-  const [themeFileLink, setThemeFileLink] = useState<string>();
-  const [fileLocal, setFileLocal] = useState<File>();
-  const [coverImage, setCoverImage] = useState<string[]>([]);
-  const [detailImages, setDetailImages] = useState<string[]>([]);
-  const [fullPreviewImages, setFullPreViewImages] = useState<string[]>([]);
+
   const [thumbnail, setThumbnail] = useState<string>();
-  const [tab, setTab] = useState<EProductTab>(EProductTab.OVERVIEW);
+  const [tab, setTab] = useState<ECollectionTab>(ECollectionTab.OVERVIEW);
   const [status, setStatus] = useState<EThemeStatus>(EThemeStatus.DRAFT);
   const [fileTypeSelect, setFileTypeSelect] = useState<IThemeFeatureType[]>([]);
-  const [themeId, setThemeId] = useState();
+  const [collectionId, setCollection] = useState<number>();
   const router = useRouter();
+  const [openChooseProductModal, setOpenChooseProductModal] = useState(false);
+  const [themeSelect, setThemeSelect] = useState<IProductSelect[]>([]);
+  //creator earning form
+  const [form] = Form.useForm();
+
+  const { collection_name } = watch();
 
   const tabList = [
-    EProductTab.OVERVIEW,
-    EProductTab.FEATURES,
-    EProductTab.UPLOAD_IMAGE,
-    EProductTab.UPLOAD_FILE
+    ECollectionTab.OVERVIEW,
+    ECollectionTab.FEATURES,
+    ECollectionTab.CREATOR_EARNING,
+    ECollectionTab.CHOOSE_PRODUCTS
   ];
-  const isUpdate = useMemo(() => themeDetail, [themeDetail]);
-  const getImageLocal = useCallback((data: any) => {
-    return data.filter((item: any) => item?.dataUrl);
-  }, []);
-
-  const getImageServer = useCallback((data: any) => {
-    return data.filter((item: any) => !item?.dataUrl);
-  }, []);
+  const isUpdate = useMemo(() => collectionDetail, [collectionDetail]);
 
   const { data: featureTypes } = useQuery({
     queryKey: [EQueryKeys.FEATURE_TYPE],
@@ -84,12 +85,11 @@ function ProductForm({ themeDetail }: IProductFormProps) {
 
   const queryClient = useQueryClient();
 
-  const { mutate: handleUpdateTheme } = useMutation({
-    mutationFn: updateTheme,
+  const { mutate: handleUpdateCollection } = useMutation({
+    mutationFn: updateCollection,
     onSuccess: () => {
       message.success('Update theme successfully');
-      queryClient.invalidateQueries({ queryKey: [EQueryKeys.YOUR_PRODUCTS] });
-      router.push('/admin/your-products', { scroll: false });
+      router.push('/admin/your-collections', { scroll: false });
     },
     onError: error => {
       message.error(error.message);
@@ -97,50 +97,67 @@ function ProductForm({ themeDetail }: IProductFormProps) {
   });
 
   useEffect(() => {
-    if (themeDetail) {
-      setValue('name', themeDetail.name);
-      setValue('overview', themeDetail.overview);
-      setValue('selling_price', Number(themeDetail.sale?.price));
-      setValue('owner_price', Number(themeDetail.listing?.price));
-      setValue('percentageOfOwnership', themeDetail.percentageOfOwnership);
-      setValue('highlight', themeDetail?.media?.highlight);
-      setValue('linkPreview', themeDetail?.linkPreview || undefined);
+    if (collectionDetail) {
+      setValue('collection_name', collectionDetail.name);
+      setValue('description', collectionDetail.description);
+      setValue('sellingPricing', Number(collectionDetail.sellingPricing));
+      setValue('ownershipPrice', Number(collectionDetail.ownershipPrice));
+      setValue('percentageOfOwnership', collectionDetail.percentageOfOwnership);
       setValue(
-        'categories',
-        themeDetail?.categories?.map(item => item.id)
+        'highlights',
+        collectionDetail?.media
+          ? JSON?.parse(collectionDetail?.media as any).highlights
+          : []
+      );
+      setValue('linkPreview', collectionDetail?.linkPreview || undefined);
+      setValue(
+        'collectionCategories',
+        collectionDetail?.collectionCategories?.map(item => item.category.id)
       );
       setValue(
-        'tags',
-        themeDetail?.tags?.map(item => item.id)
+        'collectionTags',
+        collectionDetail?.collectionTags?.map(item => item.tag.id)
       );
-      setValue('feature_ids', getThemeFeatureIds(themeDetail?.themeFeatures));
-      setCoverImage(themeDetail.media.coverImages);
-      setThumbnail(themeDetail.media.thumbnail);
-      setValue('thumbnail_link', themeDetail?.media.thumbnail);
-      setDetailImages(themeDetail.media?.detailImages || []);
-      setFullPreViewImages(themeDetail?.media?.previews || []);
-      setThemeFileLink(themeDetail.zip_link);
-      setFileTypeSelect(themeDetail?.themeFeatures.map(item => item.type));
+      form.setFieldValue(
+        'earnings',
+        collectionDetail?.collectionEarnings?.map(item => ({
+          userId: item.user.id,
+          percentage: item.percentage
+        }))
+      );
+      setFileTypeSelect(
+        collectionDetail?.collectionFeatureTypes?.map(item => item.featureTypes)
+      );
+      if (!isEmpty(collectionDetail?.themeCollection)) {
+        setThemeSelect(
+          collectionDetail?.themeCollection?.map(item => ({
+            id: item.id,
+            thumbnail: item.media.thumbnail
+          })) as IProductSelect[]
+        );
+      }
+      setThumbnail(collectionDetail.thumbnail);
+      setValue('thumbnail', collectionDetail?.thumbnail);
     }
-  }, [setValue, themeDetail]);
+  }, [setValue, collectionDetail, form]);
 
-  const { mutate: handleCreateTheme } = useMutation({
-    mutationFn: createTheme,
+  const { mutate: handleCreateCollection } = useMutation({
+    mutationFn: createCollection,
     onSuccess: data => {
       if (status === EThemeStatus.DRAFT) {
-        router.push('/admin/your-products', { scroll: false });
+        router.push('/admin/your-collections', { scroll: false });
         return;
       }
-      setThemeId(data?.data.themeId || data.data.id);
+      setCollection(data?.id);
 
-      if (tab !== EProductTab.UPLOAD_FILE) {
-        setTab((preState: EProductTab) => {
+      if (tab !== ECollectionTab.CHOOSE_PRODUCTS) {
+        setTab((preState: ECollectionTab) => {
           const currentTabIndex = tabList.indexOf(preState);
           return tabList[currentTabIndex + 1];
         });
       } else {
         message.success('Create theme successfully');
-        router.push('/admin/your-products', { scroll: false });
+        router.push('/admin/your-collections', { scroll: false });
       }
     },
     onError: error => {
@@ -151,103 +168,69 @@ function ProductForm({ themeDetail }: IProductFormProps) {
     }
   });
 
-  const onSubmit: SubmitHandler<TCreateThemeSchema> = async data => {
-    const createThemeDto: TCreateTheme = {
+  const onSubmit: SubmitHandler<any> = async (data: ICreateCollection) => {
+    const createCollectionDto: ICreateCollection = {
       ...data,
-
-      status,
-      zip_link: themeFileLink || undefined
+      collectionFeatureTypes: fileTypeSelect.map(item => item.id.toString())
     };
-
-    if (tab === EProductTab.UPLOAD_IMAGE) {
-      if (isEmpty(coverImage)) {
-        message.error({ content: 'Cover image is required' });
-        return;
-      }
-      if (isEmpty(detailImages)) {
-        message.error({ content: 'Detail image is required' });
-        return;
-      }
-      if (isEmpty(fullPreviewImages)) {
-        message.error({ content: 'Preview image is required' });
-        return;
-      }
-    }
-
-    if (tab === EProductTab.UPLOAD_FILE) {
-      if (!themeFileLink) {
-        message.error({ content: 'Theme file is required' });
-        return;
-      }
+    if (tab === ECollectionTab.CREATOR_EARNING) {
+      form.submit();
+      return;
     }
 
     if (isUpdate) {
-      const updateThemeDto = {
-        ...createThemeDto,
-        fullPreviewImages,
-        detailImages,
-        coverImages: coverImage
+      const updateCollection = {
+        ...createCollectionDto,
+        theme_ids: themeSelect.map(item => `${item.id}`)
       };
-      handleUpdateTheme({
-        themeId: Number(themeDetail?.id),
-        body: updateThemeDto
+      handleUpdateCollection({
+        id: Number(collectionDetail?.id),
+        body: updateCollection
       });
       return;
     }
 
-    if (tab !== EProductTab.OVERVIEW) {
-      handleCreateTheme({
-        ...createThemeDto,
-        theme_id: themeId,
-        coverImages: coverImage,
-        fullPreviewImages,
-        detailImages
+    if (tab !== ECollectionTab.OVERVIEW) {
+      handleCreateCollection({
+        ...createCollectionDto,
+        collectionId: collectionId,
+        theme_ids: themeSelect.map(item => `${item.id}`)
       });
       return;
     }
 
-    handleCreateTheme(createThemeDto);
+    handleCreateCollection(createCollectionDto);
   };
 
-  const uploadCoverImage = async (data: ImageListType) => {
-    try {
-      const result = await uploadTheme({
-        thumbnail: data[0].file
-      });
-      message.success('Successfully');
-      setCoverImage([result.data.thumbnail as string]);
-    } catch (error) {}
-  };
-
-  const uploadFullPreivewImages = async (data: any) => {
-    try {
-      const result = await uploadTheme({
-        previews: getImageLocal(data).map((item: any) => {
-          if (item?.file) return item?.file;
-        })
-      });
-      if (result.data.previews) {
-        setFullPreViewImages([
-          ...getImageServer(data),
-          ...result.data.previews
-        ]);
+  const handleSaveEarning = useCallback(
+    (data: { earnings: IEarning[] }) => {
+      const earnings = data.earnings.filter(
+        item => item.percentage && item.percentage
+      );
+      if (isUpdate) {
+        handleUpdateCollection({
+          id: Number(collectionDetail?.id),
+          body: {
+            earnings
+          } as ICreateCollection
+        });
+      } else {
+        handleCreateCollection({
+          collection_name,
+          collectionId: collectionId,
+          earnings
+        } as ICreateCollection);
       }
-      message.success('Successfully');
-    } catch (error) {}
-  };
-  const uploadDetailImages = async (data: any) => {
-    try {
-      const result = await uploadTheme({
-        previews: getImageLocal(data).map((item: any) => {
-          if (item?.file) return item?.file;
-        })
-      });
-      if (result.data.previews) {
-        setDetailImages([...getImageServer(data), ...result.data.previews]);
-      }
-      message.success('Successfully');
-    } catch (error) {}
-  };
+    },
+    [
+      collectionDetail?.id,
+      collectionId,
+      collection_name,
+      handleCreateCollection,
+      handleUpdateCollection,
+      isUpdate
+    ]
+  );
 
   const handleChangeThumbnail = async (file: ImageListType) => {
     try {
@@ -255,35 +238,19 @@ function ProductForm({ themeDetail }: IProductFormProps) {
         thumbnail: file
       });
       setThumbnail(result.data.thumbnail);
-      setValue('thumbnail_link', result.data.thumbnail);
+      setValue('thumbnail', result.data.thumbnail);
       message.success('Update thumbnail successfully');
     } catch (err) {
       message.error('Update thumbnail failed');
     }
   };
 
-  const handleFileThemeZip = async (
-    e: ChangeEvent<HTMLInputElement>,
-    allowFileTypes: string[]
-  ) => {
-    if (!e.target.files || e.target.files.length === 0) {
-      return;
-    }
-
-    try {
-      const result = await uploadTheme({
-        zip_file: e.target.files[0]
-      });
-      setFileLocal(e.target.files[0]);
-      setThemeFileLink(result.data.zip_file);
-      message.success('Update theme zip successfully');
-    } catch (err) {
-      message.error('Update theme zip failed');
-    }
-  };
-
   const getColorIcon = useCallback((value: string[], index: number) => {
     return isEmpty(value ? value[index] : '') ? '#E4E4E7' : '#4338CA';
+  }, []);
+
+  const handleSetThemSelect = useCallback((data: IProductSelect[]) => {
+    setThemeSelect(data);
   }, []);
 
   const { data: themeCategories } = useFetchCategories();
@@ -292,7 +259,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
   const NavLinkComponent = () => {
     return (
       <ul className="flex items-center font-medium mt-[32px] gap-10">
-        {NAV_LINKS.map((item, index) => (
+        {COLLECTION_NAV_LINKS.map((item, index) => (
           <li
             key={index}
             onClick={() => {
@@ -323,10 +290,6 @@ function ProductForm({ themeDetail }: IProductFormProps) {
     );
   };
 
-  const getImageUrl = useCallback((data: any) => {
-    return data?.dataUrl ?? data;
-  }, []);
-
   const handleSelecFileType = useCallback(
     (typeData: IThemeFeatureType) => {
       const typeExists = fileTypeSelect.find(type => type.id === typeData.id);
@@ -347,7 +310,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex justify-between">
         <h1 className="text-[#111827] text-3xl not-italic font-bold leading-9">
-          {isUpdate ? 'Update product' : 'Add new product'}
+          {isUpdate ? 'Update collection ' : 'Add new collection '}
         </h1>
         <div className="text-base not-italic font-semibold leading-6">
           <button
@@ -362,7 +325,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
             }}
             className="bg-primary text-white px-[17px] py-[9px] rounded-[14px] ml-4"
           >
-            {tab === EProductTab.UPLOAD_FILE || isUpdate
+            {tab === ECollectionTab.CHOOSE_PRODUCTS || isUpdate
               ? 'Submit for review'
               : 'Next step'}
           </button>
@@ -370,7 +333,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
       </div>
       <NavLinkComponent />
 
-      {tab === EProductTab.OVERVIEW && (
+      {tab === ECollectionTab.OVERVIEW && (
         <div className="flex gap-8">
           <div className="basis-3/5">
             <div className="">
@@ -384,17 +347,14 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                     htmlFor="single-theme"
                   >
                     <div className="pt-1">
-                      <img
-                        alt="img"
-                        src={'/assets/image/admin/upload-single.svg'}
-                      />
+                      <img alt="img" src={'/assets/icon/collection-icon.svg'} />
                     </div>
                     <div>
-                      <h3 className="font-medium">Single product</h3>
+                      <h3 className="font-medium">Collection</h3>
 
                       <p className="mt-1">
-                        Any set of files to download that contain a single type
-                        of category
+                        Sell two or more existing products as a new pack and new
+                        price
                       </p>
                     </div>
                   </label>
@@ -403,40 +363,42 @@ function ProductForm({ themeDetail }: IProductFormProps) {
             </div>
             <div className="">
               <h1 className="my-6 text-[#111827] text-xl font-medium">
-                Product detail
+                Collection detail detail
               </h1>
               <ul className="flex flex-col gap-4">
                 <li className="w-full">
                   <h2 className="mb-1">Name</h2>
                   <Controller
-                    name="name"
+                    name="collection_name"
                     control={control}
                     render={({ field }) => (
                       <Input
                         className="w-[100%] px-[13px] py-[9px] border-[#D1D5DB] border-1 rounded-[8px] outline-[#D1D5DB]"
                         type="text"
                         {...field}
-                        status={errors.name?.message ? 'error' : ''}
+                        status={errors.collection_name?.message ? 'error' : ''}
                       />
                     )}
                   />
-                  <InputMessage errorMessage={errors.name?.message} />
+                  <InputMessage
+                    errorMessage={errors.collection_name?.message}
+                  />
                   <span className="text-[#64748B]">Give it a catchy name</span>
                 </li>
                 <li className="w-full mt-2">
                   <h2 className="mb-1">Description</h2>
                   <Controller
-                    name="overview"
+                    name="description"
                     control={control}
                     render={({ field }) => (
                       <TextArea
                         className="w-[100%] h-[100px] px-[13px] py-[9px] border-[#D1D5DB] border-1 rounded-[8px] outline-[#D1D5DB]"
                         {...field}
-                        status={errors.overview?.message ? 'error' : ''}
+                        status={errors.description?.message ? 'error' : ''}
                       />
                     )}
                   />
-                  <InputMessage errorMessage={errors.overview?.message} />
+                  <InputMessage errorMessage={errors.description?.message} />
                 </li>
               </ul>
             </div>
@@ -448,18 +410,18 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                 <li className="w-full">
                   <h2 className="mb-1">Selling pricing</h2>
                   <Controller
-                    name="selling_price"
+                    name="sellingPricing"
                     control={control}
                     render={({ field }) => (
                       <div>
                         <Input
                           {...field}
-                          status={errors.selling_price?.message ? 'error' : ''}
+                          status={errors.sellingPricing?.message ? 'error' : ''}
                           size="large"
                           addonBefore="SOL"
                         />
                         <InputMessage
-                          errorMessage={errors.selling_price?.message}
+                          errorMessage={errors.sellingPricing?.message}
                         />
                       </div>
                     )}
@@ -496,7 +458,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                 <li className="w-full">
                   <h2 className="mb-1">Ownership price</h2>
                   <Controller
-                    name="owner_price"
+                    name="ownershipPrice"
                     control={control}
                     render={({ field }) => (
                       <div>
@@ -506,10 +468,10 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                           {...field}
                           size="large"
                           addonBefore="SOL"
-                          status={errors.owner_price?.message ? 'error' : ''}
+                          status={errors.ownershipPrice?.message ? 'error' : ''}
                         />
                         <InputMessage
-                          errorMessage={errors.owner_price?.message}
+                          errorMessage={errors.ownershipPrice?.message}
                         />
                       </div>
                     )}
@@ -553,7 +515,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                   ) : (
                     <UploadFile
                       customClassname={
-                        errors.thumbnail_link ? 'border-error border-[2px]' : ''
+                        errors.thumbnail ? 'border-error border-[2px]' : ''
                       }
                     />
                   )}
@@ -584,7 +546,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
         </div>
       )}
 
-      {tab === EProductTab.FEATURES && (
+      {tab === ECollectionTab.FEATURES && (
         <div className="flex justify-between gap-[150px] mt-10">
           <div className="flex-1 flex flex-col gap-6">
             <div>
@@ -592,7 +554,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
               <div className="mt-6">
                 <div className="flex flex-col gap-3">
                   <Controller
-                    name="highlight"
+                    name="highlights"
                     control={control}
                     render={({ field: { onChange, value } }) => {
                       return (
@@ -651,12 +613,14 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                 </div>
               </div>
             </div>
+          </div>
+          <div className="flex-1">
             <div>
               <p className="font-medium">Select Category</p>
               <div className="mt-6">
                 <div className="flex flex-col gap-3">
                   <Controller
-                    name="categories"
+                    name="collectionCategories"
                     control={control}
                     render={({ field: { onChange, value } }) => {
                       return (
@@ -681,7 +645,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
               <div className="mt-6">
                 <div className="flex flex-col gap-3">
                   <Controller
-                    name="tags"
+                    name="collectionTags"
                     control={control}
                     render={({ field: { onChange, value } }) => {
                       return (
@@ -703,190 +667,54 @@ function ProductForm({ themeDetail }: IProductFormProps) {
               </div>
             </div>
           </div>
-          <Controller
-            name="feature_ids"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <ul className="flex flex-1 flex-col gap-4">
-                {fileTypeSelect.map(type => (
-                  <li key={type.id} className="w-full">
-                    <h2 className="font-medium mb-6">{type.name}</h2>
-                    <SelectFeatureTag
-                      onChange={onChange}
-                      typeId={type.id}
-                      currentValue={value}
-                    />
-                  </li>
-                ))}
-              </ul>
-            )}
-          />
         </div>
       )}
 
-      {EProductTab.UPLOAD_IMAGE === tab && (
-        <div className="flex flex-col gap-[60px]">
-          <div>
-            <h1 className="my-6 text-[#111827] text-xl font-medium">Cover</h1>
-
-            <ul className="flex gap-4 flex-col">
-              <ReactImageUploading
-                acceptType={productImageAcceptTypes}
-                multiple
-                value={[]}
-                maxNumber={1}
-                dataURLKey="dataUrl"
-                onChange={e => uploadCoverImage(e)}
-              >
-                {({ onImageUpload, dragProps }) => (
-                  <div onClick={onImageUpload} {...dragProps}>
-                    {isEmpty(coverImage) ? (
-                      <UploadFile />
-                    ) : (
-                      <Image
-                        {...dragProps}
-                        width={500}
-                        height={500}
-                        src={coverImage && getImageUrl(coverImage[0])}
-                        alt="cover"
-                        className="w-full max-h-[600px] object-cover rounded-[20px]"
-                      />
-                    )}
-                  </div>
-                )}
-              </ReactImageUploading>
-            </ul>
-          </div>
-          <div>
-            <h1 className="my-6 text-[#111827] text-xl font-medium">
-              Detail images (4-8 required approval)
-            </h1>
-            <ul className="flex gap-4 flex-col">
-              <ReactImageUploading
-                multiple
-                value={[]}
-                maxNumber={8}
-                dataURLKey="dataUrl"
-                acceptType={productImageAcceptTypes}
-                onChange={data =>
-                  uploadDetailImages([...detailImages, ...data])
-                }
-              >
-                {({ onImageUpload, dragProps }) => (
-                  <div>
-                    <div onClick={onImageUpload} {...dragProps}>
-                      <UploadFile />
-                    </div>
-
-                    <div className="flex flex-wrap gap-[20px] mt-[40px]">
-                      {detailImages?.map((image, imageIndex) => (
-                        <div
-                          key={imageIndex}
-                          className="w-[calc(50%-10px)] max-h-[400px] relative"
-                        >
-                          <div
-                            onClick={() =>
-                              setDetailImages(() => {
-                                const data: any[] = [];
-                                detailImages.forEach((item, index) => {
-                                  if (imageIndex !== index) {
-                                    data.push(item);
-                                  }
-                                });
-                                return data;
-                              })
-                            }
-                            className="bg-white rounded-full w-[30px] h-[30px] absolute top-0 right-0 flex justify-center items-center cursor-pointer border-[1px] border-solid"
-                          >
-                            <CloseOutlined className="text-gray-500" />
-                          </div>
-                          <Image
-                            key={imageIndex}
-                            width={500}
-                            height={500}
-                            src={image && getImageUrl(image)}
-                            alt="cover"
-                            className="object-cover w-full rounded-[20px] max-h-[400px]"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </ReactImageUploading>
-            </ul>
-          </div>
-          <div>
-            <h1 className="my-6 text-[#111827] text-xl font-medium">
-              Full previews
-            </h1>
-            <ul className="flex gap-4 flex-col">
-              <ReactImageUploading
-                acceptType={productImageAcceptTypes}
-                multiple
-                value={[]}
-                maxNumber={8}
-                dataURLKey="dataUrl"
-                onChange={data =>
-                  uploadFullPreivewImages([...fullPreviewImages, ...data])
-                }
-              >
-                {({ onImageUpload, dragProps }) => (
-                  <div>
-                    <div onClick={onImageUpload} {...dragProps}>
-                      <UploadFile />
-                    </div>
-
-                    <div className="flex flex-wrap gap-[20px] mt-[40px]">
-                      {fullPreviewImages?.map((image, imageIndex) => (
-                        <div
-                          key={imageIndex}
-                          className="w-[calc(50%-10px)] max-h-[400px] relative"
-                        >
-                          <div
-                            onClick={() =>
-                              setFullPreViewImages(() => {
-                                const data: any[] = [];
-                                fullPreviewImages.forEach((item, index) => {
-                                  if (imageIndex !== index) {
-                                    data.push(item);
-                                  }
-                                });
-                                return data;
-                              })
-                            }
-                            className="bg-white rounded-full w-[30px] h-[30px] absolute top-0 right-0 flex justify-center items-center cursor-pointer border-[1px] border-solid"
-                          >
-                            <CloseOutlined className="text-gray-500" />
-                          </div>
-                          <Image
-                            key={imageIndex}
-                            width={500}
-                            height={500}
-                            src={image && getImageUrl(image)}
-                            alt="cover"
-                            className="object-cover w-full rounded-[20px] max-h-[400px]"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </ReactImageUploading>
-            </ul>
-          </div>
-        </div>
+      {tab === ECollectionTab.CREATOR_EARNING && (
+        <CreatorEarning form={form} handleSaveEarning={handleSaveEarning} />
       )}
+      {tab === ECollectionTab.CHOOSE_PRODUCTS && (
+        <div className="grid xl:grid-cols-3 sm:grid-cols-2 gap-[32px] mt-[32px]">
+          {themeSelect?.map(item => {
+            return (
+              <div key={item.id}>
+                {' '}
+                <Image
+                  alt="theme-image"
+                  src={item.thumbnail}
+                  width={370}
+                  height={280}
+                  className="h-[280px] w-full object-cover rounded-xl"
+                />
+              </div>
+            );
+          })}
 
-      {EProductTab.UPLOAD_FILE === tab && (
-        <UploadFileTab
-          fileLocal={fileLocal}
-          themeFile={themeFileLink}
-          handleFileThemeZip={handleFileThemeZip}
-        />
+          <div className="border rounded-2xl p-[32px] h-[280px] ">
+            <div
+              onClick={() => setOpenChooseProductModal(true)}
+              className="m-auto flex flex-col items-center justify-center h-full"
+            >
+              <img
+                className="w-[36px] h-[36px]"
+                alt="icon"
+                src="/assets/icon/plus-icon.svg"
+              />
+              <p className="text-gray-600">Choose your product.</p>
+            </div>
+          </div>
+          {openChooseProductModal && (
+            <ChooseProductModal
+              open={openChooseProductModal}
+              themeSelect={themeSelect}
+              handleSetThemSelect={handleSetThemSelect}
+              onClose={() => setOpenChooseProductModal(false)}
+            />
+          )}
+        </div>
       )}
     </form>
   );
 }
 
-export default ProductForm;
+export default CollectionForm;

@@ -1,40 +1,35 @@
-"use client";
+'use client';
 
-import { INITIAL_PAGE, INITIAL_TAKE } from "@/constants/base";
-import { ICollection } from "@/models/collection.type";
-import { deleteCollection, fetchCollections } from "@/services/collection";
-import { useQueryClient } from "@tanstack/react-query";
-import { Pagination, Popconfirm, message } from "antd";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { INITIAL_PAGE, INITIAL_TAKE } from '@/constants/base';
+import { deleteCollection, fetchCollections } from '@/services/collection';
+import { EQueryKeys } from '@/types/common';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Pagination, Popconfirm, message } from 'antd';
+import moment from 'moment';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
 
-function ProductPage() {
-  const [themes, setThemes] = useState<ICollection[]>();
+function YourCollectionPage() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(INITIAL_PAGE);
-  const loadData = async () => {
-    const result = await queryClient.fetchQuery({
-      queryFn: () =>
-        fetchCollections({
-          page: page,
-          take: INITIAL_TAKE,
-        }),
-      queryKey: [],
-    });
-    setThemes(result.data);
-  };
 
-  useEffect(() => {
-    loadData();
-  }, [page, queryClient]);
+  const { data: collectionRes } = useQuery({
+    queryKey: [EQueryKeys.YOUR_COLLECTION],
+    queryFn: () =>
+      fetchCollections({
+        page: page,
+        take: INITIAL_TAKE
+      })
+  });
 
   const confirm = async (collection_id: number) => {
     try {
       await deleteCollection(collection_id);
-      message.success("Delete collection successfully");
-      await loadData();
+      message.success('Delete collection successfully');
+      queryClient.invalidateQueries({ queryKey: [EQueryKeys.YOUR_COLLECTION] });
     } catch (err) {
-      message.error("Delete collection failed");
+      message.error('Delete collection failed');
     }
   };
 
@@ -46,7 +41,7 @@ function ProductPage() {
         </h1>
         <div className="text-base not-italic font-semibold leading-6">
           <Link
-            href={"/admin/new-collection"}
+            href={'/admin/new-collection'}
             className="bg-[#4F46E5] text-white px-[17px] py-[9px] rounded-[14px] ml-4"
           >
             New collection
@@ -63,14 +58,41 @@ function ProductPage() {
                     <th scope="col" className="px-6 py-4">
                       Name
                     </th>
+                    <th scope="col" className="px-6 py-4">
+                      Price
+                    </th>
+                    <th scope="col" className="px-6 py-4">
+                      Sales
+                    </th>
+                    <th scope="col" className="px-6 py-4">
+                      Ownership ratio
+                    </th>
+                    <th scope="col" className="px-6 py-4">
+                      Earning
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {themes &&
-                    themes.map((item, index) => (
+                  {collectionRes?.data &&
+                    collectionRes?.data.map((item, index) => (
                       <tr key={index} className="border-b border-neutral-200">
                         <td className="whitespace-nowrap px-6 py-4 font-medium flex items-center cursor-pointer justify-between">
-                          <h2>{item.name}</h2>
+                          <div className="flex gap-[14px] items-center">
+                            <Image
+                              width={172}
+                              height={120}
+                              alt="thumbnail"
+                              src={item.thumbnail}
+                              className="object-cover rounded-lg"
+                            />
+                            <div>
+                              <h2>{item.name}</h2>
+                              <p className="text-gray-500 text-[14px]">
+                                Owned:{' '}
+                                {moment(item.created_at).format('DD/MM/YYYY')}{' '}
+                              </p>
+                            </div>
+                          </div>
                           <div className="flex items-center gap-8">
                             <Link
                               className="flex items-center gap-2"
@@ -80,7 +102,7 @@ function ProductPage() {
                                 Edit
                               </h2>
                               <img
-                                src={"/assets/image/admin/edit.svg"}
+                                src={'/assets/image/admin/edit.svg'}
                                 alt="edit"
                               />
                             </Link>
@@ -88,7 +110,7 @@ function ProductPage() {
                               title="Title"
                               description="Do you want to delete this collection"
                               onConfirm={() => confirm(item.id)}
-                              onOpenChange={() => console.log("open change")}
+                              onOpenChange={() => console.log('open change')}
                             >
                               <div className="flex items-center gap-2">
                                 <h2 className="text-[#4F46E5] text-[14px]">
@@ -96,7 +118,7 @@ function ProductPage() {
                                 </h2>
                                 <img
                                   className="w-[20px] h-[20px]"
-                                  src={"/assets/image/admin/delete.svg"}
+                                  src={'/assets/image/admin/delete.svg'}
                                   alt="delete"
                                 />
                               </div>
@@ -104,20 +126,25 @@ function ProductPage() {
                             </Popconfirm>
                           </div>
                         </td>
+                        <td className="px-6 py-4">
+                          <span className="text-gray-900 ">
+                            ${item.sellingPricing}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4"></td>
+                        <td className="px-6 py-4"></td>
+                        <td className="px-6 py-4"></td>
                       </tr>
                     ))}
                 </tbody>
               </table>
               <div className="flex justify-center mt-3">
                 <Pagination
-                  total={10}
+                  total={collectionRes?.total}
                   pageSize={INITIAL_TAKE}
                   current={page}
-                  onChange={(page) => {
+                  onChange={page => {
                     setPage(page);
-                  }}
-                  onShowSizeChange={(current, size) => {
-                    setPage(size);
                   }}
                 />
               </div>
@@ -129,4 +156,4 @@ function ProductPage() {
   );
 }
 
-export default ProductPage;
+export default YourCollectionPage;

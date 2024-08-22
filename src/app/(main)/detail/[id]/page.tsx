@@ -156,16 +156,6 @@ const DetailThemePage = () => {
           <Preview data={data?.media?.previews} />
           {data?.media?.live_preview && (
             <div className="flex items-center mt-6">
-              {/* <button className="flex items-center justify-center h-[50px] rounded-[12px] bg-indigo-50 flex-1 mr-4 hover:bg-indigo-100">
-              <p className="text-base font-semibold text-indigo-700">
-                Full preview
-              </p>
-              <img
-                src={"/assets/image/eye.svg"}
-                alt="eye"
-                className="w-[20px] ml-2"
-              />
-            </button> */}
               <button
                 onClick={handleLivePreview}
                 className="flex items-center justify-center h-[50px] rounded-[12px] bg-indigo-50 flex-1 hover:bg-indigo-100"
