@@ -27,7 +27,7 @@ export interface ItemTheme {
     format: string[];
     highlight: string[];
     live_preview: string;
-    thumbnail?: string;
+    thumbnail: string;
   };
   owner_addresses: string[];
   token_mint: string;
@@ -43,37 +43,9 @@ export interface ItemTheme {
   Transactions: TransactionTheme[];
   categories: IThemeCategory[];
   tags: IThemeTag[];
-  themeFeatures: ThemeFeature[];
-}
-export interface ItemThemeChoose {
-  id: number;
-  zip_link: string;
-  name: string;
-  overview: string;
-  media: {
-    previews: string[];
-    figma_features: any[];
-    template_features: any[];
-    format: string[];
-    highlight: string[];
-    live_preview: string;
-  };
-  owner_addresses: string[];
-  token_mint: string;
-  author_address: string;
-  sale: null | {
-    theme_id: number;
-    price: string;
-  };
-  listing: null | {
-    theme_id: number;
-    price: string;
-  };
-  categories: IThemeCategory[];
-  tags: IThemeTag[];
-  themeFeatures: ThemeFeature[];
   themeCategories: { category: IThemCategory }[];
   themeTags: { tag: IThemCategory }[];
+  themeFeatures: ThemeFeature[];
 }
 
 export type TransactionTheme = {

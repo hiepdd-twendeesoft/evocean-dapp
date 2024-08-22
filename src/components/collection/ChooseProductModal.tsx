@@ -45,11 +45,11 @@ export default function ChooseProductModal({
           thumbnail: theme.media.thumbnail
         };
       });
-      const uniqThemeSelect = uniqBy(
+      const uniqThemeSelect: any = uniqBy(
         [...preState, ...(allThemeInPage || [])],
         'id'
       );
-      return uniqThemeSelect as any;
+      return uniqThemeSelect;
     });
   }, [productResponse?.data]);
 

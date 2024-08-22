@@ -43,12 +43,9 @@ interface IProductFormProps {
 
 function ProductForm({ themeDetail }: IProductFormProps) {
   const {
-    register,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors },
-    getValues,
     control
   } = useForm<TCreateThemeSchema>({
     resolver: yupResolver(createThemeSchema as any)
@@ -159,7 +156,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
       ...data,
 
       status,
-      zip_link: themeFileLink
+      zip_link: themeFileLink || undefined
     };
 
     if (tab === EProductTab.UPLOAD_IMAGE) {
