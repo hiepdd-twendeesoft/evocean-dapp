@@ -269,7 +269,9 @@ function ProductForm({ themeDetail }: IProductFormProps) {
     if (!e.target.files || e.target.files.length === 0) {
       return;
     }
+    console.log('allowFileTypes', allowFileTypes);
     const file = e.target.files[0];
+    console.log('filetype', file.type);
     const isMatchMediaType = allowFileTypes.includes(file.type);
 
     const allowedInputType = allowFileTypes
@@ -829,7 +831,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
           </div>
           <div>
             <h1 className="my-6 text-[#111827] text-xl font-medium">
-              Full preiviews
+              Full previews
             </h1>
             <ul className="flex gap-4 flex-col">
               <ReactImageUploading
