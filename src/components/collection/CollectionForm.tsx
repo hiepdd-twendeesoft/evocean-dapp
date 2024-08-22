@@ -105,7 +105,9 @@ function CollectionForm({ collectionDetail }: IProductFormProps) {
       setValue('percentageOfOwnership', collectionDetail.percentageOfOwnership);
       setValue(
         'highlights',
-        isEmpty(collectionDetail?.media) ? [] : collectionDetail?.media
+        collectionDetail?.media
+          ? JSON?.parse(collectionDetail?.media as any).highlights
+          : []
       );
       setValue('linkPreview', collectionDetail?.linkPreview || undefined);
       setValue(
@@ -308,7 +310,7 @@ function CollectionForm({ collectionDetail }: IProductFormProps) {
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex justify-between">
         <h1 className="text-[#111827] text-3xl not-italic font-bold leading-9">
-          {isUpdate ? 'Update product' : 'Add new collection '}
+          {isUpdate ? 'Update collection ' : 'Add new collection '}
         </h1>
         <div className="text-base not-italic font-semibold leading-6">
           <button

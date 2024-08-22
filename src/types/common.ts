@@ -8,7 +8,8 @@ export enum EQueryKeys {
   FEATURE_TYPE = 'feature_type',
   YOUR_PRODUCTS = 'your_product',
   USERS = 'users',
-  COLLECTION_DETAIL = 'collection_detail'
+  COLLECTION_DETAIL = 'collection_detail',
+  YOUR_COLLECTION = 'your_collection'
 }
 
 export const NAV_LINKS = [

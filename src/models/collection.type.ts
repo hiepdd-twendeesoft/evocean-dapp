@@ -45,6 +45,7 @@ export interface ICollection {
   theme_ids: number[];
   themes: IThemeItem[];
   created_by: number;
+  created_at: Date;
   description: string;
   linkPreview: string;
   ownershipPrice: string;

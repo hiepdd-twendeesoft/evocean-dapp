@@ -23,6 +23,18 @@ const CreatorEarning = ({ handleSaveEarning, form }: ICreatorEarningProps) => {
   };
   const { data: userList } = useFetchUser();
 
+  const validateTotalPercentage = () => {
+    const earnings = form.getFieldValue('earnings') || [];
+    const total = earnings.reduce(
+      (sum: number, current: any) => sum + (current?.percentage || 0),
+      0
+    );
+    if (total > 100) {
+      return Promise.reject(new Error('Total percentage cannot exceed 100%'));
+    }
+    return Promise.resolve();
+  };
+
   return (
     <Card className="mt-[68px] w-[680px] mx-auto rounded-2xl">
       <span className="text-[20px] font-medium leading-5">
@@ -42,10 +54,10 @@ const CreatorEarning = ({ handleSaveEarning, form }: ICreatorEarningProps) => {
         </div>
         <div className="mt-[8px]">
           <span className="text-[14px] text-gray-500">
-            Earn apercentage of the sale price when one of your items is re-sold
-            using OpenSea. Adding multiple addresses may increase gas fees for
-            buyers. If you set a lower fee on other marketplaces, your fee on
-            OpenSea will be updated to match that amount.
+            Earn a percentage of the sale price when one of your items is
+            re-sold using OpenSea. Adding multiple addresses may increase gas
+            fees for buyers. If you set a lower fee on other marketplaces, your
+            fee on OpenSea will be updated to match that amount.
           </span>
           <span className="text-blue-500 ml-1">Learn more</span>
         </div>
@@ -88,7 +100,15 @@ const CreatorEarning = ({ handleSaveEarning, form }: ICreatorEarningProps) => {
                           }))}
                         />
                       </Form.Item>
-                      <Form.Item {...restField} name={[name, 'percentage']}>
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'percentage']}
+                        rules={[
+                          {
+                            validator: validateTotalPercentage
+                          }
+                        ]}
+                      >
                         <InputNumber max={100} size="large" suffix="%" />
                       </Form.Item>
                       <Form.Item>
