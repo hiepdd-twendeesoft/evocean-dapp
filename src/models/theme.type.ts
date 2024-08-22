@@ -125,3 +125,7 @@ export interface ICreateThemeResponse {
   themId: number;
   createdAt: string;
 }
+
+export interface IThemeMedia {
+  thumbnail: string;
+}

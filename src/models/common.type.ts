@@ -1,4 +1,4 @@
-import { IThemeCategory, IThemeTag, ThemeFeature } from './theme.type';
+import { IThemeCategory, ThemeFeature } from './theme.type';
 
 export interface FetchThemeParams {
   page: number;
@@ -27,6 +27,7 @@ export interface ItemTheme {
     format: string[];
     highlight: string[];
     live_preview: string;
+    thumbnail?: string;
   };
   owner_addresses: string[];
   token_mint: string;
@@ -43,6 +44,36 @@ export interface ItemTheme {
   categories: IThemeCategory[];
   tags: IThemeTag[];
   themeFeatures: ThemeFeature[];
+}
+export interface ItemThemeChoose {
+  id: number;
+  zip_link: string;
+  name: string;
+  overview: string;
+  media: {
+    previews: string[];
+    figma_features: any[];
+    template_features: any[];
+    format: string[];
+    highlight: string[];
+    live_preview: string;
+  };
+  owner_addresses: string[];
+  token_mint: string;
+  author_address: string;
+  sale: null | {
+    theme_id: number;
+    price: string;
+  };
+  listing: null | {
+    theme_id: number;
+    price: string;
+  };
+  categories: IThemeCategory[];
+  tags: IThemeTag[];
+  themeFeatures: ThemeFeature[];
+  themeCategories: { category: IThemCategory }[];
+  themeTags: { tag: IThemCategory }[];
 }
 
 export type TransactionTheme = {
@@ -68,6 +99,11 @@ export type IUploadThemeRes = {
 };
 
 export interface IThemCategory {
+  id: number;
+  createdAt: Date;
+  name: string;
+}
+export interface IThemeTag {
   id: number;
   createdAt: Date;
   name: string;
