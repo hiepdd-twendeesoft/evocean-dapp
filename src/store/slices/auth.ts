@@ -1,11 +1,12 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
-import { IAccountInfo } from "@/models/user.type";
-import { RootState } from ".";
-import { googleLoginAction } from "../actions/auth";
+import { IAccountInfo } from '@/models/user.type';
+import { RootState } from '.';
+import { googleLoginAction } from '../actions/auth';
 
-interface IAuth {
+export interface IAuth {
   accessToken?: string;
+  refreshToken?: string;
   accountInfo?: IAccountInfo | null;
   isLogin: boolean;
   loadings: Record<string, boolean | undefined>;
@@ -14,12 +15,12 @@ interface IAuth {
 const initialState: IAuth = {
   accountInfo: null,
   isLogin: false,
-  accessToken: "",
-  loadings: {},
+  accessToken: '',
+  loadings: {}
 };
 
 const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState: initialState,
   reducers: {
     setAccessToken: (state, action) => {
@@ -27,17 +28,17 @@ const authSlice = createSlice({
     },
     logout: () => {
       return initialState;
-    },
+    }
   },
-  extraReducers: (builder) => {
-    builder.addCase(googleLoginAction.pending, (state) => {});
+  extraReducers: builder => {
+    builder.addCase(googleLoginAction.pending, state => {});
     builder.addCase(googleLoginAction.fulfilled, (state, action) => {
       state.accessToken = action.payload?.accessToken;
       state.accountInfo = action.payload?.user;
       state.isLogin = true;
     });
-    builder.addCase(googleLoginAction.rejected, (state) => {
-      state.accessToken = "";
+    builder.addCase(googleLoginAction.rejected, state => {
+      state.accessToken = '';
     });
     // builder.addCase(googleLogoutAction.pending, (state) => {
     // })
@@ -49,11 +50,11 @@ const authSlice = createSlice({
     // builder.addCase(googleLogoutAction.rejected, (state) => {
     //   state.accessToken = ''
     // })
-  },
+  }
 });
 
 export const authActions = {
-  ...authSlice.actions,
+  ...authSlice.actions
 };
 
 export const selectAuth = (state: RootState) => state.auth;
