@@ -258,7 +258,7 @@ function CollectionForm({ collectionDetail }: IProductFormProps) {
 
   const NavLinkComponent = () => {
     return (
-      <ul className="flex items-center font-medium mt-[32px] gap-10">
+      <ul className="flex items-center justify-between font-medium mt-[32px] gap-10">
         {COLLECTION_NAV_LINKS.map((item, index) => (
           <li
             key={index}
@@ -266,10 +266,13 @@ function CollectionForm({ collectionDetail }: IProductFormProps) {
               if (!isUpdate) return;
               setTab(item.value);
             }}
-            className="flex items-center gap-4 cursor-pointer"
+            className={clsx(
+              'flex items-center gap-4 cursor-pointer flex-1 py-[12px] px-[8px] lg:px-[16px] 2xl:px-[32px] rounded-[8px]',
+              item.value === tab && 'bg-slate-50'
+            )}
           >
             <span
-              className={`w-[40px] flex items-center justify-center h-[40px] border border-1 rounded-[50%] ${
+              className={`min-w-[40px] flex items-center justify-center min-h-[40px] border border-1 rounded-[50%] ${
                 item.value === tab
                   ? 'border-primary text-primary'
                   : 'border-[#6B7280] text-[#6B7280]'
@@ -640,7 +643,7 @@ function CollectionForm({ collectionDetail }: IProductFormProps) {
                 </div>
               </div>
             </div>
-            <div>
+            <div className="mt-[40px]">
               <p className="font-medium">Select Tags</p>
               <div className="mt-6">
                 <div className="flex flex-col gap-3">

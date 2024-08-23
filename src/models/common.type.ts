@@ -46,6 +46,7 @@ export interface ItemTheme {
   themeCategories: { category: IThemCategory }[];
   themeTags: { tag: IThemCategory }[];
   themeFeatures: ThemeFeature[];
+  linkPreview: string;
 }
 
 export type TransactionTheme = {

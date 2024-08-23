@@ -123,7 +123,7 @@ const DetailThemePage = () => {
   };
 
   const handleLivePreview = () => {
-    window.open(data?.media?.live_preview);
+    window.open(data?.linkPreview);
   };
 
   const themeFormat = useMemo(
@@ -135,7 +135,6 @@ const DetailThemePage = () => {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/themes/payment?url=${url}`
     );
-    console.log('response', response.url);
     return response.url as string;
   };
 
@@ -154,7 +153,7 @@ const DetailThemePage = () => {
       <div className="flex items-start justify-between max-md:flex-col mb-12">
         <div className="w-[53%] max-md:w-[100%]">
           <Preview data={data?.media?.previews} />
-          {data?.media?.live_preview && (
+          {data?.linkPreview && (
             <div className="flex items-center mt-6">
               <button
                 onClick={handleLivePreview}

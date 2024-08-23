@@ -1,9 +1,9 @@
-"use client";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { FC, memo, useCallback, useState } from "react";
-import "swiper/css";
-import "swiper/css/pagination";
-import ImageViewer from "react-simple-image-viewer";
+'use client';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { FC, memo, useCallback, useState } from 'react';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import ImageViewer from 'react-simple-image-viewer';
 
 interface IProps {
   data?: string[];
@@ -25,15 +25,15 @@ const Preview: FC<IProps> = ({ data }) => {
     <div className="z-10">
       <img
         onClick={handleViewerImage}
-        src={data?.[indexImage] || "/assets/image/theme.png"}
+        src={data?.[indexImage] || '/assets/image/theme.png'}
         alt="theme"
-        className="w-[100%] max-h-[475px] max-sm:max-h-[225px] rounded-[20px] border-[1px] border-gray-200 cursor-pointer mb-5 drop-shadow-md"
+        className="w-[100%] max-h-[475px] max-sm:max-h-[225px] object-cover rounded-[20px] border-[1px] border-gray-200 cursor-pointer mb-5 drop-shadow-md"
       />
       <Swiper
         slidesPerView={4}
         spaceBetween={30}
         pagination={{
-          clickable: true,
+          clickable: true
         }}
         className="-z-10"
       >

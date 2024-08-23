@@ -37,13 +37,13 @@ export default function SelectCustom({
     >
       <div>
         <Select
+          className="h-[46px]"
           size="large"
           mode="multiple"
           style={{ width: '100%' }}
           onChange={e => {
             onChange(e);
           }}
-          className="!min-h-[50px]"
           value={currentValue}
           tokenSeparators={[',']}
           options={options}

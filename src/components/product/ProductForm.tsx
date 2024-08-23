@@ -2,7 +2,10 @@
 
 import SelectCustom from '@/components/common/SelectCustom';
 import UploadFile from '@/components/common/UploadFile';
-import { productImageAcceptTypes } from '@/constants/common';
+import {
+  MAX_THEME_IMAGE_UPDATE,
+  productImageAcceptTypes
+} from '@/constants/common';
 import useFetchAllTags from '@/hooks/useFetchAllTags';
 import useFetchCategories from '@/hooks/useFetchCategories';
 import {
@@ -21,7 +24,7 @@ import { createThemeSchema } from '@/validation/admin/theme.validation';
 import { CloseOutlined } from '@ant-design/icons';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Input, message } from 'antd';
+import { Input, InputNumber, message } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import clsx from 'clsx';
 import { isEmpty } from 'lodash';
@@ -36,6 +39,9 @@ import DoubleLine from '../../../public/assets/icon/DoubleLineIcon';
 import InputMessage from '../common/InputMessage';
 import SelectFeatureTag from '../common/SelectFeatureTag';
 import UploadFileTab from './UploadFileTab';
+import { fetchCollections } from '@/services/collection';
+import ProductCard from '../collection/ProductCard';
+import CollectionCard from '../collection/CollectionCard';
 
 interface IProductFormProps {
   themeDetail?: ITheme;
@@ -61,6 +67,15 @@ function ProductForm({ themeDetail }: IProductFormProps) {
   const [fileTypeSelect, setFileTypeSelect] = useState<IThemeFeatureType[]>([]);
   const [themeId, setThemeId] = useState();
   const router = useRouter();
+
+  const { data: collectionRes } = useQuery({
+    queryKey: [EQueryKeys.YOUR_COLLECTION],
+    queryFn: () =>
+      fetchCollections({
+        page: 1,
+        take: 20
+      })
+  });
 
   const tabList = [
     EProductTab.OVERVIEW,
@@ -299,10 +314,13 @@ function ProductForm({ themeDetail }: IProductFormProps) {
               if (!isUpdate) return;
               setTab(item.value);
             }}
-            className="flex items-center gap-4 cursor-pointer"
+            className={clsx(
+              'flex items-center gap-4 cursor-pointer flex-1 py-[12px] px-[32px] rounded-[8px]',
+              item.value === tab && 'bg-slate-50'
+            )}
           >
             <span
-              className={`w-[40px] flex items-center justify-center h-[40px] border border-1 rounded-[50%] ${
+              className={`min-w-[40px] flex items-center justify-center min-h-[40px] border border-1 rounded-[50%] ${
                 item.value === tab
                   ? 'border-primary text-primary'
                   : 'border-[#6B7280] text-[#6B7280]'
@@ -346,7 +364,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex justify-between">
-        <h1 className="text-[#111827] text-3xl not-italic font-bold leading-9">
+        <h1 className="text-black text-3xl not-italic font-bold leading-9">
           {isUpdate ? 'Update product' : 'Add new product'}
         </h1>
         <div className="text-base not-italic font-semibold leading-6">
@@ -374,7 +392,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
         <div className="flex gap-8">
           <div className="basis-3/5">
             <div className="">
-              <h1 className="my-6 text-[#111827] text-xl font-medium">
+              <h1 className="my-6 text-black text-xl font-medium">
                 Product type
               </h1>
               <ul className="flex gap-4">
@@ -402,7 +420,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
               </ul>
             </div>
             <div className="">
-              <h1 className="my-6 text-[#111827] text-xl font-medium">
+              <h1 className="my-6 text-black text-xl font-medium">
                 Product detail
               </h1>
               <ul className="flex flex-col gap-4">
@@ -421,7 +439,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                     )}
                   />
                   <InputMessage errorMessage={errors.name?.message} />
-                  <span className="text-[#64748B]">Give it a catchy name</span>
+                  <p className="text-stone-500 mt-2">Give it a catchy name</p>
                 </li>
                 <li className="w-full mt-2">
                   <h2 className="mb-1">Description</h2>
@@ -430,6 +448,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                     control={control}
                     render={({ field }) => (
                       <TextArea
+                        placeholder="Something about your product..."
                         className="w-[100%] h-[100px] px-[13px] py-[9px] border-[#D1D5DB] border-1 rounded-[8px] outline-[#D1D5DB]"
                         {...field}
                         status={errors.overview?.message ? 'error' : ''}
@@ -441,9 +460,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
               </ul>
             </div>
             <div className="">
-              <h1 className="my-6 text-[#111827] text-xl font-medium">
-                Pricing
-              </h1>
+              <h1 className="my-6 text-black text-xl font-medium">Pricing</h1>
               <ul className="flex flex-col gap-4">
                 <li className="w-full">
                   <h2 className="mb-1">Selling pricing</h2>
@@ -464,9 +481,9 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                       </div>
                     )}
                   />
-                  <span className="text-[#64748B]">
+                  <p className="text-stone-500 mt-2">
                     How much do you want to sell this?
-                  </span>
+                  </p>
                 </li>
                 <li className="w-full">
                   <h2 className="mb-1">Percentage of Ownership</h2>
@@ -475,7 +492,8 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                     control={control}
                     render={({ field }) => (
                       <div>
-                        <Input
+                        <InputNumber
+                          className="w-full"
                           {...field}
                           status={
                             errors.percentageOfOwnership?.message ? 'error' : ''
@@ -489,9 +507,9 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                       </div>
                     )}
                   />
-                  <span className="text-[#64748B]">
+                  <p className="text-stone-500 mt-2">
                     How much would you pass with product?
-                  </span>
+                  </p>
                 </li>
                 <li className="w-full">
                   <h2 className="mb-1">Ownership price</h2>
@@ -514,9 +532,9 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                       </div>
                     )}
                   />
-                  <span className="text-[#64748B]">
+                  <p className="text-stone-500 mt-2">
                     How much would you pass with product?
-                  </span>
+                  </p>
                 </li>
 
                 <li className="w-full">
@@ -534,9 +552,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
           </div>
           <div className="basis-2/5">
             <div className="">
-              <h1 className="my-6 text-[#111827] text-xl font-medium">
-                Thumbnail
-              </h1>
+              <h1 className="my-6 text-black text-xl font-medium">Thumbnail</h1>
 
               <ul className="flex gap-4 flex-col">
                 <FileUploader
@@ -561,7 +577,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
               </ul>
             </div>
             <div>
-              <h1 className="my-6 text-[#111827] text-xl font-medium">
+              <h1 className="my-6 text-black text-xl font-medium">
                 File type included
               </h1>
               <ul className="flex gap-4 flex-wrap">
@@ -588,7 +604,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
         <div className="flex justify-between gap-[150px] mt-10">
           <div className="flex-1 flex flex-col gap-6">
             <div>
-              <p className="font-medium">Highlight Features</p>
+              <p className="font-medium text-[20px]">Highlight Features</p>
               <div className="mt-6">
                 <div className="flex flex-col gap-3">
                   <Controller
@@ -628,7 +644,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
               </div>
             </div>
             <div>
-              <p className="font-medium">Link preview</p>
+              <p className="font-medium text-[20px]">Link preview</p>
               <div className="mt-6">
                 <div className="flex flex-col gap-3">
                   <Controller
@@ -652,7 +668,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
               </div>
             </div>
             <div>
-              <p className="font-medium">Select Category</p>
+              <p className="font-medium text-[20px]">Select Category</p>
               <div className="mt-6">
                 <div className="flex flex-col gap-3">
                   <Controller
@@ -677,7 +693,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
               </div>
             </div>
             <div>
-              <p className="font-medium">Select Tags</p>
+              <p className="font-medium text-[20px]">Select Tags</p>
               <div className="mt-6">
                 <div className="flex flex-col gap-3">
                   <Controller
@@ -703,33 +719,49 @@ function ProductForm({ themeDetail }: IProductFormProps) {
               </div>
             </div>
           </div>
-          <Controller
-            name="feature_ids"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <ul className="flex flex-1 flex-col gap-4">
-                {fileTypeSelect.map(type => (
-                  <li key={type.id} className="w-full">
-                    <h2 className="font-medium mb-6">{type.name}</h2>
-                    <SelectFeatureTag
-                      onChange={onChange}
-                      typeId={type.id}
-                      currentValue={value}
-                    />
-                  </li>
+          <div className="flex-1">
+            <Controller
+              name="feature_ids"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <ul className="flex flex-1 flex-col gap-[40px]">
+                  {fileTypeSelect.map(type => (
+                    <li key={type.id} className="w-full">
+                      <h2 className="font-medium mb-6 text-[20px]">
+                        {type.name}
+                      </h2>
+                      <SelectFeatureTag
+                        onChange={onChange}
+                        typeId={type.id}
+                        currentValue={value}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            />
+            <div>
+              <p className="text-[20px] font-medium leading-7 mt-[40px]">
+                Add into Collection
+              </p>
+              <div className="mt-[12px]">
+                {collectionRes?.data?.map(collection => (
+                  <CollectionCard collection={collection} key={collection.id} />
                 ))}
-              </ul>
-            )}
-          />
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
       {EProductTab.UPLOAD_IMAGE === tab && (
         <div className="flex flex-col gap-[60px]">
           <div>
-            <h1 className="my-6 text-[#111827] text-xl font-medium">Cover</h1>
+            <h1 className="my-6 text-black text-xl font-medium mt-[28px]">
+              Cover
+            </h1>
 
-            <ul className="flex gap-4 flex-col">
+            <ul className="flex gap-4 flex-col mt-[20px]">
               <ReactImageUploading
                 acceptType={productImageAcceptTypes}
                 multiple
@@ -749,7 +781,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                         height={500}
                         src={coverImage && getImageUrl(coverImage[0])}
                         alt="cover"
-                        className="w-full max-h-[600px] object-cover rounded-[20px]"
+                        className="max-h-[400px] mx-auto w-full lg:w-[70%] 2xl:w-[50%] object-cover rounded-[20px]"
                       />
                     )}
                   </div>
@@ -758,14 +790,20 @@ function ProductForm({ themeDetail }: IProductFormProps) {
             </ul>
           </div>
           <div>
-            <h1 className="my-6 text-[#111827] text-xl font-medium">
+            <h1 className="my-6 text-black text-xl font-medium">
               Detail images (4-8 required approval)
             </h1>
             <ul className="flex gap-4 flex-col">
               <ReactImageUploading
                 multiple
                 value={[]}
-                maxNumber={8}
+                onError={(error: any) => {
+                  const { maxNumber } = error;
+                  if (maxNumber) {
+                    message.error({ content: 'Maximum 8 images' });
+                  }
+                }}
+                maxNumber={MAX_THEME_IMAGE_UPDATE - (detailImages.length || 0)}
                 dataURLKey="dataUrl"
                 acceptType={productImageAcceptTypes}
                 onChange={data =>
@@ -778,12 +816,9 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                       <UploadFile />
                     </div>
 
-                    <div className="flex flex-wrap gap-[20px] mt-[40px]">
+                    <div className="gap-[20px] mt-[40px] grid sm:grid-cols-2 xl:grid-cols-4">
                       {detailImages?.map((image, imageIndex) => (
-                        <div
-                          key={imageIndex}
-                          className="w-[calc(50%-10px)] max-h-[400px] relative"
-                        >
+                        <div key={imageIndex} className="h-[250px] relative">
                           <div
                             onClick={() =>
                               setDetailImages(() => {
@@ -806,7 +841,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                             height={500}
                             src={image && getImageUrl(image)}
                             alt="cover"
-                            className="object-cover w-full rounded-[20px] max-h-[400px]"
+                            className="object-cover w-full rounded-[20px] h-full"
                           />
                         </div>
                       ))}
@@ -817,7 +852,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
             </ul>
           </div>
           <div>
-            <h1 className="my-6 text-[#111827] text-xl font-medium">
+            <h1 className="my-6 text-black text-xl font-medium">
               Full previews
             </h1>
             <ul className="flex gap-4 flex-col">
@@ -825,7 +860,15 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                 acceptType={productImageAcceptTypes}
                 multiple
                 value={[]}
-                maxNumber={8}
+                onError={(error: any) => {
+                  const { maxNumber } = error;
+                  if (maxNumber) {
+                    message.error({ content: 'Maximum 8 images' });
+                  }
+                }}
+                maxNumber={
+                  MAX_THEME_IMAGE_UPDATE - (fullPreviewImages.length || 0)
+                }
                 dataURLKey="dataUrl"
                 onChange={data =>
                   uploadFullPreivewImages([...fullPreviewImages, ...data])
@@ -837,12 +880,9 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                       <UploadFile />
                     </div>
 
-                    <div className="flex flex-wrap gap-[20px] mt-[40px]">
+                    <div className="gap-[20px] mt-[40px] grid sm:grid-cols-2 xl:grid-cols-4">
                       {fullPreviewImages?.map((image, imageIndex) => (
-                        <div
-                          key={imageIndex}
-                          className="w-[calc(50%-10px)] max-h-[400px] relative"
-                        >
+                        <div key={imageIndex} className="h-[250px] relative">
                           <div
                             onClick={() =>
                               setFullPreViewImages(() => {
@@ -865,7 +905,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                             height={500}
                             src={image && getImageUrl(image)}
                             alt="cover"
-                            className="object-cover w-full rounded-[20px] max-h-[400px]"
+                            className="object-cover w-full rounded-[20px] h-[250px]"
                           />
                         </div>
                       ))}
