@@ -1,10 +1,10 @@
 'use client';
 import { Route } from '@/constants/route';
 import useBalance from '@/hooks/useBalance';
+import useLoginWallet from '@/hooks/useLoginWallet';
 import { RootState, authActions } from '@/store/slices';
 import { useAppDispatch } from '@/store/store';
 import { shortenAddress } from '@/utils/helper';
-import { PhantomWalletName } from '@solana/wallet-adapter-phantom';
 import { useWallet } from '@solana/wallet-adapter-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -13,12 +13,14 @@ import { useSelector } from 'react-redux';
 
 const TabBar = () => {
   const pathname = usePathname();
-  const { connect, select, publicKey, disconnect, connected } = useWallet();
+  const { publicKey } = useWallet();
+  const { onConnectWallet, onDisconnect, connected } = useLoginWallet();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isLogin, accountInfo } = useSelector(
     (state: RootState) => state.auth
   );
+
   const [domLoaded, setDomLoaded] = useState(false);
   const [showOption, setShowOption] = useState<boolean>(false);
   const [showSetting, setShowSetting] = useState<boolean>(false);
@@ -27,13 +29,6 @@ const TabBar = () => {
   useEffect(() => {
     setDomLoaded(true);
   }, []);
-
-  const handleConnectWallet = useCallback(async () => {
-    try {
-      await select(PhantomWalletName);
-      await connect();
-    } catch (error) {}
-  }, [connect, select]);
 
   const handleProfile = useCallback(() => {
     setShowOption(false);
@@ -44,11 +39,11 @@ const TabBar = () => {
   }, []);
 
   const handleSignOut = useCallback(() => {
-    disconnect();
+    onDisconnect();
     dispatch(authActions.logout());
-    router.push('/login', { scroll: false });
+    router.push('/', { scroll: false });
     setShowSetting(false);
-  }, [disconnect, dispatch, router]);
+  }, [dispatch, onDisconnect, router]);
 
   const clickSetting = (route: string) => {
     router.push(route, { scroll: false });
@@ -160,7 +155,7 @@ const TabBar = () => {
                           </div>
                         ) : (
                           <button
-                            onClick={handleConnectWallet}
+                            onClick={onConnectWallet}
                             type="button"
                             className="relative flex max-w-xs items-center rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                             id="user-menu-button"
@@ -208,7 +203,13 @@ const TabBar = () => {
                                   role="menuitem"
                                   id="menu-item-0"
                                 >
-                                  Signed in as {accountInfo?.email}
+                                  Signed in as
+                                  <p>
+                                    {accountInfo?.email ||
+                                      shortenAddress(
+                                        accountInfo?.address || ''
+                                      )}
+                                  </p>
                                 </p>
                               </div>
                               <div className="py-1" role="none">
@@ -269,15 +270,34 @@ const TabBar = () => {
                             </div>
                           )}
                         </div>
-                        <div>
-                          <img
-                            src={
-                              'https://pbs.twimg.com/media/FoUoGo3XsAMEPFr?format=jpg&name=4096x4096'
-                            }
-                            alt="avatar"
-                            className="w-[36px] h-[36px] object-cover rounded-[50%]"
-                          />
-                        </div>
+                        {accountInfo?.email ? (
+                          <div>
+                            <img
+                              src={
+                                'https://pbs.twimg.com/media/FoUoGo3XsAMEPFr?format=jpg&name=4096x4096'
+                              }
+                              alt="avatar"
+                              className="w-[36px] h-[36px] object-cover rounded-[50%]"
+                            />
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            className="relative mr-3 flex max-w-xs items-center rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                            id="user-menu-button"
+                            aria-expanded="false"
+                            aria-haspopup="true"
+                            onClick={() => {
+                              router.push('/login', { scroll: false });
+                            }}
+                          >
+                            <img
+                              className="w-[24px] h-[24px] object-cover rounded-[50%]"
+                              src={'/assets/image/Google.svg'}
+                              alt="Google"
+                            />
+                          </button>
+                        )}
                       </div>
                     ) : (
                       <button
@@ -301,35 +321,6 @@ const TabBar = () => {
                       </button>
                     )}
                   </div>
-                  {/* {showOption && (
-                    <div
-                      className="absolute right-0 z-10 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none mt-2"
-                      role="menu"
-                      aria-orientation="vertical"
-                      aria-labelledby="user-menu-button"
-                      tabIndex={-1}
-                    >
-                      <Link
-                        href={Route.PROFILE}
-                        onClick={handleProfile}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50"
-                        role="menuitem"
-                        tabIndex={-1}
-                        id="user-menu-item-0"
-                      >
-                        Your Profile
-                      </Link>
-                      <a
-                        onClick={handleSignOut}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50"
-                        role="menuitem"
-                        tabIndex={-1}
-                        id="user-menu-item-2"
-                      >
-                        Sign out
-                      </a>
-                    </div>
-                  )} */}
                 </div>
               </div>
             </div>
