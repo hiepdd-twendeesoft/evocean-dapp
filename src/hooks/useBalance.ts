@@ -1,9 +1,9 @@
-import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
-import { useEffect, useState } from "react";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
+import { useEffect, useState } from 'react';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 
 const useBalance = (publicKey: PublicKey | null) => {
-  const [balance, setBalance] = useState<string>("0");
+  const [balance, setBalance] = useState<string>('0');
 
   useEffect(() => {
     if (!publicKey) {
@@ -12,16 +12,15 @@ const useBalance = (publicKey: PublicKey | null) => {
 
     const connection = new Connection(
       clusterApiUrl(WalletAdapterNetwork.Devnet) ||
-        "https://api.mainnet-beta.solana.com",
+        'https://api.mainnet-beta.solana.com'
     );
     connection
       .getBalance(publicKey)
-      .then((balance) => {
+      .then(balance => {
         setBalance((balance / 10 ** 9).toFixed(2));
-        console.log(balance / 10 ** 9); // Convert lamports to SOL
       })
-      .catch((error) => {
-        console.error("Error fetching balance:", error);
+      .catch(error => {
+        console.error('Error fetching balance:', error);
       });
   }, [publicKey]);
 

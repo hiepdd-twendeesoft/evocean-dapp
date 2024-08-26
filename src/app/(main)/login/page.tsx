@@ -1,50 +1,49 @@
-"use client";
+'use client';
 
-import { googleLoginAction } from "@/store/actions/auth";
-import { useAppDispatch } from "@/store/store";
-import { useGoogleLogin } from "@react-oauth/google";
-import { AxiosError } from "axios";
-import Link from "next/link";
-import { redirect, useRouter } from "next/navigation";
+import { googleLoginAction } from '@/store/actions/auth';
+import { useAppDispatch } from '@/store/store';
+import { useGoogleLogin } from '@react-oauth/google';
+import Link from 'next/link';
+import { redirect, useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/slices';
+import useLoginWallet from '@/hooks/useLoginWallet';
+import { googleLogin } from '@/services/auth';
+import { toast } from 'react-toastify';
 
 type Props = {};
 
 const LoginPage = (props: Props) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-
-  // const navigate = useNavigate();
+  const { onConnectWallet } = useLoginWallet();
+  const { accountInfo } = useSelector((state: RootState) => state.auth);
 
   const quickRegisterRedirect = (
     oauthToken: string,
-    provider: "google" | "facebook",
+    provider: 'google' | 'facebook'
   ) => {
-    redirect("/login");
+    redirect('/login');
   };
 
-  const onError = (err: AxiosError) => {
-    console.log("message", err);
-  };
-
-  // const { mutateAsync: onGoogleAccessSuccess } = useMutation({
-  //   mutationFn: googleLogin,
-  //   onSuccess: (res) => handleLoginSuccess(res.data),
-  //   onError,
-  // });
   const google = useGoogleLogin({
     onSuccess: async ({ access_token }) => {
       try {
-        await dispatch(
-          googleLoginAction({
-            access_token: access_token,
-          }),
-        );
-        router.push("/", { scroll: false });
+        const res = await googleLogin({
+          access_token: access_token,
+          user_id: accountInfo?.id,
+          address: accountInfo?.address
+        });
+        await dispatch(googleLoginAction(res));
+        router.push('/', { scroll: false });
       } catch (error: any) {
-        if ((error?.response?.data as any)?.statusCode === 400)
-          quickRegisterRedirect(access_token, "google");
+        toast.warn(error?.response?.data?.message);
+        if ((error?.response?.data as any)?.statusCode === 400) {
+          quickRegisterRedirect(access_token, 'google');
+        }
+        router.push('/', { scroll: false });
       }
-    },
+    }
   });
 
   return (
@@ -52,7 +51,7 @@ const LoginPage = (props: Props) => {
       <div className="w-[494px] bg-white flex-col items-center px-[32px] py-[40px]">
         <div className="w-full flex justify-center">
           <img
-            src={"/assets/image/mark.png"}
+            src={'/assets/image/mark.png'}
             alt="sale"
             className="w-[48px] mx-[4px]"
           />
@@ -66,7 +65,7 @@ const LoginPage = (props: Props) => {
         >
           <div>
             <img
-              src={"/assets/image/Google.svg"}
+              src={'/assets/image/Google.svg'}
               alt="sale"
               className="w-5 h-5"
             />
@@ -83,25 +82,33 @@ const LoginPage = (props: Props) => {
         <button className="w-full flex justify-center items-center gap-3 rounded-[var(--rounded-md,12px)] border border-[color:var(--Gray-300,#D1D5DB)] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border-solid px-[23px] py-[13px]">
           <div>
             <img
-              src={"/assets/image/wallet.svg"}
+              src={'/assets/image/wallet.svg'}
               alt="sale"
               className="w-5 h-5"
             />
           </div>
-          <h3 className="text-[#374151] text-base leading-6">Phantom Wallet</h3>
+          <h3
+            className="text-[#374151] text-base leading-6"
+            onClick={async () => {
+              await onConnectWallet();
+              router.push('/', { scroll: false });
+            }}
+          >
+            Phantom Wallet
+          </h3>
         </button>
         <div className="mt-12 text-[#6B7280] text-xs not-italic font-medium leading-5">
-          By signing up, you agree to our{" "}
+          By signing up, you agree to our{' '}
           <span className="text-[#111827]">
-            <Link href={"/term"}>Terms</Link>
+            <Link href={'/term'}>Terms</Link>
           </span>
-          ,{" "}
+          ,{' '}
           <span className="text-[#111827]">
-            <Link href={"/term"}>Data Policy</Link>
-          </span>{" "}
-          and{" "}
+            <Link href={'/term'}>Data Policy</Link>
+          </span>{' '}
+          and{' '}
           <span className="text-[#111827]">
-            <Link href={"/term"}>Cookies Policy</Link>
+            <Link href={'/term'}>Cookies Policy</Link>
           </span>
           .
         </div>

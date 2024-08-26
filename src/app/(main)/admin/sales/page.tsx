@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { INITIAL_PAGE, INITIAL_TAKE } from "@/constants/base";
-import { ISaleItem } from "@/models/sale.type";
-import { getCryptoPrice } from "@/services/get-crypto-price";
-import { getDashboardSales } from "@/services/get-dashboard-sales";
-import { parseDate } from "@/utils/helper";
-import { lamportsToSol } from "@/utils/lamports-to-sol";
-import { useQueryClient } from "@tanstack/react-query";
-import { Pagination } from "antd";
-import { useEffect, useState } from "react";
+import { INITIAL_PAGE, INITIAL_TAKE } from '@/constants/base';
+import { ISaleItem } from '@/models/sale.type';
+import { getCryptoPrice } from '@/services/get-crypto-price';
+import { getDashboardSales } from '@/services/get-dashboard-sales';
+import { parseDate } from '@/utils/helper';
+import { lamportsToSol } from '@/utils/lamports-to-sol';
+import { useQueryClient } from '@tanstack/react-query';
+import { Pagination } from 'antd';
+import { useEffect, useState } from 'react';
 
 function SalesPage() {
   const [page, setPage] = useState(INITIAL_PAGE);
@@ -19,17 +19,16 @@ function SalesPage() {
   useEffect(() => {
     const loadData = async () => {
       const result = await queryClient.fetchQuery({
-        queryKey: ["get-dashboard-sales"],
+        queryKey: ['get-dashboard-sales'],
         queryFn: () =>
           getDashboardSales({
             page: page,
-            take: INITIAL_TAKE,
-          }),
+            take: INITIAL_TAKE
+          })
       });
-      console.log("result", result.data);
       let dataPrice = await queryClient.fetchQuery({
-        queryKey: ["get-scrypto-price"],
-        queryFn: () => getCryptoPrice("solana"),
+        queryKey: ['get-scrypto-price'],
+        queryFn: () => getCryptoPrice('solana')
       });
       setDataPrice(dataPrice);
       setSales(result.data);
@@ -37,9 +36,6 @@ function SalesPage() {
 
     loadData();
   }, [page, queryClient]);
-
-  console.log("sales", sales);
-  console.log("dataPrice", dataPrice);
 
   return (
     <div className="overflow-x-auto">
@@ -77,9 +73,9 @@ function SalesPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        row.status === "Paid"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
+                        row.status === 'Paid'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
                       }`}
                     >
                       {row.status}
@@ -90,7 +86,7 @@ function SalesPage() {
                   </td>
                   <td
                     className="px-6 py-4 whitespace-nowrap"
-                    style={{ whiteSpace: "pre-line" }}
+                    style={{ whiteSpace: 'pre-line' }}
                   >
                     <div className="text-black">
                       $
@@ -105,7 +101,7 @@ function SalesPage() {
                   </td>
                   <td
                     className="px-6 py-4 whitespace-nowrap"
-                    style={{ whiteSpace: "pre-line" }}
+                    style={{ whiteSpace: 'pre-line' }}
                   >
                     <div className="text-black">
                       $
@@ -127,7 +123,7 @@ function SalesPage() {
             total={10}
             pageSize={INITIAL_TAKE}
             current={page}
-            onChange={(page) => {
+            onChange={page => {
               setPage(page);
             }}
             onShowSizeChange={(current, size) => {
