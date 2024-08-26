@@ -135,7 +135,6 @@ const DetailThemePage = () => {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/themes/payment?url=${url}`
     );
-    console.log('response', response.url);
     return response.url as string;
   };
 

@@ -3,21 +3,21 @@
 import { googleLoginAction } from '@/store/actions/auth';
 import { useAppDispatch } from '@/store/store';
 import { useGoogleLogin } from '@react-oauth/google';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { AxiosError } from 'axios';
 import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
-import { useCallback } from 'react';
-import { PhantomWalletName } from '@solana/wallet-adapter-phantom';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/slices';
+import useLoginWallet from '@/hooks/useLoginWallet';
+import { googleLogin } from '@/services/auth';
+import { toast } from 'react-toastify';
 
 type Props = {};
 
 const LoginPage = (props: Props) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { connect, select } = useWallet();
-
-  // const navigate = useNavigate();
+  const { onConnectWallet } = useLoginWallet();
+  const { accountInfo } = useSelector((state: RootState) => state.auth);
 
   const quickRegisterRedirect = (
     oauthToken: string,
@@ -26,30 +26,25 @@ const LoginPage = (props: Props) => {
     redirect('/login');
   };
 
-
   const google = useGoogleLogin({
     onSuccess: async ({ access_token }) => {
       try {
-        await dispatch(
-          googleLoginAction({
-            access_token: access_token
-          })
-        );
+        const res = await googleLogin({
+          access_token: access_token,
+          user_id: accountInfo?.id,
+          address: accountInfo?.address
+        });
+        await dispatch(googleLoginAction(res));
         router.push('/', { scroll: false });
       } catch (error: any) {
-        if ((error?.response?.data as any)?.statusCode === 400)
+        toast.warn(error?.response?.data?.message);
+        if ((error?.response?.data as any)?.statusCode === 400) {
           quickRegisterRedirect(access_token, 'google');
+        }
+        router.push('/', { scroll: false });
       }
     }
   });
-
-  const handleConnectWallet = useCallback(async () => {
-    try {
-      await select(PhantomWalletName);
-      await connect();
-      router.push('/', { scroll: false });
-    } catch (error) {}
-  }, [connect, select]);
 
   return (
     <div className="h-screen w-full flex justify-center items-center bg-[#03071299]">
@@ -94,7 +89,7 @@ const LoginPage = (props: Props) => {
           </div>
           <h3
             className="text-[#374151] text-base leading-6"
-            onClick={handleConnectWallet}
+            onClick={onConnectWallet}
           >
             Phantom Wallet
           </h3>

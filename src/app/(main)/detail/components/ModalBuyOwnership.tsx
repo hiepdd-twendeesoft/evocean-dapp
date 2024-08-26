@@ -1,54 +1,54 @@
 /* eslint-disable react/display-name */
-"use client";
+'use client';
 
-import { useTx } from "@/hooks/useTx";
-import { buyLicenseTheme } from "@/services/buy-theme-license";
-import { web3 } from "@coral-xyz/anchor";
+import { useTx } from '@/hooks/useTx';
+import { buyLicenseTheme } from '@/services/buy-theme-license';
+import { web3 } from '@coral-xyz/anchor';
 import {
   TOKEN_PROGRAM_ID,
   createAssociatedTokenAccountInstruction,
   getAccount,
-  getAssociatedTokenAddressSync,
-} from "@solana/spl-token";
-import { PublicKey } from "@solana/web3.js";
+  getAssociatedTokenAddressSync
+} from '@solana/spl-token';
+import { PublicKey } from '@solana/web3.js';
 import {
   Fragment,
   createRef,
   forwardRef,
   useCallback,
   useImperativeHandle,
-  useState,
-} from "react";
-import Modal from "react-modal";
-import "../detail.style.css";
-import useConvertDollar from "@/hooks/useConvertDollar";
-import Link from "next/link";
-import { Route } from "@/constants/route";
-import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+  useState
+} from 'react';
+import Modal from 'react-modal';
+import '../detail.style.css';
+import useConvertDollar from '@/hooks/useConvertDollar';
+import Link from 'next/link';
+import { Route } from '@/constants/route';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 export const refModalBuyOwnership = createRef<any>();
 
 export const modalBuyOwnershipControl = {
   show: () => refModalBuyOwnership.current?.show(),
-  close: () => refModalBuyOwnership.current?.close(),
+  close: () => refModalBuyOwnership.current?.close()
 };
 
 const customStyles: Modal.Styles = {
   content: {
-    top: "50%",
-    left: "50%",
-    right: "50%",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-    zIndex: "100",
+    top: '50%',
+    left: '50%',
+    right: '50%',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: '100',
     borderRadius: 12,
-    padding: 32,
+    padding: 32
   },
   overlay: {
-    zIndex: "inherit",
-  },
+    zIndex: 'inherit'
+  }
 };
 
 type ModalBuyOwnershipProps = {
@@ -70,9 +70,9 @@ const ModalBuyOwnership = forwardRef(
       name,
       image,
       priceOwner,
-      refetch,
+      refetch
     }: ModalBuyOwnershipProps,
-    ref,
+    ref
   ) => {
     const { push } = useRouter();
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -89,7 +89,7 @@ const ModalBuyOwnership = forwardRef(
     useImperativeHandle(ref, () => {
       return {
         show,
-        close,
+        close
       };
     });
 
@@ -99,7 +99,7 @@ const ModalBuyOwnership = forwardRef(
         await handleBuyLicense();
         setStep(2);
       } catch (error) {
-        console.error("buy error", error);
+        console.error('buy error', error);
         setStep(0);
       }
     };
@@ -108,39 +108,39 @@ const ModalBuyOwnership = forwardRef(
 
     const handleBuyLicense = async () => {
       if (!token_mint || !author_address || !theme_id) {
-        console.error("missing token mint or author_address or theme_id");
-        return toast.warn("Missing token mint or author_address or theme_id");
+        console.error('missing token mint or author_address or theme_id');
+        return toast.warn('Missing token mint or author_address or theme_id');
       }
 
       if (author_address == provider.wallet.publicKey.toBase58()) {
-        console.error("can not buy your own theme");
-        return toast.warn("Can not buy your own theme");
+        console.error('can not buy your own theme');
+        return toast.warn('Can not buy your own theme');
       }
 
       const seller = new web3.PublicKey(author_address);
       const tokenMint = new web3.PublicKey(token_mint);
 
       const [listingAccount] = web3.PublicKey.findProgramAddressSync(
-        [Buffer.from("listing_account_"), tokenMint.toBuffer()],
-        program.programId,
+        [Buffer.from('listing_account_'), tokenMint.toBuffer()],
+        program.programId
       );
 
       const [marketTokenAccount] = web3.PublicKey.findProgramAddressSync(
-        [Buffer.from("market_token_account_"), tokenMint.toBuffer()],
-        program.programId,
+        [Buffer.from('market_token_account_'), tokenMint.toBuffer()],
+        program.programId
       );
 
       let userTokenAccount: PublicKey;
 
       const associatedToken = getAssociatedTokenAddressSync(
         tokenMint,
-        provider.wallet.publicKey,
+        provider.wallet.publicKey
       );
 
       try {
         const { address } = await getAccount(
           provider.connection,
-          associatedToken,
+          associatedToken
         );
 
         userTokenAccount = address;
@@ -150,23 +150,23 @@ const ModalBuyOwnership = forwardRef(
             provider.wallet.publicKey,
             associatedToken,
             provider.wallet.publicKey,
-            tokenMint,
-          ),
+            tokenMint
+          )
         );
 
         await provider.sendAndConfirm(transaction);
 
         const { address } = await getAccount(
           provider.connection,
-          associatedToken,
+          associatedToken
         );
 
         userTokenAccount = address;
       }
 
       if (!userTokenAccount) {
-        console.error("Can not create user token account");
-        return toast.warn("Can not create user token account");
+        console.error('Can not create user token account');
+        return toast.warn('Can not create user token account');
       }
 
       const instruction = await program.methods
@@ -179,7 +179,7 @@ const ModalBuyOwnership = forwardRef(
           systemProgram: web3.SystemProgram.programId,
           tokenMint,
           tokenProgram: TOKEN_PROGRAM_ID,
-          userTokenAccount,
+          userTokenAccount
         })
         .instruction();
 
@@ -189,12 +189,10 @@ const ModalBuyOwnership = forwardRef(
 
       await buyLicenseTheme({
         buyer: provider.wallet.publicKey.toBase58(),
-        theme_id,
+        theme_id
       });
       refetch?.();
-      toast.success("Buy ownership successful");
-
-      console.log("done buy");
+      toast.success('Buy ownership successful');
     };
 
     const handleProfileOwner = () => {
@@ -207,14 +205,14 @@ const ModalBuyOwnership = forwardRef(
           <div className="flex items-start justify-between">
             <h3
               className={`text-2xl font-semibold ${
-                step === 2 ? "text-green-600" : "text-gray-900"
+                step === 2 ? 'text-green-600' : 'text-gray-900'
               }`}
             >
-              {step === 2 ? "Your purchase is complete" : "Buy ownership"}
+              {step === 2 ? 'Your purchase is complete' : 'Buy ownership'}
             </h3>
             <button onClick={close}>
               <img
-                src={"/assets/icon/close-icon.svg"}
+                src={'/assets/icon/close-icon.svg'}
                 alt="close"
                 className="w-[38px]"
               />
@@ -222,7 +220,7 @@ const ModalBuyOwnership = forwardRef(
           </div>
           <div className="flex items-start mt-6 border-b-gray-200 border-b-[1px] pb-8 mb-8">
             <img
-              src={image || "/assets/image/theme.png"}
+              src={image || '/assets/image/theme.png'}
               alt="theme"
               className="w-[126px] rounded-[12px]"
             />
@@ -308,7 +306,7 @@ const ModalBuyOwnership = forwardRef(
         </div>
       </Modal>
     );
-  },
+  }
 );
 
 export default ModalBuyOwnership;

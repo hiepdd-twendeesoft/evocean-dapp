@@ -5,7 +5,6 @@ import useLoginWallet from '@/hooks/useLoginWallet';
 import { RootState, authActions } from '@/store/slices';
 import { useAppDispatch } from '@/store/store';
 import { shortenAddress } from '@/utils/helper';
-import { PhantomWalletName } from '@solana/wallet-adapter-phantom';
 import { useWallet } from '@solana/wallet-adapter-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -14,8 +13,8 @@ import { useSelector } from 'react-redux';
 
 const TabBar = () => {
   const pathname = usePathname();
-  const { publicKey, disconnect, connected } = useWallet();
-  const { onConnectWallet } = useLoginWallet();
+  const { publicKey, connected } = useWallet();
+  const { onConnectWallet, onDisconnect } = useLoginWallet();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isLogin, accountInfo } = useSelector(
@@ -40,11 +39,11 @@ const TabBar = () => {
   }, []);
 
   const handleSignOut = useCallback(() => {
-    disconnect();
+    onDisconnect();
     dispatch(authActions.logout());
     router.push('/', { scroll: false });
     setShowSetting(false);
-  }, [disconnect, dispatch, router]);
+  }, [dispatch, onDisconnect, router]);
 
   const clickSetting = (route: string) => {
     router.push(route, { scroll: false });
