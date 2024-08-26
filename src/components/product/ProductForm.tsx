@@ -569,7 +569,9 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                   ) : (
                     <UploadFile
                       customClassname={
-                        errors.thumbnail_link ? 'border-error border-[2px]' : ''
+                        errors.thumbnail_link
+                          ? '!border-error border-[2px]'
+                          : ''
                       }
                     />
                   )}

@@ -105,6 +105,7 @@ const CreatorEarning = ({ handleSaveEarning, form }: ICreatorEarningProps) => {
                         name={[name, 'percentage']}
                         rules={[
                           {
+                            required: false,
                             validator: validateTotalPercentage
                           }
                         ]}

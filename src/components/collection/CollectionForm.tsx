@@ -23,7 +23,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Form, Input, message } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import clsx from 'clsx';
-import { isEmpty } from 'lodash';
+import { isEmpty, isNil } from 'lodash';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -204,7 +204,7 @@ function CollectionForm({ collectionDetail }: IProductFormProps) {
 
   const handleSaveEarning = useCallback(
     (data: { earnings: IEarning[] }) => {
-      const earnings = data.earnings.filter(
+      const earnings = data.earnings?.filter(
         item => item.percentage && item.percentage
       );
       if (isUpdate) {
@@ -518,7 +518,7 @@ function CollectionForm({ collectionDetail }: IProductFormProps) {
                   ) : (
                     <UploadFile
                       customClassname={
-                        errors.thumbnail ? 'border-error border-[2px]' : ''
+                        errors.thumbnail ? '!border-error border-[2px]' : ''
                       }
                     />
                   )}
