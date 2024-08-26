@@ -1,7 +1,7 @@
 import { CHOOSE_PRODUCT_PAGE_SIZE, INITIAL_PAGE } from '@/constants/base';
 import { COLOR } from '@/constants/common';
 import { ItemTheme } from '@/models/common.type';
-import { fetchThemes } from '@/services/common.service';
+import { fetchThemes, fetchYourThemes } from '@/services/common.service';
 import { EQueryKeys } from '@/types/common';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Button, ConfigProvider, Modal, Pagination } from 'antd';
@@ -29,17 +29,13 @@ export default function ChooseProductModal({
   );
   const { data: productResponse } = useQuery({
     queryKey: [EQueryKeys.YOUR_PRODUCTS, { page }],
-    queryFn: () =>
-      fetchThemes({
-        page: page,
-        take: CHOOSE_PRODUCT_PAGE_SIZE
-      }),
+    queryFn: () => fetchYourThemes(),
     placeholderData: keepPreviousData
   });
 
   const selectAll = useCallback(() => {
     setProductSelect(preState => {
-      const allThemeInPage = productResponse?.data.map(theme => {
+      const allThemeInPage = productResponse?.map(theme => {
         return {
           id: theme.id,
           thumbnail: theme.media.thumbnail
@@ -51,7 +47,7 @@ export default function ChooseProductModal({
       );
       return uniqThemeSelect;
     });
-  }, [productResponse?.data]);
+  }, [productResponse]);
 
   const handleClickProductCard = useCallback(
     (theme: ItemTheme) => {
@@ -102,7 +98,7 @@ export default function ChooseProductModal({
                 }
               }}
             >
-              <Pagination
+              {/* <Pagination
                 showLessItems
                 defaultCurrent={page}
                 onChange={page => {
@@ -110,7 +106,7 @@ export default function ChooseProductModal({
                 }}
                 total={productResponse?.total}
                 showSizeChanger={false}
-              />
+              /> */}
             </ConfigProvider>
           </div>
           <div
@@ -135,7 +131,7 @@ export default function ChooseProductModal({
       </div>
       <div className="border-t mt-4" />
       <div className="my-[24px] grid grid-cols-2 gap-[20px]">
-        {productResponse?.data.map(product => (
+        {productResponse?.map(product => (
           <div onClick={() => handleClickProductCard(product)} key={product.id}>
             <ProductCard
               isActive={checkProductSelected(product.id)}

@@ -34,3 +34,15 @@ body {
     display: none;
   }
 }
+
+.gradient-border {
+  border: 2px solid; 
+  border-image: linear-gradient(to right, #10F4B1, #CB4EE8) 1;
+  
+}
+
+.gradient-border > .content {
+  border-radius: 10px; /* Bo tròn các góc cho nội dung bên trong */
+  background: white; /* Màu nền của nội dung */
+
+}

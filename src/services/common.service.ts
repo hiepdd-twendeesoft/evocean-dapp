@@ -18,6 +18,14 @@ export function fetchThemes(
     .then(res => res.data)
     .catch(err => err);
 }
+
+export async function fetchYourThemes(): Promise<ItemTheme[]> {
+  return api(`${ApiThemes.theme}/themes-by-user`, null, {
+    method: 'GET'
+  })
+    .then(res => res.data)
+    .catch(err => err);
+}
 export function fetchThemeCategories(): Promise<IThemCategory[]> {
   return api(ApiThemes.fetchThemeCategories, null, {
     method: 'GET'

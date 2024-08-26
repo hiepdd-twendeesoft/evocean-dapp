@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import useConvertDollar from "@/hooks/useConvertDollar";
-import { getDashboard } from "@/services/amin";
-import { lamportsToSol } from "@/utils/lamports-to-sol";
-import { useQuery } from "@tanstack/react-query";
-import { CategoryScale } from "chart.js";
-import Chart from "chart.js/auto";
+import useConvertDollar from '@/hooks/useConvertDollar';
+import { getDashboard } from '@/services/amin';
+import { lamportsToSol } from '@/utils/lamports-to-sol';
+import { useQuery } from '@tanstack/react-query';
+import { CategoryScale } from 'chart.js';
+import Chart from 'chart.js/auto';
 
-import { useRef } from "react";
+import { useRef } from 'react';
 
-import { Line } from "react-chartjs-2";
+import { Line } from 'react-chartjs-2';
 
 function DashboardPage() {
   Chart.register(CategoryScale);
   const ref = useRef();
 
   const { data: statistic, refetch } = useQuery({
-    queryKey: ["get-dashboard"],
-    queryFn: () => getDashboard(),
+    queryKey: ['get-dashboard'],
+    queryFn: () => getDashboard()
   });
 
   const selling =
@@ -32,42 +32,42 @@ function DashboardPage() {
 
   const data = {
     labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
     ],
     datasets: [
       {
-        label: "Total",
+        label: 'Total',
         data: total,
         fill: false,
-        backgroundColor: "rgb(67, 56, 202, 0.2)",
-        borderColor: "rgb(67, 56, 202, 1)",
+        backgroundColor: 'rgb(67, 56, 202, 0.2)',
+        borderColor: 'rgb(67, 56, 202, 1)'
       },
       {
-        label: "Selling",
+        label: 'Selling',
         data: selling,
         fill: false,
-        backgroundColor: "rgb(132, 204, 22, 0.2)",
-        borderColor: "rgb(132, 204, 22, 1)",
+        backgroundColor: 'rgb(132, 204, 22, 0.2)',
+        borderColor: 'rgb(132, 204, 22, 1)'
       },
       {
-        label: "Owned",
+        label: 'Owned',
         data: owned,
         fill: false,
-        backgroundColor: "rgb(20, 184, 166, 0.2)",
-        borderColor: "rgb(20, 184, 166, 1)",
-      },
-    ],
+        backgroundColor: 'rgb(20, 184, 166, 0.2)',
+        borderColor: 'rgb(20, 184, 166, 1)'
+      }
+    ]
   };
   return (
     <div>
@@ -83,13 +83,13 @@ function DashboardPage() {
             <h1 className="text-[#9CA3AF]">$</h1>
             <h1 className="text-[#111827]">
               {useConvertDollar(
-                lamportsToSol(statistic?.data?.sellingTotal || 0),
+                lamportsToSol(statistic?.data?.sellingTotal || 0)
               )}
             </h1>
           </div>
           <div className="flex items-center text-[24px] font-bold uppercase">
             <img
-              src={"/assets/image/SOL 2.svg"}
+              src={'/assets/image/SOL 2.svg'}
               alt="eye"
               className="w-[18px] ml-2"
             />
@@ -115,13 +115,13 @@ function DashboardPage() {
             <h1 className="text-[#9CA3AF]">$</h1>
             <h1 className="text-[#111827]">
               {useConvertDollar(
-                lamportsToSol(statistic?.data?.sellingOwnerTotal || 0),
+                lamportsToSol(statistic?.data?.sellingOwnerTotal || 0)
               )}
             </h1>
           </div>
           <div className="flex items-center text-[24px] font-bold uppercase">
             <img
-              src={"/assets/image/SOL 2.svg"}
+              src={'/assets/image/SOL 2.svg'}
               alt="eye"
               className="w-[18px] ml-2"
             />
@@ -147,13 +147,13 @@ function DashboardPage() {
             <h1 className="text-[#9CA3AF]">$</h1>
             <h1 className="text-[#111827]">
               {useConvertDollar(
-                lamportsToSol(statistic?.data?.totalPayout || 0),
+                lamportsToSol(statistic?.data?.totalPayout || 0)
               )}
             </h1>
           </div>
           <div className="flex items-center text-[24px] font-bold uppercase">
             <img
-              src={"/assets/image/SOL 2.svg"}
+              src={'/assets/image/SOL 2.svg'}
               alt="eye"
               className="w-[18px] ml-2"
             />
@@ -182,7 +182,6 @@ function DashboardPage() {
           </div>
         </div>
         <div className="p-4 flex-auto">
-          {/* Chart */}
           <div className="relative h-350-px">
             <Line
               ref={ref}
@@ -191,20 +190,20 @@ function DashboardPage() {
                 responsive: true,
                 plugins: {
                   legend: {
-                    position: "bottom",
+                    position: 'bottom',
                     labels: {
                       usePointStyle: true,
-                      pointStyle: "circle",
+                      pointStyle: 'circle',
                       boxHeight: 5,
                       boxWidth: 5,
                       padding: 30,
                       font: {
                         size: 18,
-                        weight: 500,
-                      },
-                    },
-                  },
-                },
+                        weight: 500
+                      }
+                    }
+                  }
+                }
               }}
             />
           </div>

@@ -1,8 +1,10 @@
-import { TransactionTheme } from "@/models/common.type";
-import { shortenAddress } from "@/utils/helper";
-import { lamportsToSol } from "@/utils/lamports-to-sol";
-import moment from "moment";
-import { FC, Fragment } from "react";
+import { TransactionTheme } from '@/models/common.type';
+import { shortenAddress } from '@/utils/helper';
+import { lamportsToSol } from '@/utils/lamports-to-sol';
+import { Empty } from 'antd';
+import { isEmpty } from 'lodash';
+import moment from 'moment';
+import { FC, Fragment } from 'react';
 
 interface IProps {
   Transactions?: TransactionTheme[];
@@ -26,51 +28,61 @@ const TabTransaction: FC<IProps> = ({ Transactions }) => {
               <thead>
                 <tr className="border-b-[1px] border-b-gray-200">
                   <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
-                    Buyer
+                    Signature
                   </th>
                   <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
-                    Seller
-                  </th>
-                  <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
-                    Price
+                    Time
                   </th>
                   <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
                     Type
                   </th>
-                  <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 uppercase whitespace-nowrap text-left">
-                    Time
+                  <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
+                    From
+                  </th>
+
+                  <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
+                    To
                   </th>
                   <th className="px-6 text-gray-900 text-sm font-semibold align-middle py-3 whitespace-nowrap text-left">
-                    Theme ID
+                    Account
                   </th>
                 </tr>
               </thead>
 
               <tbody>
-                {Transactions?.map((item, index) => (
-                  <tr key={index} className="border-b-[1px] border-b-gray-200">
-                    <th className="border-t-0 px-6 py-4 align-middle text-sm font-medium whitespace-nowrap text-left text-gray-900">
-                      {shortenAddress(item.buyer)}
-                    </th>
-                    <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap ">
-                      {shortenAddress(item.seller)}
-                    </td>
-                    <td className="border-t-0 px-6 py-4 align-center text-[14px] text-gray-500 whitespace-nowrap">
-                      {lamportsToSol(item.price)} SOL
-                    </td>
-                    <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
-                      {item.kind}
-                    </td>
-                    <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
-                      {moment(item.date).fromNow()}
-                    </td>
-                    <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
-                      {item.theme_id}
-                    </td>
-                  </tr>
-                ))}
+                {!isEmpty(Transactions) &&
+                  Transactions?.map((item, index) => (
+                    <tr
+                      key={index}
+                      className="border-b-[1px] border-b-gray-200"
+                    >
+                      <th className="border-t-0 px-6 py-4 align-middle text-sm font-medium whitespace-nowrap text-left text-gray-900">
+                        {shortenAddress(item.buyer)}
+                      </th>
+                      <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap ">
+                        {shortenAddress(item.seller)}
+                      </td>
+                      <td className="border-t-0 px-6 py-4 align-center text-[14px] text-gray-500 whitespace-nowrap">
+                        {lamportsToSol(item.price)} SOL
+                      </td>
+                      <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
+                        {item.kind}
+                      </td>
+                      <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
+                        {moment(item.date).fromNow()}
+                      </td>
+                      <td className="border-t-0 px-6 py-4 align-middle text-[14px] text-gray-500 whitespace-nowrap">
+                        {item.theme_id}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
+            {isEmpty(Transactions) && (
+              <div className="mt-10">
+                <Empty className="m-auto" />
+              </div>
+            )}
           </div>
         </div>
       </div>

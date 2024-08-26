@@ -46,7 +46,7 @@ const Preview: FC<IProps> = ({ data }) => {
             <img
               src={item}
               alt="theme"
-              className="w-[100%] rounded-[8px] h-[88px] max-sm:h-[54px]"
+              className="w-[100%] border-[1px] border-gray-200 rounded-[8px] object-cover h-[88px] max-sm:h-[54px]"
             />
             <div className="absolute top-0 left-0 rounded-[8px] group-hover:block hidden right-0 bottom-0 bg-[#00000050]" />
           </SwiperSlide>

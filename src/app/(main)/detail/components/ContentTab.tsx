@@ -66,16 +66,14 @@ const ContentTab: FC<IProps> = ({
               return (
                 <div
                   key={index}
-                  className="h-[32px] rounded-[16px] px-3 bg-gray-100 flex items-center justify-center mr-4 mb-3"
+                  className="h-[32px] rounded-[16px] hover:bg px-3 bg-gray-100 flex items-center justify-center mr-4 mb-3 hover:bg-indigo-100 cursor-pointer text-gray-800 hover:text-indigo-600"
                 >
                   <img
                     src={'/assets/image/global.svg'}
                     alt="global"
                     className="w-[16px]"
                   />
-                  <p className="text-sm font-medium text-gray-800 ml-1">
-                    {item.name}
-                  </p>
+                  <p className="text-sm font-medium ml-1">{item.name}</p>
                 </div>
               );
             })}

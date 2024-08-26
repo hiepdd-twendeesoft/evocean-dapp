@@ -3,7 +3,7 @@ import { FC, PropsWithChildren } from 'react';
 
 const AppLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <div className="w-full h-full bg-white flex">
+    <div className="w-full h-full flex">
       <div className="w-[16%]">
         <Aside />
       </div>

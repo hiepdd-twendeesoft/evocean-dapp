@@ -19,7 +19,7 @@ const TabOverView: FC<IProps> = ({
       {themeFeatures?.map((item, index) => (
         <div key={index}>
           <h4 className="text-lg font-medium text-gray-900 mb-4 mt-8">
-            {item.type.name}
+            {item.type.name} features
           </h4>
           <div className="grid grid-cols-2 gap-4">
             {item.features.map(feature => (
