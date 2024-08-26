@@ -34,7 +34,7 @@ const authSlice = createSlice({
     builder.addCase(googleLoginAction.pending, state => {});
     builder.addCase(googleLoginAction.fulfilled, (state, action) => {
       state.accessToken = action.payload?.accessToken;
-      state.accountInfo = action.payload?.user;
+      state.accountInfo = action.payload?.accountInfo;
       state.isLogin = true;
     });
     builder.addCase(googleLoginAction.rejected, state => {
