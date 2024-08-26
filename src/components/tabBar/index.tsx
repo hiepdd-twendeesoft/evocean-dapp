@@ -13,8 +13,8 @@ import { useSelector } from 'react-redux';
 
 const TabBar = () => {
   const pathname = usePathname();
-  const { publicKey, connected } = useWallet();
-  const { onConnectWallet, onDisconnect } = useLoginWallet();
+  const { publicKey } = useWallet();
+  const { onConnectWallet, onDisconnect, connected } = useLoginWallet();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isLogin, accountInfo } = useSelector(

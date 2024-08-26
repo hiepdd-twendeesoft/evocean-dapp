@@ -89,7 +89,10 @@ const LoginPage = (props: Props) => {
           </div>
           <h3
             className="text-[#374151] text-base leading-6"
-            onClick={onConnectWallet}
+            onClick={async () => {
+              await onConnectWallet();
+              router.push('/', { scroll: false });
+            }}
           >
             Phantom Wallet
           </h3>

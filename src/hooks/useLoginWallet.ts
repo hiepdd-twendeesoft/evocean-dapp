@@ -7,12 +7,14 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/slices';
 import { walletLogin } from '@/services/auth';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 const useLoginWallet = () => {
   const { connect, select, publicKey, disconnect } = useWallet();
   const { accountInfo } = useSelector((state: RootState) => state.auth);
   const dispatch = useAppDispatch();
   const [connected, setConnected] = useState(false);
+  const router = useRouter();
 
   const onConnectWallet = async () => {
     try {
@@ -26,7 +28,7 @@ const useLoginWallet = () => {
     setConnected(false);
   };
 
-  const handleLogionWithWallet = useCallback(async () => {
+  const handleLoginWithWallet = useCallback(async () => {
     if (publicKey) {
       setConnected(false);
       try {
@@ -46,7 +48,7 @@ const useLoginWallet = () => {
 
   useEffect(() => {
     if (publicKey) {
-      handleLogionWithWallet();
+      handleLoginWithWallet();
     }
   }, [publicKey]);
 
