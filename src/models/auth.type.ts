@@ -4,6 +4,7 @@ export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
   accountInfo?: IAccountInfo | null;
+  user?: IAccountInfo | null;
 }
 
 export interface OAuthLoginDto {
