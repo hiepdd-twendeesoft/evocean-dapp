@@ -33,6 +33,8 @@ export interface ITheme {
   tags: IThemeTag[];
   fileUrl: string;
   themeFeatures: ThemeFeature[];
+  selling_price: string;
+  owner_price: string;
 }
 
 export interface ThemeFeature {
@@ -128,4 +130,9 @@ export interface ICreateThemeResponse {
 
 export interface IThemeMedia {
   thumbnail: string;
+}
+
+export interface IListThemeParams {
+  themeId: string;
+  nft_token: string;
 }

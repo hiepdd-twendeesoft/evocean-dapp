@@ -1,9 +1,13 @@
-import { ITheme, IThemeItem, TCreateTheme } from '@/models/theme.type';
+import {
+  IListThemeParams,
+  ITheme,
+  IThemeItem,
+  TCreateTheme
+} from '@/models/theme.type';
 import api, { getAxiosInstance } from './axios';
 import {
   FetchThemeParams,
   IUploadThemeRes,
-  ItemTheme,
   ListData,
   TUploadTheme
 } from '@/models/common.type';
@@ -66,3 +70,13 @@ export const deleteTheme = (themeId: number): Promise<number> =>
   api(`${ApiThemes.deleteProduct}/${themeId}`, null, { method: 'DELETE' }).then(
     res => res.data
   );
+
+export const listingThemeServece = ({
+  themeId,
+  nft_token
+}: IListThemeParams): Promise<any> =>
+  api(
+    `${ApiThemes.theme}/listing/${themeId}`,
+    { nft_token },
+    { method: 'PATCH' }
+  ).then(res => res.data);

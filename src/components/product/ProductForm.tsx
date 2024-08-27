@@ -16,7 +16,12 @@ import {
   TCreateThemeSchema
 } from '@/models/theme.type';
 import { fetchFeatureType } from '@/services/common.service';
-import { createTheme, updateTheme, uploadTheme } from '@/services/theme';
+import {
+  createTheme,
+  listingThemeServece,
+  updateTheme,
+  uploadTheme
+} from '@/services/theme';
 import { EQueryKeys, NAV_LINKS } from '@/types/common';
 import { EProductTab } from '@/types/product';
 import { getThemeFeatureIds } from '@/utils/helper';
@@ -24,7 +29,7 @@ import { createThemeSchema } from '@/validation/admin/theme.validation';
 import { CloseOutlined } from '@ant-design/icons';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Input, InputNumber, message } from 'antd';
+import { Button, Input, InputNumber, message } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import clsx from 'clsx';
 import { isEmpty } from 'lodash';
@@ -40,8 +45,9 @@ import InputMessage from '../common/InputMessage';
 import SelectFeatureTag from '../common/SelectFeatureTag';
 import UploadFileTab from './UploadFileTab';
 import { fetchCollections } from '@/services/collection';
-import ProductCard from '../collection/ProductCard';
-import CollectionCard from '../collection/CollectionCard';
+import useMintAndListingNFT from '@/hooks/useMintAndListingNFT';
+import Loading from '../common/Loading';
+import { lamportsToSol } from '@/utils/lamports-to-sol';
 
 interface IProductFormProps {
   themeDetail?: ITheme;
@@ -67,15 +73,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
   const [fileTypeSelect, setFileTypeSelect] = useState<IThemeFeatureType[]>([]);
   const [themeId, setThemeId] = useState();
   const router = useRouter();
-
-  const { data: collectionRes } = useQuery({
-    queryKey: [EQueryKeys.YOUR_COLLECTION],
-    queryFn: () =>
-      fetchCollections({
-        page: 1,
-        take: 20
-      })
-  });
+  const { mintAndListingNFT } = useMintAndListingNFT();
 
   const tabList = [
     EProductTab.OVERVIEW,
@@ -99,7 +97,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
 
   const queryClient = useQueryClient();
 
-  const { mutate: handleUpdateTheme } = useMutation({
+  const { mutate: handleUpdateTheme, isPending } = useMutation({
     mutationFn: updateTheme,
     onSuccess: () => {
       message.success('Update theme successfully');
@@ -115,8 +113,11 @@ function ProductForm({ themeDetail }: IProductFormProps) {
     if (themeDetail) {
       setValue('name', themeDetail.name);
       setValue('overview', themeDetail.overview);
-      setValue('selling_price', Number(themeDetail.sale?.price));
-      setValue('owner_price', Number(themeDetail.listing?.price));
+      setValue(
+        'selling_price',
+        Number(lamportsToSol(themeDetail.selling_price))
+      );
+      setValue('owner_price', Number(lamportsToSol(themeDetail.owner_price)));
       setValue('percentageOfOwnership', themeDetail.percentageOfOwnership);
       setValue('highlight', themeDetail?.media?.highlight);
       setValue('linkPreview', themeDetail?.linkPreview || undefined);
@@ -139,7 +140,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
     }
   }, [setValue, themeDetail]);
 
-  const { mutate: handleCreateTheme } = useMutation({
+  const { mutate: handleCreateTheme, isPending: pendingCreate } = useMutation({
     mutationFn: createTheme,
     onSuccess: data => {
       if (status === EThemeStatus.DRAFT) {
@@ -194,6 +195,29 @@ function ProductForm({ themeDetail }: IProductFormProps) {
         message.error({ content: 'Theme file is required' });
         return;
       }
+
+      try {
+        if (themeId) {
+          const res = await mintAndListingNFT();
+          await listingThemeServece({
+            nft_token: res.publicKey.toBase58().toString(),
+            themeId: themeId
+          });
+
+          await handleCreateTheme({
+            ...createThemeDto,
+            theme_id: themeId,
+            coverImages: coverImage,
+            fullPreviewImages,
+            detailImages
+          });
+          return;
+        }
+      } catch (error) {
+        console.log(error);
+        message.error({ content: 'Error' });
+      } finally {
+      }
     }
 
     if (isUpdate) {
@@ -203,10 +227,24 @@ function ProductForm({ themeDetail }: IProductFormProps) {
         detailImages,
         coverImages: coverImage
       };
-      handleUpdateTheme({
-        themeId: Number(themeDetail?.id),
-        body: updateThemeDto
-      });
+      try {
+        if (!themeDetail?.token_mint) {
+          const res = await mintAndListingNFT();
+          await listingThemeServece({
+            nft_token: res.publicKey.toBase58().toString(),
+            themeId: themeDetail?.id as any
+          });
+        }
+        handleUpdateTheme({
+          themeId: Number(themeDetail?.id),
+          body: updateThemeDto
+        });
+      } catch (error) {
+        message.error({ content: 'Error' });
+        console.log(error);
+      } finally {
+      }
+
       return;
     }
 
@@ -381,7 +419,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
             className="bg-primary text-white px-[17px] py-[9px] rounded-[14px] ml-4"
           >
             {tab === EProductTab.UPLOAD_FILE || isUpdate
-              ? 'Submit for review'
+              ? 'Submit for review and mint'
               : 'Next step'}
           </button>
         </div>
@@ -498,6 +536,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                           status={
                             errors.percentageOfOwnership?.message ? 'error' : ''
                           }
+                          max={100}
                           size="large"
                           addonBefore="%"
                         />
@@ -917,6 +956,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
           handleFileThemeZip={handleFileThemeZip}
         />
       )}
+      {(isPending || pendingCreate) && <Loading />}
     </form>
   );
 }

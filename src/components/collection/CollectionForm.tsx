@@ -35,6 +35,7 @@ import DoubleLine from '../../../public/assets/icon/DoubleLineIcon';
 import InputMessage from '../common/InputMessage';
 import ChooseProductModal from './ChooseProductModal';
 import CreatorEarning, { IEarning } from './CreatorEarning';
+import { lamportsToSol } from '@/utils/lamports-to-sol';
 
 interface IProductFormProps {
   collectionDetail?: ICollection;
@@ -100,8 +101,14 @@ function CollectionForm({ collectionDetail }: IProductFormProps) {
     if (collectionDetail) {
       setValue('collection_name', collectionDetail.name);
       setValue('description', collectionDetail.description);
-      setValue('sellingPricing', Number(collectionDetail.sellingPricing));
-      setValue('ownershipPrice', Number(collectionDetail.ownershipPrice));
+      setValue(
+        'sellingPricing',
+        Number(lamportsToSol(collectionDetail.sellingPricing))
+      );
+      setValue(
+        'ownershipPrice',
+        Number(lamportsToSol(collectionDetail.ownershipPrice))
+      );
       setValue('percentageOfOwnership', collectionDetail.percentageOfOwnership);
       setValue(
         'highlights',

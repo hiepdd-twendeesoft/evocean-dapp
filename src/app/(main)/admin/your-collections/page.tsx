@@ -3,6 +3,7 @@
 import { INITIAL_PAGE, INITIAL_TAKE } from '@/constants/base';
 import { deleteCollection, fetchCollections } from '@/services/collection';
 import { EQueryKeys } from '@/types/common';
+import { lamportsToSol } from '@/utils/lamports-to-sol';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Pagination, Popconfirm, message } from 'antd';
 import moment from 'moment';
@@ -128,7 +129,7 @@ function YourCollectionPage() {
                         </td>
                         <td className="px-6 py-4">
                           <span className="text-gray-900 ">
-                            ${item.sellingPricing}
+                            ${lamportsToSol(item.sellingPricing)}
                           </span>
                         </td>
                         <td className="px-6 py-4"></td>
