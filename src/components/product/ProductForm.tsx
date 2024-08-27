@@ -742,16 +742,6 @@ function ProductForm({ themeDetail }: IProductFormProps) {
                 </ul>
               )}
             />
-            <div>
-              <p className="text-[20px] font-medium leading-7 mt-[40px]">
-                Add into Collection
-              </p>
-              <div className="mt-[12px]">
-                {collectionRes?.data?.map(collection => (
-                  <CollectionCard collection={collection} key={collection.id} />
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       )}

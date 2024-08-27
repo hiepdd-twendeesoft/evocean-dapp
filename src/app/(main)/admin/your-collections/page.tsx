@@ -83,7 +83,7 @@ function YourCollectionPage() {
                               height={120}
                               alt="thumbnail"
                               src={item.thumbnail}
-                              className="object-cover rounded-lg"
+                              className="object-cover h-[120px] rounded-lg"
                             />
                             <div>
                               <h2>{item.name}</h2>

@@ -142,7 +142,7 @@ const DetailThemePage = () => {
     return response.url as string;
   };
   return (
-    <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16">
+    <div className="min-h-[500px] mx-auto max-w-[1536px] px-4 sm:px-6 lg:px-8 pt-16">
       <ModalBuyOwnership
         ref={refModalBuyOwnership}
         author_address={data?.author_address}
@@ -263,7 +263,7 @@ const DetailThemePage = () => {
             </div>
             <div className="flex items-center mt-6 mb-4">
               <div className="flex flex-1 items-center justify-center">
-                <p className="text-sm font-medium text-gray-900">sale</p>
+                <p className="text-sm font-medium text-gray-900">Sale</p>
                 <img
                   src={'/assets/image/sale.svg'}
                   alt="sale"

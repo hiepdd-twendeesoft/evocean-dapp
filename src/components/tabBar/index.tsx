@@ -55,7 +55,7 @@ const TabBar = () => {
       {domLoaded && (
         <div className="min-h-full">
           <nav className="bg-white border-b-[1px] border-b-slate-200">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-[1536px] px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 items-center justify-between">
                 <div className="flex items-center">
                   <Link href={'/'}>

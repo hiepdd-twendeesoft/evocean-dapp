@@ -43,7 +43,7 @@ const ItemNft: FC<IItemNftProps> = ({
       <img
         src={image || '/assets/image/theme.png'}
         alt="Theme"
-        className="w-[100%] rounded-[16px] border-gray-300 border-[1px] h-[200px]"
+        className="w-[100%] rounded-[16px] border-gray-300 border-[1px] h-[260px] object-cover"
       />
       <h2 className="text-base text-gray-900 font-semibold mt-[12px] line-clamp-1">
         {name || 'DataWise Framer - Multi-Layout SaaS Framer Template'}

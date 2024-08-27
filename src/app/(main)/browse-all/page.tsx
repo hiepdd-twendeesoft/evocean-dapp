@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import ItemNft from "@/components/itemNft";
-import LabelCategory from "../components/LabelCategory";
-import { useFetchTheme } from "@/hooks/useFetchTheme";
-import { Fragment } from "react";
+import ItemNft from '@/components/itemNft';
+import LabelCategory from '../components/LabelCategory';
+import { useFetchTheme } from '@/hooks/useFetchTheme';
+import { Fragment } from 'react';
 
 const BrowseAllPage = () => {
   const { data } = useFetchTheme({ page: 1, take: 8, listing: true });
 
   return (
-    <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <h2 className="text-3xl font-semibold text-slate-800 my-12 max-w-[70%] lg:text-6xl md:text-4xl">
+    <div className="min-h-[500px] mx-auto max-w-[1536px] px-4 sm:px-6 lg:px-8">
+      <h2 className="text-3xl font-semibold text-gray-900 my-12 max-w-[70%] lg:text-6xl md:text-4xl">
         Browse and find your suitable products
       </h2>
       <LabelCategory

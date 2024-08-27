@@ -12,7 +12,7 @@ const HomePage = () => {
   });
 
   return (
-    <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[500px] mx-auto max-w-[1536px] px-4 sm:px-6 lg:px-8">
       <h2 className="text-2xl font-semibold text-slate-800 mt-12 mb-12 max-sm:mb-2 max-w-[70%] max-sm:max-w-[100%] lg:text-6xl md:text-4xl">
         Digital Products resouces to optimize for creative work flow
       </h2>

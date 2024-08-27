@@ -1,40 +1,40 @@
-"use client";
+'use client';
 
-import { MARKET_CONTRACT_ADDRESS } from "@/constants/contract";
-import idl from "@/idl/marketplace.json";
-import { Marketplace } from "@/idl/type";
-import { ItemTheme } from "@/models/common.type";
-import { detailTheme, listTheme } from "@/services/list-theme";
-import { lamportsToSol } from "@/utils/lamports-to-sol";
+import { MARKET_CONTRACT_ADDRESS } from '@/constants/contract';
+import idl from '@/idl/marketplace.json';
+import { Marketplace } from '@/idl/type';
+import { ItemTheme } from '@/models/common.type';
+import { detailTheme, listTheme } from '@/services/list-theme';
+import { lamportsToSol } from '@/utils/lamports-to-sol';
 import {
   AnchorProvider,
   BN,
   Program,
   setProvider,
-  web3,
-} from "@coral-xyz/anchor";
+  web3
+} from '@coral-xyz/anchor';
 import {
   TOKEN_PROGRAM_ID,
-  getAssociatedTokenAddressSync,
-} from "@solana/spl-token";
-import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
-import { PublicKey } from "@solana/web3.js";
-import { useQuery } from "@tanstack/react-query";
-import { useParams, useRouter } from "next/navigation";
-import { Fragment, useState } from "react";
-import { toast } from "react-toastify";
+  getAssociatedTokenAddressSync
+} from '@solana/spl-token';
+import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
+import { PublicKey } from '@solana/web3.js';
+import { useQuery } from '@tanstack/react-query';
+import { useParams, useRouter } from 'next/navigation';
+import { Fragment, useState } from 'react';
+import { toast } from 'react-toastify';
 
 const DetailProduct = () => {
   const { back } = useRouter();
   const { id } = useParams();
   const { connection } = useConnection();
-  const [priceOwner, setPriceOwner] = useState<string>("");
-  const [priceSale, setPriceSale] = useState<string>("");
+  const [priceOwner, setPriceOwner] = useState<string>('');
+  const [priceSale, setPriceSale] = useState<string>('');
 
   const { data, refetch } = useQuery<ItemTheme, Error>({
-    queryKey: ["detailTheme", { id }],
+    queryKey: ['detailTheme', { id }],
     queryFn: () => detailTheme(Number(id)),
-    enabled: !!id,
+    enabled: !!id
   });
 
   const wallet = useAnchorWallet();
@@ -45,34 +45,34 @@ const DetailProduct = () => {
 
   const program = new Program(
     idl as Marketplace,
-    new PublicKey(MARKET_CONTRACT_ADDRESS),
+    new PublicKey(MARKET_CONTRACT_ADDRESS)
   );
 
   const handleList = async () => {
     if (!priceOwner || !priceSale) {
-      return toast.warn("Please cannot empty this field!");
+      return toast.warn('Please cannot empty this field!');
     }
     if (!wallet) {
-      return toast.warn("Not found wallet");
+      return toast.warn('Not found wallet');
     }
     try {
       const tokenMint = new web3.PublicKey(
-        data?.token_mint || "", //token_mint
+        data?.token_mint || '' //token_mint
       );
 
       const [listingAccount] = web3.PublicKey.findProgramAddressSync(
-        [Buffer.from("listing_account_"), tokenMint.toBuffer()],
-        program.programId,
+        [Buffer.from('listing_account_'), tokenMint.toBuffer()],
+        program.programId
       );
 
       const [marketTokenAccount] = web3.PublicKey.findProgramAddressSync(
-        [Buffer.from("market_token_account_"), tokenMint.toBuffer()],
-        program.programId,
+        [Buffer.from('market_token_account_'), tokenMint.toBuffer()],
+        program.programId
       );
 
       const tokenAccount = getAssociatedTokenAddressSync(
         tokenMint,
-        wallet.publicKey,
+        wallet.publicKey
       );
 
       const instruction = await program.methods
@@ -84,7 +84,7 @@ const DetailProduct = () => {
           systemProgram: web3.SystemProgram.programId,
           tokenMint,
           tokenProgram: TOKEN_PROGRAM_ID,
-          userTokenAccount: tokenAccount,
+          userTokenAccount: tokenAccount
         })
         .instruction();
 
@@ -96,13 +96,13 @@ const DetailProduct = () => {
         listing_price: Number(priceOwner) * web3.LAMPORTS_PER_SOL,
         sale_price: Number(priceSale) * web3.LAMPORTS_PER_SOL,
         seller: wallet.publicKey.toBase58(),
-        theme_id: Number(id),
+        theme_id: Number(id)
       });
       refetch();
-      toast.success("List theme successful!");
+      toast.success('List theme successful!');
     } catch (error) {
-      toast.error("List theme fail!");
-      console.error("error list: ", error);
+      toast.error('List theme fail!');
+      console.error('error list: ', error);
     }
   };
 
@@ -110,7 +110,7 @@ const DetailProduct = () => {
   const onChangePriceSale = (event: any) => setPriceSale(event.target.value);
 
   return (
-    <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16">
+    <div className="min-h-[500px] mx-auto max-w-[1536px] px-4 sm:px-6 lg:px-8 pt-16">
       <button
         onClick={back}
         className="border-gray-300 border-[1px] flex items-center px-4 rounded-[12px] h-[40px] group hover:border-indigo-600"
@@ -202,7 +202,7 @@ const DetailProduct = () => {
             </h4>
             <div className="flex items-start mb-6">
               <img
-                src={data?.media?.previews?.[0] || "/assets/image/theme.png"}
+                src={data?.media?.previews?.[0] || '/assets/image/theme.png'}
                 alt="theme"
                 className="w-[126px] h-[88px] rounded-[12px] mr-4"
               />

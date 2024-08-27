@@ -1,9 +1,9 @@
-"use client";
-import ItemNft from "@/components/itemNft";
-import Category from "../../components/Category";
-import { FC, Fragment } from "react";
-import { getCategoryName } from "@/utils/utils";
-import { useFetchTheme } from "@/hooks/useFetchTheme";
+'use client';
+import ItemNft from '@/components/itemNft';
+import Category from '../../components/Category';
+import { FC, Fragment } from 'react';
+import { getCategoryName } from '@/utils/utils';
+import { useFetchTheme } from '@/hooks/useFetchTheme';
 
 interface IProps {
   params: { categoryName: string };
@@ -14,7 +14,7 @@ const CategoryDetailPage: FC<IProps> = ({ params }) => {
   const { data } = useFetchTheme({ page: 1, take: 30, listing: true });
 
   return (
-    <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[500px] mx-auto max-w-[1536px] px-4 sm:px-6 lg:px-8">
       <h2 className="text-3xl font-semibold text-slate-800 mt-12 mb-2 max-w-[70%] lg:text-6xl md:text-4xl">
         {getCategoryName(categoryName)}
       </h2>

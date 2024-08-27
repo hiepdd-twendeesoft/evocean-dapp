@@ -45,7 +45,7 @@ const DetailThemePagePayment = () => {
   };
 
   return (
-    <div className="min-h-[500px] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 flex justify-center">
+    <div className="min-h-[500px] mx-auto max-w-[1536px] px-4 sm:px-6 lg:px-8 pt-16 flex justify-center">
       <MoonPayProvider
         apiKey={process.env.NEXT_PUBLIC_PUBLIC_KEY_MOONPAY ?? ''}
         debug
