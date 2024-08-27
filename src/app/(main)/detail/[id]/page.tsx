@@ -181,7 +181,7 @@ const DetailThemePage = () => {
                     Full preview
                   </p>
                   <img
-                    src={'/assets/image/global.svg'}
+                    src={'/assets/image/eye.svg'}
                     alt="eye"
                     className="w-[18px] ml-2"
                   />
