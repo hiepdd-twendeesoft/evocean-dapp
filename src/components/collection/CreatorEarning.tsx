@@ -80,11 +80,11 @@ const CreatorEarning = ({ handleSaveEarning, form }: ICreatorEarningProps) => {
                       style={{
                         display: 'flex',
                         marginBottom: 8,
-                        alignItems: 'center'
+                        alignItems: 'flex-start'
                       }}
                     >
                       <Form.Item
-                        className="flex-1"
+                        className="flex-1 flex"
                         {...restField}
                         name={[name, 'userId']}
                       >
@@ -110,7 +110,7 @@ const CreatorEarning = ({ handleSaveEarning, form }: ICreatorEarningProps) => {
                           }
                         ]}
                       >
-                        <InputNumber max={100} size="large" suffix="%" />
+                        <InputNumber size="large" suffix="%" />
                       </Form.Item>
                       <Form.Item>
                         <Image

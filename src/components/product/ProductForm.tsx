@@ -203,20 +203,18 @@ function ProductForm({ themeDetail }: IProductFormProps) {
             nft_token: res.publicKey.toBase58().toString(),
             themeId: themeId
           });
-
-          await handleCreateTheme({
-            ...createThemeDto,
-            theme_id: themeId,
-            coverImages: coverImage,
-            fullPreviewImages,
-            detailImages
-          });
-          return;
         }
       } catch (error) {
-        console.log(error);
-        message.error({ content: 'Error' });
+        message.error({ content: JSON.stringify(error) });
       } finally {
+        handleCreateTheme({
+          ...createThemeDto,
+          theme_id: themeId,
+          coverImages: coverImage,
+          fullPreviewImages,
+          detailImages
+        });
+        return;
       }
     }
 
@@ -240,9 +238,13 @@ function ProductForm({ themeDetail }: IProductFormProps) {
           body: updateThemeDto
         });
       } catch (error) {
-        message.error({ content: 'Error' });
-        console.log(error);
+        // message.error({ content: 'Error' });
+        message.error({ content: JSON.stringify(error) });
       } finally {
+        handleUpdateTheme({
+          themeId: Number(themeDetail?.id),
+          body: updateThemeDto
+        });
       }
 
       return;

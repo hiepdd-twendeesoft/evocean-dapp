@@ -20,7 +20,7 @@ import { createCollection, updateCollection } from '@/services/collection';
 import { createCollectionSchema } from '@/validation/admin/collection.validation';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Form, Input, message } from 'antd';
+import { Form, Input, InputNumber, message } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import clsx from 'clsx';
 import { isEmpty, isNil } from 'lodash';
@@ -447,12 +447,14 @@ function CollectionForm({ collectionDetail }: IProductFormProps) {
                     control={control}
                     render={({ field }) => (
                       <div>
-                        <Input
+                        <InputNumber
+                          className="w-full"
                           {...field}
                           status={
                             errors.percentageOfOwnership?.message ? 'error' : ''
                           }
                           size="large"
+                          max={100}
                           addonBefore="%"
                         />
                         <InputMessage
