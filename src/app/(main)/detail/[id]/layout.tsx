@@ -1,15 +1,15 @@
-import { ItemTheme } from "@/models/common.type";
-import { detailTheme } from "@/services/list-theme";
-import { Metadata } from "next";
+import { ItemTheme } from '@/models/common.type';
+import { detailTheme } from '@/services/list-theme';
+import { Metadata } from 'next';
 
 export async function generateMetadata({
-  params,
+  params
 }: {
   params: { id: string };
 }): Promise<Metadata> {
   // read route params
   const id = params.id;
-  const url = `https://evocean-dapp-jet.vercel.app/detail/${id}`;
+  const url = `https://www.moonkits.com/${id}`;
   // fetch data
   const event: ItemTheme = await detailTheme(Number(id));
 
@@ -17,22 +17,22 @@ export async function generateMetadata({
     title: event.name,
     openGraph: {
       title: event.name,
-      type: "website",
+      type: 'website',
       description: event.overview,
       images: [
         {
           url: event?.media?.previews?.[0], // Must be an absolute URL
           width: 800,
-          height: 600,
-        },
+          height: 600
+        }
       ],
-      url,
-    },
+      url
+    }
   };
 }
 
 export default function ThemeLayout({
-  children,
+  children
 }: {
   children: React.ReactNode;
 }) {

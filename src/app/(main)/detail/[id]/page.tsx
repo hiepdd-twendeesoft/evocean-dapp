@@ -15,7 +15,7 @@ import { useAnchorWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import ContentTab from '../components/ContentTab';
@@ -45,6 +45,11 @@ const DetailThemePage = () => {
     queryFn: () => getTheme(Number(id))
   });
 
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   const usdAmount = useConvertDollar(lamportsToSol(data?.sale?.price));
 
   const isBuy = data?.owner_addresses?.some(
@@ -233,34 +238,38 @@ const DetailThemePage = () => {
           <p className="text-gray-600 text-base font-normal mt-1 line-clamp-2">
             {data?.overview}
           </p>
+
           <div className="bg-gray-100 rounded-[20px] p-[12px] mt-8">
-            <div className="flex items-center gap-2">
-              {isLogin && (
-                <button
-                  onClick={() => {
-                    handleBuy();
-                  }}
-                  className="h-[50px] flex-1 flex items-center justify-center rounded-[12px]  border-[1px] cursor-pointer hover:bg-indigo-800 duration-200 bg-indigo-600"
-                >
-                  <p className="text-white font-semibold text-base mr-3">
-                    Buy for {usdAmount}$
+            {isMounted && (
+              <div className="flex items-center gap-2">
+                {isLogin && (
+                  <button
+                    onClick={() => {
+                      handleBuy();
+                    }}
+                    className="h-[50px] flex-1 flex items-center justify-center rounded-[12px]  border-[1px] cursor-pointer hover:bg-indigo-800 duration-200 bg-indigo-600"
+                  >
+                    <p className="text-white font-semibold text-base mr-3">
+                      Buy for {usdAmount}$
+                    </p>
+                  </button>
+                )}
+                <button className="h-[50px] flex gap-[12px] border-indigo-600 border-[1px] flex-1 items-center justify-center cursor-pointer rounded-[12px] hover:scale-105 duration-200">
+                  <p
+                    className="text-base font-semibold text-indigo-600"
+                    onClick={handleBuySol}
+                  >
+                    Buy for {lamportsToSol(data?.sale?.price)} SOL
                   </p>
+                  <img
+                    src={'/assets/image/SOL.svg'}
+                    alt="SOL"
+                    className="w-[20px]"
+                  />
                 </button>
-              )}
-              <button className="h-[50px] flex gap-[12px] border-indigo-600 border-[1px] flex-1 items-center justify-center cursor-pointer rounded-[12px] hover:scale-105 duration-200">
-                <p
-                  className="text-base font-semibold text-indigo-600"
-                  onClick={handleBuySol}
-                >
-                  Buy for {lamportsToSol(data?.sale?.price)} SOL
-                </p>
-                <img
-                  src={'/assets/image/SOL.svg'}
-                  alt="SOL"
-                  className="w-[20px]"
-                />
-              </button>
-            </div>
+              </div>
+            )}
+
             <div className="flex items-center mt-6 mb-4">
               <div className="flex flex-1 items-center justify-center">
                 <p className="text-sm font-medium text-gray-900">Sale</p>
@@ -287,6 +296,7 @@ const DetailThemePage = () => {
               </div>
             </div>
           </div>
+
           <div className="mt-10 border-t-gray-200 border-t-[1px] pt-10 flex items-center">
             <p className="text-sm text-gray-500 font-medium">Owner</p>
             <img

@@ -2,10 +2,12 @@
 import { Route } from '@/constants/route';
 import useBalance from '@/hooks/useBalance';
 import useLoginWallet from '@/hooks/useLoginWallet';
+import { Strorages } from '@/models/storage.enum';
 import { RootState, authActions } from '@/store/slices';
 import { useAppDispatch } from '@/store/store';
 import { shortenAddress } from '@/utils/helper';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { deleteCookie } from 'cookies-next';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Fragment, useCallback, useEffect, useState } from 'react';
@@ -41,6 +43,8 @@ const TabBar = () => {
   const handleSignOut = useCallback(() => {
     onDisconnect();
     dispatch(authActions.logout());
+    deleteCookie(Strorages.RefreshToken);
+    deleteCookie(Strorages.AccessToken);
     router.push('/', { scroll: false });
     setShowSetting(false);
   }, [dispatch, onDisconnect, router]);
