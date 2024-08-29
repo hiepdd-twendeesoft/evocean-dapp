@@ -9,13 +9,8 @@ import { walletLogin } from '@/services/auth';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 
-interface useLoginWalletProps {
-  isGoogleLogin?: boolean;
-}
-
-const useLoginWallet = (isGoogleLogin?: boolean) => {
-  const { connect, select, publicKey, disconnect, signIn, signMessage } =
-    useWallet();
+const useLoginWallet = () => {
+  const { connect, select, publicKey, disconnect } = useWallet();
   const { accountInfo } = useSelector((state: RootState) => state.auth);
   const dispatch = useAppDispatch();
   const [connected, setConnected] = useState(false);
@@ -24,8 +19,7 @@ const useLoginWallet = (isGoogleLogin?: boolean) => {
   const onConnectWallet = async () => {
     try {
       select(PhantomWalletName);
-      await signIn!();
-      // await connect();
+      await connect();
     } catch (error) {}
   };
 
@@ -53,7 +47,7 @@ const useLoginWallet = (isGoogleLogin?: boolean) => {
   }, [accountInfo?.id, disconnect, dispatch, publicKey]);
 
   useEffect(() => {
-    if (publicKey && !isGoogleLogin) {
+    if (publicKey) {
       handleLoginWithWallet();
     }
   }, [publicKey]);

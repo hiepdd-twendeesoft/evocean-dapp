@@ -47,8 +47,6 @@ export interface ItemTheme {
   themeTags: { tag: IThemCategory }[];
   themeFeatures: ThemeFeature[];
   linkPreview: string;
-  selling_price: number;
-  owner_price: number;
 }
 
 export type TransactionTheme = {

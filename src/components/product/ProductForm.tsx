@@ -72,7 +72,6 @@ function ProductForm({ themeDetail }: IProductFormProps) {
   const [status, setStatus] = useState<EThemeStatus>(EThemeStatus.DRAFT);
   const [fileTypeSelect, setFileTypeSelect] = useState<IThemeFeatureType[]>([]);
   const [themeId, setThemeId] = useState();
-  const [ownerPrice, setOwnerPrice] = useState<number>(0);
   const router = useRouter();
   const { mintAndListingNFT } = useMintAndListingNFT();
 
@@ -149,7 +148,6 @@ function ProductForm({ themeDetail }: IProductFormProps) {
         return;
       }
       setThemeId(data?.data.themeId || data.data.id);
-      setOwnerPrice(data.owner_price);
 
       if (tab !== EProductTab.UPLOAD_FILE) {
         setTab((preState: EProductTab) => {
@@ -200,9 +198,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
 
       try {
         if (themeId) {
-          const res = await mintAndListingNFT(
-            ownerPrice || Number(themeDetail?.owner_price)
-          );
+          const res = await mintAndListingNFT();
           await listingThemeServece({
             nft_token: res.publicKey.toBase58().toString(),
             themeId: themeId
@@ -231,9 +227,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
       };
       try {
         if (!themeDetail?.token_mint) {
-          const res = await mintAndListingNFT(
-            ownerPrice || Number(themeDetail?.owner_price)
-          );
+          const res = await mintAndListingNFT();
           await listingThemeServece({
             nft_token: res.publicKey.toBase58().toString(),
             themeId: themeDetail?.id as any

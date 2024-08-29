@@ -81,7 +81,6 @@ const ModalBuyOwnership = forwardRef(
     const show = useCallback(() => {
       setShowModal(true);
     }, []);
-
     const close = useCallback(() => {
       setStep(0);
       setShowModal(false);
@@ -173,7 +172,7 @@ const ModalBuyOwnership = forwardRef(
       const instruction = await program.methods
         .buy()
         .accounts({
-          buyer: provider.wallet.publicKey.toBase58(),
+          buyer: provider.wallet.publicKey,
           seller,
           listingAccount,
           marketTokenAccount,
@@ -186,13 +185,11 @@ const ModalBuyOwnership = forwardRef(
 
       const transaction = new web3.Transaction().add(instruction);
 
-      const signature = await provider.sendAndConfirm(transaction);
+      await provider.sendAndConfirm(transaction);
 
       await buyLicenseTheme({
         buyer: provider.wallet.publicKey.toBase58(),
-        theme_id,
-        tx_id: signature,
-        currency: 'sol'
+        theme_id
       });
       refetch?.();
       toast.success('Buy ownership successful');

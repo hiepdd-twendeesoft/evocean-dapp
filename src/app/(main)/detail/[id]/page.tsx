@@ -45,7 +45,7 @@ const DetailThemePage = () => {
     queryFn: () => getTheme(Number(id))
   });
 
-  const usdAmount = useConvertDollar(lamportsToSol(data?.selling_price));
+  const usdAmount = useConvertDollar(lamportsToSol(data?.sale?.price));
 
   const isBuy = data?.owner_addresses?.some(
     item => item === wallet?.publicKey?.toBase58()
@@ -106,17 +106,15 @@ const DetailThemePage = () => {
         SystemProgram.transfer({
           fromPubkey: provider.wallet.publicKey,
           toPubkey: new PublicKey(data.author_address),
-          lamports: Number(data.selling_price)
+          lamports: Number(data.sale.price)
         })
       );
 
-      const signature = await provider.sendAndConfirm(transaction);
+      const signal = await provider.sendAndConfirm(transaction);
 
       await buyTheme({
         buyer: provider.wallet.publicKey.toBase58(),
-        theme_id: data.id,
-        tx_id: signature,
-        currency: 'sol'
+        theme_id: data.id
       });
       refetch();
       toast.success('Buy success');
@@ -152,7 +150,7 @@ const DetailThemePage = () => {
         theme_id={data?.id}
         name={data?.name}
         image={data?.media?.previews?.[0]}
-        priceOwner={lamportsToSol(data?.owner_price)}
+        priceOwner={lamportsToSol(data?.listing?.price)}
         refetch={refetch}
       />
       <div className="flex items-start justify-between max-md:flex-col mb-12">
@@ -254,7 +252,7 @@ const DetailThemePage = () => {
                   className="text-base font-semibold text-indigo-600"
                   onClick={handleBuySol}
                 >
-                  Buy for {lamportsToSol(data?.selling_price)} SOL
+                  Buy for {lamportsToSol(data?.sale?.price)} SOL
                 </p>
                 <img
                   src={'/assets/image/SOL.svg'}
@@ -323,11 +321,11 @@ const DetailThemePage = () => {
                   alt="SOL"
                   className="w-[14px] mr-[4px]"
                 />{' '}
-                {lamportsToSol(data?.owner_price)}
+                {lamportsToSol(data?.listing?.price)}
               </p>
             </div>
             <p className="text-sm text-gray-500 font-medium ml-[6px]">
-              {`($ ${useConvertDollar(lamportsToSol(data?.owner_price))})`}
+              {`($ ${useConvertDollar(lamportsToSol(data?.listing?.price))})`}
             </p>
           </div>
           <div className="mt-1 flex gap-1">

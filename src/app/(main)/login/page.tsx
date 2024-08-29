@@ -16,7 +16,7 @@ type Props = {};
 const LoginPage = (props: Props) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { onConnectWallet } = useLoginWallet(true);
+  const { onConnectWallet } = useLoginWallet();
   const { accountInfo } = useSelector((state: RootState) => state.auth);
 
   const quickRegisterRedirect = (

@@ -24,7 +24,7 @@ function useMintAndListingNFT() {
 
   let associatedToken: web3.PublicKey;
 
-  const mintAndListingNFT = async (owner_price: number) => {
+  const mintAndListingNFT = async () => {
     const tx = new web3.Transaction();
 
     const lamports = await getMinimumBalanceForRentExemptMint(
@@ -98,7 +98,7 @@ function useMintAndListingNFT() {
 
       tx.add(
         await program.methods
-          .list(new BN(owner_price * web3.LAMPORTS_PER_SOL))
+          .list(new BN(10 * web3.LAMPORTS_PER_SOL))
           .accountsStrict({
             listingAccount,
             marketTokenAccount,
@@ -112,8 +112,6 @@ function useMintAndListingNFT() {
       );
     }
     await provider.sendAndConfirm(tx, [mint]);
-
-    // await program.account.listing.fetch(listingAccount)
     return mint;
   };
 
