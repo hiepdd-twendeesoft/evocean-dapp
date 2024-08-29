@@ -1,7 +1,7 @@
-import { getCryptoPrice } from "@/services/get-crypto-price";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { getCryptoPrice } from '@/services/get-crypto-price';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { useEffect, useMemo, useState } from 'react';
 
 const useConvertDollar = (price: number) => {
   // const { data } = useQuery({
@@ -14,9 +14,9 @@ const useConvertDollar = (price: number) => {
   // });
 
   const { data } = useQuery({
-    queryKey: ["get-scrypto-price"],
-    queryFn: () => getCryptoPrice("solana"),
-    enabled: !!price,
+    queryKey: ['get-scrypto-price'],
+    queryFn: () => getCryptoPrice('solana'),
+    enabled: !!price
   });
 
   const value = useMemo(() => {
