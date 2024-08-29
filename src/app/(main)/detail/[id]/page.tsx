@@ -50,7 +50,7 @@ const DetailThemePage = () => {
   useEffect(() => {
     setIsMounted(true);
   }, []);
-  const usdAmount = useConvertDollar(lamportsToSol(data?.sale?.price));
+  const usdAmount = useConvertDollar(lamportsToSol(data?.selling_price));
 
   const isBuy = data?.owner_addresses?.some(
     item => item === wallet?.publicKey?.toBase58()
