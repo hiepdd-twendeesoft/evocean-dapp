@@ -111,15 +111,17 @@ const DetailThemePage = () => {
         SystemProgram.transfer({
           fromPubkey: provider.wallet.publicKey,
           toPubkey: new PublicKey(data.author_address),
-          lamports: Number(data.sale.price)
+          lamports: Number(data.selling_price)
         })
       );
 
-      const signal = await provider.sendAndConfirm(transaction);
+      const signature = await provider.sendAndConfirm(transaction);
 
       await buyTheme({
         buyer: provider.wallet.publicKey.toBase58(),
-        theme_id: data.id
+        theme_id: data.id,
+        tx_id: signature,
+        currency: 'sol'
       });
       refetch();
       toast.success('Buy success');
@@ -155,7 +157,7 @@ const DetailThemePage = () => {
         theme_id={data?.id}
         name={data?.name}
         image={data?.media?.previews?.[0]}
-        priceOwner={lamportsToSol(data?.listing?.price)}
+        priceOwner={lamportsToSol(data?.owner_price)}
         refetch={refetch}
       />
       <div className="flex items-start justify-between max-md:flex-col mb-12">
@@ -259,7 +261,7 @@ const DetailThemePage = () => {
                     className="text-base font-semibold text-indigo-600"
                     onClick={handleBuySol}
                   >
-                    Buy for {lamportsToSol(data?.sale?.price)} SOL
+                    Buy for {lamportsToSol(data?.selling_price)} SOL
                   </p>
                   <img
                     src={'/assets/image/SOL.svg'}
@@ -331,11 +333,11 @@ const DetailThemePage = () => {
                   alt="SOL"
                   className="w-[14px] mr-[4px]"
                 />{' '}
-                {lamportsToSol(data?.listing?.price)}
+                {lamportsToSol(data?.owner_price)}
               </p>
             </div>
             <p className="text-sm text-gray-500 font-medium ml-[6px]">
-              {`($ ${useConvertDollar(lamportsToSol(data?.listing?.price))})`}
+              {`($ ${useConvertDollar(lamportsToSol(data?.owner_price))})`}
             </p>
           </div>
           <div className="mt-1 flex gap-1">
