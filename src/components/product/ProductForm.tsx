@@ -244,9 +244,7 @@ function ProductForm({ themeDetail }: IProductFormProps) {
           body: updateThemeDto
         });
       } catch (error) {
-        // message.error({ content: 'Error' });
         message.error({ content: JSON.stringify(error) });
-      } finally {
         handleUpdateTheme({
           themeId: Number(themeDetail?.id),
           body: updateThemeDto

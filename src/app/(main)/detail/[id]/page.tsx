@@ -221,7 +221,7 @@ const DetailThemePage = () => {
             {data?.categories.map((item, index) => (
               <div
                 key={index}
-                className="h-[28px] bg-indigo-100 rounded-[12px] px-[16px] mr-[12px] flex items-center justify-center"
+                className="h-[28px] bg-indigo-100 rounded-[12px] px-[16px] mr-[12px] flex items-center justify-center mb-2"
               >
                 <p className="text-sm text-indigo-800 font-medium">
                   {item.name}

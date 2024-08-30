@@ -8,8 +8,12 @@ export const googleLoginAction = createAsyncThunk(
   'auth/loginAction',
   async (payload: AuthResponse, { fulfillWithValue, rejectWithValue }) => {
     if (payload) {
-      setCookie(Strorages.AccessToken, payload.accessToken);
-      setCookie(Strorages.RefreshToken, payload.refreshToken);
+      setCookie(Strorages.AccessToken, payload.accessToken, {
+        expires: undefined
+      });
+      setCookie(Strorages.RefreshToken, payload.refreshToken, {
+        expires: undefined
+      });
       return fulfillWithValue(payload);
     }
     return rejectWithValue({});

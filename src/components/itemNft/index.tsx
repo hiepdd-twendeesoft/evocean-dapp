@@ -22,6 +22,7 @@ const ItemNft: FC<IItemNftProps> = ({
   sale,
   hidePrice,
   listing,
+  owner_price,
   categories
 }) => {
   const router = useRouter();
@@ -80,7 +81,7 @@ const ItemNft: FC<IItemNftProps> = ({
               className="w-[14px] h-[14px]"
             />
             <p className="font-medium text-gray-900 text-sm ml-[4px]">
-              {lamportsToSol(listing?.price)}
+              {lamportsToSol(owner_price)}
             </p>
           </div>
         </div>

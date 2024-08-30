@@ -25,6 +25,7 @@ const BrowseAllPage = () => {
                 key={index}
                 id={item.id}
                 name={item.name}
+                owner_price={item.owner_price}
                 sale={item.sale}
                 image={item.media?.previews?.[0]}
               />
