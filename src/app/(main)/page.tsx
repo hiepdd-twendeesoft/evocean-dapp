@@ -29,10 +29,10 @@ const HomePage = () => {
               <ItemNft
                 key={index}
                 id={item.id}
+                owner_price={item.owner_price}
+                selling_price={item.selling_price}
                 name={item.name}
                 image={item.media?.previews?.[0]}
-                sale={item.sale}
-                listing={item.listing}
               />
             ))}
           </Fragment>

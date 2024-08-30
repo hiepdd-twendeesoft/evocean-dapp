@@ -1,23 +1,23 @@
-import ItemNft from "@/components/itemNft";
-import { Route } from "@/constants/route";
-import { useFetchTheme } from "@/hooks/useFetchTheme";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useRouter } from "next/navigation";
-import { Fragment, useCallback } from "react";
+import ItemNft from '@/components/itemNft';
+import { Route } from '@/constants/route';
+import { useFetchTheme } from '@/hooks/useFetchTheme';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { useRouter } from 'next/navigation';
+import { Fragment, useCallback } from 'react';
 
 const TabPurchase = () => {
   const router = useRouter();
   const { publicKey } = useWallet();
   const { data } = useFetchTheme(
     { page: 1, take: 60, owner: publicKey?.toBase58() },
-    !publicKey,
+    !publicKey
   );
 
   const handleItem = useCallback(
     (id: number) => {
       router.push(`${Route.DETAIL_PRODUCT}/${id}`);
     },
-    [router],
+    [router]
   );
 
   return (
@@ -31,6 +31,8 @@ const TabPurchase = () => {
               name={item.name}
               image={item.media?.previews?.[0]}
               handleItem={handleItem}
+              owner_price={item.owner_price}
+              selling_price={item.selling_price}
               hidePrice
             />
           ))}

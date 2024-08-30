@@ -19,15 +19,14 @@ const ItemNft: FC<IItemNftProps> = ({
   image,
   name,
   id,
-  sale,
   hidePrice,
-  listing,
+  selling_price,
   owner_price,
   categories
 }) => {
   const router = useRouter();
 
-  const priceDollar = useConvertDollar(lamportsToSol(sale?.price));
+  const priceDollar = useConvertDollar(lamportsToSol(selling_price));
 
   const _handleItem = () => {
     if (handleItem && id) {
@@ -63,7 +62,7 @@ const ItemNft: FC<IItemNftProps> = ({
                 className="w-[14px] h-[14px]"
               />
               <p className="font-medium text-gray-900 text-sm ml-[4px]">
-                {lamportsToSol(sale?.price)}
+                {lamportsToSol(selling_price)}
               </p>
             </div>
             <p className="font-medium text-gray-500 text-sm">

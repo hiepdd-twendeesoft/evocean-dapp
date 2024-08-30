@@ -26,7 +26,7 @@ const BrowseAllPage = () => {
                 id={item.id}
                 name={item.name}
                 owner_price={item.owner_price}
-                sale={item.sale}
+                selling_price={item.selling_price}
                 image={item.media?.previews?.[0]}
               />
             ))}
@@ -42,7 +42,8 @@ const BrowseAllPage = () => {
                 key={index}
                 id={item.id}
                 name={item.name}
-                sale={item.sale}
+                owner_price={item.owner_price}
+                selling_price={item.selling_price}
                 image={item.media?.previews?.[0]}
               />
             ))}
@@ -61,7 +62,8 @@ const BrowseAllPage = () => {
                 key={index}
                 id={item.id}
                 name={item.name}
-                sale={item.sale}
+                owner_price={item.owner_price}
+                selling_price={item.selling_price}
                 image={item.media?.previews?.[0]}
               />
             ))}
@@ -77,7 +79,8 @@ const BrowseAllPage = () => {
                 key={index}
                 id={item.id}
                 name={item.name}
-                sale={item.sale}
+                owner_price={item.owner_price}
+                selling_price={item.selling_price}
                 image={item.media?.previews?.[0]}
               />
             ))}
