@@ -10,8 +10,9 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { deleteCookie } from 'cookies-next';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useOnClickOutside } from 'usehooks-ts';
 
 const TabBar = () => {
   const pathname = usePathname();
@@ -28,6 +29,7 @@ const TabBar = () => {
   const [showOption, setShowOption] = useState<boolean>(false);
   const [showSetting, setShowSetting] = useState<boolean>(false);
   const balance = useBalance(publicKey);
+  const ref = useRef(null);
 
   useEffect(() => {
     setDomLoaded(true);
@@ -40,6 +42,10 @@ const TabBar = () => {
   const handleOption = useCallback(() => {
     setShowOption(prev => !prev);
   }, []);
+
+  useOnClickOutside(ref, () => {
+    setShowSetting(false);
+  });
 
   const handleSignOut = useCallback(() => {
     onDisconnect();
@@ -180,7 +186,10 @@ const TabBar = () => {
                       </div>
                     </div>
                     {isLogin ? (
-                      <div className="cursor-pointer flex items-center justify-center gap-2">
+                      <div
+                        ref={ref}
+                        className="cursor-pointer flex items-center justify-center gap-2"
+                      >
                         <div className="relative">
                           <div
                             onClick={() => setShowSetting(!showSetting)}
